@@ -20,7 +20,7 @@ export function Navigation() {
         <Link href="/" className="text-2xl font-bold text-primary tracking-tight">
           FastTrack
         </Link>
-        <nav className="flex items-center gap-4 sm:gap-6">
+        <nav className="flex items-center gap-4 sm:gap-6 md:pr-12">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
