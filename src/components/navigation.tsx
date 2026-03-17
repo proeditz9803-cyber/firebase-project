@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from 'next/link';
@@ -20,7 +21,7 @@ export function Navigation() {
         <Link href="/" className="text-2xl font-bold text-primary tracking-tight">
           FastTrack
         </Link>
-        <nav className="flex items-center gap-4 sm:gap-6 md:pr-12">
+        <nav className="flex items-center gap-4 sm:gap-8 md:pr-32 lg:pr-48">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
