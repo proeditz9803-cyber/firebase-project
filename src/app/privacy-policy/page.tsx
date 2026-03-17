@@ -9,7 +9,7 @@ export default function PrivacyPolicyPage() {
       {/* Brand Header - Identical styling to About page */}
       <section className="text-center space-y-6">
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
-          Privacy & Legal
+          Privacy & Legal Terms
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
           FastTrack
