@@ -7,7 +7,7 @@ export default function AboutPage() {
     { icon: Timer, label: 'fasting based guide and tips' },
     { icon: Brain, label: 'mental clarity and discipline' },
     { icon: Zap, label: 'productive and healthy lifestyle' },
-    { icon: Heart, label: 'Mental wellness and mindfulness content' },
+    { icon: Heart, label: 'Mental wellness and mindful content' },
     { icon: Star, label: 'Motivation and lifestyle inspiration' },
   ];
 
