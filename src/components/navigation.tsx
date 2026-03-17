@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Timer, ClipboardList, BookOpen } from 'lucide-react';
+import { Timer, ClipboardList, BookOpen, Info } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -12,6 +12,7 @@ export function Navigation() {
     { href: '/', label: 'Timer', icon: Timer },
     { href: '/log', label: 'Log', icon: ClipboardList },
     { href: '/guide', label: 'Guide', icon: BookOpen },
+    { href: '/about', label: 'About', icon: Info },
   ];
 
   return (
@@ -20,7 +21,7 @@ export function Navigation() {
         <Link href="/" className="text-2xl font-bold text-primary tracking-tight">
           FastTrack
         </Link>
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-4 sm:gap-6">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
