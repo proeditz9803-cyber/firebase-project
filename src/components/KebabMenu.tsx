@@ -23,7 +23,7 @@ export default function KebabMenu() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <div className="fixed top-20 right-4 z-[100]" ref={menuRef}>
+    <div className="fixed top-[72px] right-4 z-[100]" ref={menuRef}>
       <button
         onClick={toggleMenu}
         className={cn(
