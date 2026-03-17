@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Timer, ClipboardList, BookOpen, Info } from 'lucide-react';
+import { Timer, ClipboardList, BookOpen } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -12,7 +12,6 @@ export function Navigation() {
     { href: '/', label: 'Timer', icon: Timer },
     { href: '/log', label: 'Log', icon: ClipboardList },
     { href: '/guide', label: 'Guide', icon: BookOpen },
-    { href: '/about', label: 'About', icon: Info },
   ];
 
   return (
