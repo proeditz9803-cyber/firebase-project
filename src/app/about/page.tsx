@@ -1,14 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dumbbell, Apple, Brain, Star, Zap, ShieldCheck, Heart } from 'lucide-react';
+import { Timer, Brain, Zap, Heart, Star, ShieldCheck } from 'lucide-react';
 
 export default function AboutPage() {
   const coverageItems = [
-    { icon: Dumbbell, label: 'Expert fitness tips and workout guides' },
-    { icon: Apple, label: 'Nutrition and diet advice' },
-    { icon: Brain, label: 'Mental wellness and mindfulness content' },
-    { icon: Star, label: 'Product reviews and recommendations' },
-    { icon: Zap, label: 'Motivation and lifestyle inspiration' },
+    { icon: Timer, label: 'fasting based guide and tips' },
+    { icon: Brain, label: 'mental clarity and discipline' },
+    { icon: Zap, label: 'productive and healthy lifestyle' },
+    { icon: Heart, label: 'Mental wellness and mindfulness content' },
+    { icon: Star, label: 'Motivation and lifestyle inspiration' },
   ];
 
   return (
@@ -42,7 +42,10 @@ export default function AboutPage() {
 
       {/* 3. What We Cover */}
       <section className="space-y-8">
-        <h2 className="text-3xl font-bold text-center tracking-tight">What We Cover</h2>
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">What We Cover</h2>
+          <p className="text-muted-foreground">At FastTrack we provide specialized guidance in key wellness areas:</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {coverageItems.map((item, index) => (
             <Card key={index} className="bg-card/50 border-border/50 hover:border-primary/50 transition-colors group">
