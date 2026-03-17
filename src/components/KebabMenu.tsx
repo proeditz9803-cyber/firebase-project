@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -23,11 +24,11 @@ export default function KebabMenu() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <div className="fixed top-[72px] right-4 z-[100]" ref={menuRef}>
+    <div className="fixed top-3.5 right-4 z-[100]" ref={menuRef}>
       <button
         onClick={toggleMenu}
         className={cn(
-          "p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-none border border-transparent focus:outline-none",
+          "p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-md border border-transparent focus:outline-none",
           isOpen && "bg-primary/10 text-primary border-primary/20 shadow-sm"
         )}
         aria-label="Menu"
@@ -37,7 +38,7 @@ export default function KebabMenu() {
 
       <div
         className={cn(
-          "absolute top-full right-0 mt-2 w-48 bg-popover border border-border shadow-2xl rounded-none overflow-hidden transition-all duration-300 ease-out origin-top-right",
+          "absolute top-full right-0 mt-2 w-48 bg-popover border border-border shadow-2xl rounded-md overflow-hidden transition-all duration-300 ease-out origin-top-right",
           isOpen 
             ? "opacity-100 scale-100 translate-y-0" 
             : "opacity-0 scale-95 -translate-y-4 pointer-events-none"
@@ -46,14 +47,14 @@ export default function KebabMenu() {
         <Link
           href="/about"
           onClick={closeMenu}
-          className="block px-4 py-4 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           About Us
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
-          className="block px-4 py-4 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           Privacy Policy
         </Link>
