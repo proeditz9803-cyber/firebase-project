@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -24,7 +23,7 @@ export default function KebabMenu() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <div className="fixed top-3.5 right-4 z-[100]" ref={menuRef}>
+    <div className="fixed top-3.5 left-4 z-[100]" ref={menuRef}>
       <button
         onClick={toggleMenu}
         className={cn(
@@ -38,7 +37,7 @@ export default function KebabMenu() {
 
       <div
         className={cn(
-          "absolute top-full right-0 mt-2 w-48 bg-popover border border-border shadow-2xl rounded-md overflow-hidden transition-all duration-300 ease-out origin-top-right",
+          "absolute top-full left-0 mt-2 w-48 bg-popover border border-border shadow-2xl rounded-md overflow-hidden transition-all duration-300 ease-out origin-top-left",
           isOpen 
             ? "opacity-100 scale-100 translate-y-0" 
             : "opacity-0 scale-95 -translate-y-4 pointer-events-none"

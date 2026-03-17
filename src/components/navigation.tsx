@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from 'next/link';
@@ -18,9 +17,11 @@ export function Navigation() {
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-primary tracking-tight">
-          FastTrack
-        </Link>
+        <div className="flex items-center gap-10">
+          <Link href="/" className="text-2xl font-bold text-primary tracking-tight pl-10">
+            FastTrack
+          </Link>
+        </div>
         <nav className="flex items-center gap-4 sm:gap-8 md:pr-32 lg:pr-48">
           {navLinks.map((link) => {
             const Icon = link.icon;
