@@ -23,12 +23,12 @@ export default function KebabMenu() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <div className="fixed top-2 right-2 z-[100]" ref={menuRef}>
+    <div className="fixed top-4 right-4 z-[100]" ref={menuRef}>
       <button
         onClick={toggleMenu}
         className={cn(
-          "p-1.5 text-foreground/70 hover:text-foreground hover:bg-foreground/10 transition-all rounded-none focus:outline-none",
-          isOpen && "bg-foreground/10 text-foreground"
+          "p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-full focus:outline-none",
+          isOpen && "bg-primary/10 text-primary"
         )}
         aria-label="Menu"
       >
@@ -37,7 +37,7 @@ export default function KebabMenu() {
 
       <div
         className={cn(
-          "absolute top-full right-0 mt-1 w-44 bg-white border border-gray-200 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] rounded-none overflow-hidden transition-all duration-200 ease-out origin-top-right",
+          "absolute top-full right-0 mt-2 w-48 bg-popover border border-border shadow-xl rounded-lg overflow-hidden transition-all duration-200 ease-out origin-top-right",
           isOpen 
             ? "opacity-100 scale-100 translate-y-0" 
             : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
@@ -46,14 +46,14 @@ export default function KebabMenu() {
         <Link
           href="/about"
           onClick={closeMenu}
-          className="block px-5 py-3 text-black font-bold text-xs hover:bg-gray-100 transition-colors uppercase tracking-wider"
+          className="block px-4 py-3 text-sm font-medium text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           About Us
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
-          className="block px-5 py-3 text-black font-bold text-xs border-t border-gray-100 hover:bg-gray-100 transition-colors uppercase tracking-wider"
+          className="block px-4 py-3 text-sm font-medium text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           Privacy Policy
         </Link>
