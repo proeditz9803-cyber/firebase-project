@@ -1,17 +1,26 @@
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 
 export default function PrivacyPolicyPage() {
   const effectiveDate = "October 27, 2023";
 
   return (
     <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">
-      {/* Header */}
-      <header className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">Privacy Policy</h1>
-        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-          Effective Date: {effectiveDate}
-        </p>
-      </header>
+      {/* Brand Header - Identical styling to About page */}
+      <section className="text-center space-y-6">
+        <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
+          Privacy & Legal
+        </Badge>
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
+          FastTrack
+        </h1>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">Privacy Policy</h2>
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Effective Date: {effectiveDate}
+          </p>
+        </div>
+      </section>
 
       {/* 1. Introduction */}
       <section className="space-y-4">
