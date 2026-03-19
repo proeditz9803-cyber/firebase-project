@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Timer, ClipboardList, BookOpen } from 'lucide-react';
+import { LogoToggle } from './LogoToggle';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -17,10 +18,9 @@ export function Navigation() {
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-10">
-          <Link href="/" className="text-2xl font-bold text-primary tracking-tight pl-10">
-            FasTrack
-          </Link>
+        <div className="flex items-center">
+          {/* Replaced static Link with interactive LogoToggle component */}
+          <LogoToggle />
         </div>
         <nav className="flex items-center gap-4 sm:gap-8 md:pr-32 lg:pr-48">
           {navLinks.map((link) => {
