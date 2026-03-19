@@ -1,54 +1,69 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
  * LogoToggle Component
- * Implements a premium "Letter Pop" reveal animation where characters
- * cascade out downwards and pop back up in a staggered sequence.
+ * Implements a premium "Letter Pop" reveal animation with precise 
+ * synchronization between visual design changes and motion.
  */
 export function LogoToggle() {
-  const [isProfessional, setIsProfessional] = useState(false);
-  const [animPhase, setAnimPhase] = useState<'idle' | 'exiting' | 'entering'>('idle');
-  const isAnimating = useRef(false);
+  // Separate animation trigger state from design toggle state
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isToggled, setIsToggled] = useState(false);
+  
+  // Refs for tracking animation lock and cleaning up timeouts
+  const isAnimatingRef = useRef(false);
+  const startToggledRef = useRef(false);
+  const midpointTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const endTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const logoText = "FasTrack";
   const letters = logoText.split("");
   const staggerDelay = 40; // 40ms stagger between letters
   const letterDuration = 200; // 200ms per letter animation
-  const phaseDuration = (letters.length - 1) * staggerDelay + letterDuration;
+  
+  // Dynamically calculate timing based on character count
+  // midpoint = time when the last outgoing letter finishes its 200ms exit
+  const midpoint = (letters.length - 1) * staggerDelay + letterDuration;
+  const totalDuration = midpoint * 2 + 20; // total cycle time + 20ms buffer
+
+  // Cleanup timeouts on unmount to prevent memory leaks or stale state updates
+  useEffect(() => {
+    return () => {
+      if (midpointTimeoutRef.current) clearTimeout(midpointTimeoutRef.current);
+      if (endTimeoutRef.current) clearTimeout(endTimeoutRef.current);
+    };
+  }, []);
 
   const handleToggle = useCallback((e: React.MouseEvent | React.KeyboardEvent) => {
-    // Keyboard accessibility
+    // Keyboard accessibility for Enter and Space keys
     if ('key' in e) {
       const ke = e as React.KeyboardEvent;
       if (ke.key !== 'Enter' && ke.key !== ' ') return;
       e.preventDefault();
     }
 
-    // Prevent interruption during active animation
-    if (isAnimating.current) return;
+    // Prevent interruption during an active animation cycle
+    if (isAnimatingRef.current) return;
 
-    isAnimating.current = true;
-    
-    // Step 1: Start Exit Animation
-    setAnimPhase('exiting');
+    isAnimatingRef.current = true;
+    startToggledRef.current = isToggled;
+    setIsAnimating(true);
 
-    // Step 2: Swap state mid-way after exit completes
-    setTimeout(() => {
-      setIsProfessional((prev) => !prev);
-      setAnimPhase('entering');
+    // Step 2: Trigger design change at the exact invisible midpoint seam
+    midpointTimeoutRef.current = setTimeout(() => {
+      setIsToggled(prev => !prev);
+    }, midpoint);
 
-      // Step 3: Return to idle after enter completes
-      setTimeout(() => {
-        setAnimPhase('idle');
-        isAnimating.current = false;
-      }, phaseDuration);
+    // Step 3: Reset animation state after the full cycle (outgoing + incoming) completes
+    endTimeoutRef.current = setTimeout(() => {
+      setIsAnimating(false);
+      isAnimatingRef.current = false;
+    }, totalDuration);
 
-    }, phaseDuration);
-
-  }, [phaseDuration]);
+  }, [isToggled, midpoint, totalDuration]);
 
   return (
     <div
@@ -61,46 +76,32 @@ export function LogoToggle() {
     >
       <div className="relative flex items-center font-bold text-xl sm:text-2xl tracking-tighter">
         {letters.map((char, index) => {
-          const isExiting = animPhase === 'exiting';
-          const isEntering = animPhase === 'entering';
-          const isIdle = animPhase === 'idle';
+          // Phase detection:
+          // isExiting: We are animating and still have the 'start' design state
+          // isEntering: We are animating and the state has flipped to the 'target' design state
+          const isExiting = isAnimating && isToggled === startToggledRef.current;
+          const isEntering = isAnimating && isToggled !== startToggledRef.current;
           const isLast = index === letters.length - 1;
 
-          // Determine which color to show
-          // If idle, show current state
-          // If exiting, show old state
-          // If entering, show new state
-          let activeColorClass = "";
-          if (isIdle) {
-            activeColorClass = isProfessional 
-              ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
-              : "text-primary";
-          } else if (isExiting) {
-            activeColorClass = isProfessional 
-              ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
-              : "text-primary";
-          } else {
-            // Entering - show what it will become
-            activeColorClass = !isProfessional 
-              ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
-              : "text-primary";
-          }
+          // Determine design classes based on the current toggle state
+          const activeColorClass = isToggled 
+            ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
+            : "text-primary";
 
           return (
             <span
-              key={`${index}-${isProfessional}-${animPhase}`}
+              key={`${index}-${isToggled}-${isAnimating}`}
               className={cn(
-                "inline-block will-change-transform opacity-100",
+                "inline-block will-change-transform",
                 activeColorClass,
                 isExiting && "animate-letter-out",
                 isEntering && (isLast ? "animate-letter-in-snap" : "animate-letter-in"),
-                // If we aren't animating, ensure they are visible at rest
-                !isExiting && !isEntering && "opacity-100 translate-y-0"
+                !isAnimating && "opacity-100 translate-y-0"
               )}
               style={{
                 animationDelay: `${index * staggerDelay}ms`,
-                // Maintain width during gradient text clipping
-                WebkitBackgroundClip: isProfessional || (isEntering && !isProfessional) || (isExiting && isProfessional) ? 'text' : 'unset'
+                // Ensure text clipping works correctly for the gradient text state
+                WebkitBackgroundClip: isToggled ? 'text' : 'unset'
               }}
             >
               {char === " " ? "\u00A0" : char}
