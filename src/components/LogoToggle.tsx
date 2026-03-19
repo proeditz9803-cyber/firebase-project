@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 /**
  * LogoToggle Component
  * Provides a smooth crossfade interaction between the default teal FasTrack logo
- * and the professional gradient logo used in informational pages.
+ * and the professional gradient logo.
  */
 export function LogoToggle() {
   const [isProfessional, setIsProfessional] = useState(false);
@@ -28,36 +28,39 @@ export function LogoToggle() {
       aria-label="Toggle FasTrack Logo Appearance"
       onClick={handleToggle}
       onKeyDown={handleToggle}
-      className="relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md h-10 w-28 sm:w-36 md:w-40 flex items-center select-none ml-10 transition-shadow"
+      className="relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md h-10 w-28 sm:w-36 md:w-40 select-none ml-10 overflow-hidden"
     >
       {/* 
         Default Logo Container:
-        Displays the vibrant teal branding used across the main interface.
+        Displays the vibrant teal branding.
       */}
       <div
         className={cn(
           "absolute inset-0 flex items-center transition-opacity duration-[400ms] ease-in-out",
-          isProfessional ? "opacity-0 pointer-events-none" : "opacity-100"
+          isProfessional ? "opacity-0" : "opacity-100"
         )}
       >
-        <span className="text-xl sm:text-2xl font-bold text-primary tracking-tight" aria-hidden="true">
+        <span 
+          className="text-xl sm:text-2xl font-bold text-primary tracking-tight" 
+          aria-label="Default FasTrack Logo"
+        >
           FasTrack
         </span>
       </div>
 
       {/* 
         Professional Logo Container:
-        Displays the gradient branding found on 'About' and 'Privacy' pages.
+        Displays the gradient branding.
       */}
       <div
         className={cn(
           "absolute inset-0 flex items-center transition-opacity duration-[400ms] ease-in-out",
-          isProfessional ? "opacity-100" : "opacity-0 pointer-events-none"
+          isProfessional ? "opacity-100" : "opacity-0"
         )}
       >
         <span 
           className="text-xl sm:text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50"
-          aria-hidden="true"
+          aria-label="Professional FasTrack Logo"
         >
           FasTrack
         </span>
