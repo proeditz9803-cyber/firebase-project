@@ -43,3 +43,45 @@
 .timer-progress-arc {
   transition: stroke-dashoffset 0.3s ease;
 }
+
+/* 
+  LogoToggle Letter Pop Animations
+  --------------------------------
+  letterPopOut: Individual letters drop down and fade
+  letterPopIn: Individual letters jump up and land
+*/
+
+@keyframes letterPopOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes letterPopIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-letter-out {
+  animation: letterPopOut 200ms ease-in forwards;
+}
+
+.animate-letter-in {
+  animation: letterPopIn 200ms ease-out forwards;
+}
+
+/* Special overshoot/snap bezier for the last letter landing */
+.animate-letter-in-snap {
+  animation: letterPopIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
