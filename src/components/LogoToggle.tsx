@@ -5,36 +5,29 @@ import { cn } from '@/lib/utils';
 
 /**
  * LogoToggle Component
- * Implements a premium, slowed, and dramatic "Letter Pop" reveal animation.
- * Features precisely synchronized design swaps at the invisible midpoint.
+ * Implements a premium, parallel "Letter Pop" reveal animation.
+ * Features simultaneous outgoing and incoming sequences for a more
+ * dynamic, layered, and high-end brand interaction.
  */
 export function LogoToggle() {
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isToggled, setIsToggled] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   const isAnimatingRef = useRef(false);
-  const startToggledRef = useRef(false);
-  const midpointTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const endTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const logoText = "FasTrack";
   const letters = logoText.split("");
   
-  // Refined timing for a more luxurious, dramatic experience
-  const staggerDelay = 60;   // Increased from 40ms for more visible "drama"
-  const letterDuration = 450; // Increased from 200ms for a "slowed" feel
+  // Timing configuration for a smooth, dramatic cascade
+  const staggerDelay = 60;   
+  const letterDuration = 450; 
   
-  /**
-   * Midpoint calculation:
-   * Precisely synchronizes the visual state swap when all outgoing letters
-   * are invisible, before the first incoming letter appears.
-   */
-  const midpoint = (letters.length * staggerDelay) + letterDuration;
-  const totalDuration = (midpoint * 2) + 40; // Total cycle + safety buffer
+  // Total duration until the last letter settles in its new position
+  const totalDuration = (letters.length * staggerDelay) + letterDuration;
 
   useEffect(() => {
     return () => {
-      if (midpointTimeoutRef.current) clearTimeout(midpointTimeoutRef.current);
       if (endTimeoutRef.current) clearTimeout(endTimeoutRef.current);
     };
   }, []);
@@ -49,21 +42,66 @@ export function LogoToggle() {
     if (isAnimatingRef.current) return;
 
     isAnimatingRef.current = true;
-    startToggledRef.current = isToggled;
     setIsAnimating(true);
+    setIsToggled(prev => !prev);
 
-    // Step 2: Swap the design at the invisible seam (all letters vanished)
-    midpointTimeoutRef.current = setTimeout(() => {
-      setIsToggled(prev => !prev);
-    }, midpoint);
-
-    // Step 3: Re-enable interactions after the glorious landing is complete
+    // Re-enable interactions once the parallel crossfade is complete
     endTimeoutRef.current = setTimeout(() => {
       setIsAnimating(false);
       isAnimatingRef.current = false;
-    }, totalDuration);
+    }, totalDuration + 20);
 
-  }, [isToggled, midpoint, totalDuration]);
+  }, [isToggled, totalDuration]);
+
+  /**
+   * Renders a layer of letters for a specific brand style.
+   * Logic handles whether this specific layer should animate 'in' or 'out' based on the toggle state.
+   */
+  const renderLogoLayer = (isPremiumStyle: boolean, animationType: 'in' | 'out' | null) => {
+    const colorClass = isPremiumStyle 
+      ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
+      : "text-primary";
+
+    // Determine if this layer should be visible when NO animation is playing
+    const isStaticVisible = !isAnimating && (isPremiumStyle === isToggled);
+
+    return (
+      <div 
+        className={cn(
+          "absolute inset-0 flex items-center font-bold text-xl sm:text-2xl tracking-tighter",
+          !isAnimating && !isStaticVisible && "opacity-0 pointer-events-none"
+        )}
+      >
+        {letters.map((char, index) => {
+          const isLast = index === letters.length - 1;
+          
+          let animationClass = "";
+          if (animationType === 'out') {
+            animationClass = "animate-letter-out";
+          } else if (animationType === 'in') {
+            animationClass = isLast ? "animate-letter-in-snap" : "animate-letter-in";
+          }
+
+          return (
+            <span
+              key={`${index}-${isPremiumStyle}-${animationType}`}
+              className={cn(
+                "inline-block will-change-transform",
+                colorClass,
+                animationClass
+              )}
+              style={{
+                animationDelay: `${index * staggerDelay}ms`,
+                WebkitBackgroundClip: isPremiumStyle ? 'text' : 'unset'
+              }}
+            >
+              {char === " " ? "\u00A0" : char}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -74,38 +112,17 @@ export function LogoToggle() {
       onKeyDown={handleToggle}
       className="relative cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md h-10 w-32 sm:w-36 md:w-40 select-none ml-10 overflow-hidden flex items-center"
     >
-      <div className="relative flex items-center font-bold text-xl sm:text-2xl tracking-tighter">
-        {letters.map((char, index) => {
-          // Phase synchronization logic
-          const isExiting = isAnimating && isToggled === startToggledRef.current;
-          const isEntering = isAnimating && isToggled !== startToggledRef.current;
-          const isLast = index === letters.length - 1;
-
-          // Design variant styles
-          const activeColorClass = isToggled 
-            ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
-            : "text-primary";
-
-          return (
-            <span
-              key={`${index}-${isToggled}-${isAnimating}`}
-              className={cn(
-                "inline-block will-change-transform",
-                activeColorClass,
-                isExiting && "animate-letter-out",
-                isEntering && (isLast ? "animate-letter-in-snap" : "animate-letter-in"),
-                !isAnimating && "opacity-100 translate-y-0"
-              )}
-              style={{
-                animationDelay: `${index * staggerDelay}ms`,
-                WebkitBackgroundClip: isToggled ? 'text' : 'unset'
-              }}
-            >
-              {char === " " ? "\u00A0" : char}
-            </span>
-          );
-        })}
-      </div>
+      {/* Default (Teal) Layer: Animates 'out' when toggled to premium, 'in' when toggled back */}
+      {renderLogoLayer(
+        false, 
+        isAnimating ? (isToggled ? 'out' : 'in') : null
+      )}
+      
+      {/* Premium (Gradient) Layer: Animates 'in' when toggled to premium, 'out' when toggled back */}
+      {renderLogoLayer(
+        true, 
+        isAnimating ? (isToggled ? 'in' : 'out') : null
+      )}
     </div>
   );
 }
