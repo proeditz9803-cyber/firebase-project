@@ -11,7 +11,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'FastTrack | Intermittent Fasting Timer',
+  title: 'FasTrack | Intermittent Fasting Timer',
   description: 'A free, simple, no-account intermittent fasting timer and tracker.',
 };
 

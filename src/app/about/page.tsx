@@ -19,10 +19,10 @@ export default function AboutPage() {
           Who We Are
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
-          FastTrack
+          FasTrack
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
-          Welcome to FastTrack — your trusted destination for fitness knowledge, wellness guidance, and a healthier lifestyle.
+          Welcome to FasTrack — your trusted destination for fitness knowledge, wellness guidance, and a healthier lifestyle.
         </p>
       </section>
 
@@ -44,7 +44,7 @@ export default function AboutPage() {
       <section className="space-y-8">
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">What We Cover</h2>
-          <p className="text-muted-foreground">At FastTrack we provide specialized guidance in key wellness areas:</p>
+          <p className="text-muted-foreground">At FasTrack we provide specialized guidance in key wellness areas:</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {coverageItems.map((item, index) => (
@@ -78,7 +78,7 @@ export default function AboutPage() {
       {/* 5. Closing Statement */}
       <section className="text-center py-12 border-t border-border">
         <p className="text-2xl font-bold tracking-tight mb-8">
-          Whether you're just starting your fitness journey or looking to level up, <span className="text-primary">FastTrack</span> is here to guide you every step of the way.
+          Whether you're just starting your fitness journey or looking to level up, <span className="text-primary">FasTrack</span> is here to guide you every step of the way.
         </p>
         <div className="flex justify-center gap-4">
           <div className="h-1 w-12 bg-primary rounded-full" />

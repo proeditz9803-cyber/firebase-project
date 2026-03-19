@@ -4,13 +4,13 @@ import { Badge } from '@/components/ui/badge';
 export default function TermsAndConditionsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">
-      {/* Brand Header - Consistent with About and Privacy pages */}
+      {/* Brand Header */}
       <section className="text-center space-y-6">
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
           Rules & Guidelines
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
-          FastTrack
+          FasTrack
         </h1>
         <div className="space-y-2">
           <h2 className="text-3xl font-bold tracking-tight text-foreground">Terms and Conditions</h2>
@@ -22,13 +22,13 @@ export default function TermsAndConditionsPage() {
         <h2 className="text-2xl font-bold text-primary">1. Health and Safety Terms</h2>
         <div className="leading-relaxed text-muted-foreground space-y-4">
           <p>
-            We built FastTrack because we genuinely believe in 
+            We built FasTrack because we genuinely believe in 
             the power of fasting done right. But fasting is not 
             for everyone and we want to be upfront about that.
           </p>
           <p>
             If any of the following apply to you please speak 
-            to your doctor before using FastTrack:
+            to your doctor before using FasTrack:
           </p>
           <ul className="list-disc pl-6 space-y-2">
             <li>You are pregnant or currently breastfeeding</li>
@@ -50,7 +50,7 @@ export default function TermsAndConditionsPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-primary">2. Fasting Timer Accuracy Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
-          We have worked hard to make FastTrack's timer as 
+          We have worked hard to make FasTrack's timer as 
           reliable and accurate as possible. However your 
           device and browser can sometimes get in the way. 
           Factors like your phone going to sleep, your browser 
@@ -72,7 +72,7 @@ export default function TermsAndConditionsPage() {
         <h2 className="text-2xl font-bold text-primary">3. Nutritional Information Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           We share fasting and nutrition related information 
-          on FastTrack because we want to help you get the 
+          on FasTrack because we want to help you get the 
           most out of your fasting journey. However we are 
           not nutritionists or dietitians and nothing we 
           share should be treated as personalized dietary 
@@ -92,8 +92,8 @@ export default function TermsAndConditionsPage() {
         <div className="leading-relaxed text-muted-foreground space-y-4">
           <p>
             At the end of the day you know your body better 
-            than anyone else. While FastTrack is here to 
-            support your fasting journey the responsibility 
+            than anyone else. While FasTrack is here to 
+            support your FasTrack journey the responsibility 
             for your health and wellbeing during a fast 
             rests with you.
           </p>
@@ -114,7 +114,7 @@ export default function TermsAndConditionsPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-primary">5. No Guarantee of Results Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
-          We would love to promise you that FastTrack will 
+          We would love to promise you that FasTrack will 
           transform your health overnight but that would 
           not be honest. Fasting affects everyone differently 
           and results depend on many personal factors 
@@ -122,7 +122,7 @@ export default function TermsAndConditionsPage() {
           condition and consistency.
         </p>
         <p className="leading-relaxed text-muted-foreground">
-          FastTrack is a tool to help you stay on track. 
+          FasTrack is a tool to help you stay on track. 
           The results are built by you.
         </p>
         <Separator className="opacity-20" />
@@ -132,7 +132,7 @@ export default function TermsAndConditionsPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-primary">6. Emergency Situations</h2>
         <p className="leading-relaxed text-muted-foreground">
-          FastTrack is a fasting tracker not a medical 
+          FasTrack is a fasting tracker not a medical 
           service. If at any point during your fast you 
           experience a medical emergency please stop 
           fasting immediately and contact your local 
@@ -151,7 +151,7 @@ export default function TermsAndConditionsPage() {
         <h2 className="text-2xl font-bold text-primary">7. Fasting Content Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           The fasting tips guides and educational content 
-          on FastTrack are based on widely practiced fasting 
+          on FasTrack are based on widely practiced fasting 
           methods and general wellness knowledge. We share 
           this content to inform and inspire not to prescribe.
         </p>
@@ -168,10 +168,10 @@ export default function TermsAndConditionsPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-primary">8. Data and Local Storage</h2>
         <p className="leading-relaxed text-muted-foreground">
-          Everything you track on FastTrack stays on your 
+          Everything you track on FasTrack stays on your 
           device. We do not collect store or have any access 
           to your fasting data. Your privacy matters to us 
-          and we have intentionally built FastTrack so that 
+          and we have intentionally built FasTrack so that 
           your personal fasting history never leaves your 
           own hands.
         </p>
@@ -187,10 +187,10 @@ export default function TermsAndConditionsPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-primary">9. Changes to These Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
-          As FastTrack grows and evolves these terms may 
+          As FasTrack grows and evolves these terms may 
           be updated from time to time. We will always 
           keep this page current so we recommend checking 
-          back occasionally. Continuing to use FastTrack 
+          back occasionally. Continuing to use FasTrack 
           after any updates means you are comfortable 
           with the revised terms.
         </p>
@@ -202,7 +202,7 @@ export default function TermsAndConditionsPage() {
         <h2 className="text-2xl font-bold text-primary">10. Contact Us</h2>
         <p className="leading-relaxed text-muted-foreground">
           Have a question about these terms or anything 
-          else on FastTrack? We are happy to hear from you. 
+          else on FasTrack? We are happy to hear from you. 
           Reach out to us anytime at:
         </p>
         <p className="font-bold text-foreground text-lg">

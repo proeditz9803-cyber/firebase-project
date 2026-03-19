@@ -19,7 +19,7 @@ export function Navigation() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-10">
           <Link href="/" className="text-2xl font-bold text-primary tracking-tight pl-10">
-            FastTrack
+            FasTrack
           </Link>
         </div>
         <nav className="flex items-center gap-4 sm:gap-8 md:pr-32 lg:pr-48">
