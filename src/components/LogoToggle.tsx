@@ -5,15 +5,13 @@ import { cn } from '@/lib/utils';
 
 /**
  * LogoToggle Component
- * Implements a premium "Letter Pop" reveal animation with precise 
- * synchronization between visual design changes and motion.
+ * Implements a premium, slowed, and dramatic "Letter Pop" reveal animation.
+ * Features precisely synchronized design swaps at the invisible midpoint.
  */
 export function LogoToggle() {
-  // Separate animation trigger state from design toggle state
   const [isAnimating, setIsAnimating] = useState(false);
   const [isToggled, setIsToggled] = useState(false);
   
-  // Refs for tracking animation lock and cleaning up timeouts
   const isAnimatingRef = useRef(false);
   const startToggledRef = useRef(false);
   const midpointTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -21,15 +19,19 @@ export function LogoToggle() {
 
   const logoText = "FasTrack";
   const letters = logoText.split("");
-  const staggerDelay = 40; // 40ms stagger between letters
-  const letterDuration = 200; // 200ms per letter animation
   
-  // Dynamically calculate timing based on character count
-  // midpoint = time when the last outgoing letter finishes its 200ms exit
-  const midpoint = (letters.length - 1) * staggerDelay + letterDuration;
-  const totalDuration = midpoint * 2 + 20; // total cycle time + 20ms buffer
+  // Refined timing for a more luxurious, dramatic experience
+  const staggerDelay = 60;   // Increased from 40ms for more visible "drama"
+  const letterDuration = 450; // Increased from 200ms for a "slowed" feel
+  
+  /**
+   * Midpoint calculation:
+   * Precisely synchronizes the visual state swap when all outgoing letters
+   * are invisible, before the first incoming letter appears.
+   */
+  const midpoint = (letters.length * staggerDelay) + letterDuration;
+  const totalDuration = (midpoint * 2) + 40; // Total cycle + safety buffer
 
-  // Cleanup timeouts on unmount to prevent memory leaks or stale state updates
   useEffect(() => {
     return () => {
       if (midpointTimeoutRef.current) clearTimeout(midpointTimeoutRef.current);
@@ -38,26 +40,24 @@ export function LogoToggle() {
   }, []);
 
   const handleToggle = useCallback((e: React.MouseEvent | React.KeyboardEvent) => {
-    // Keyboard accessibility for Enter and Space keys
     if ('key' in e) {
       const ke = e as React.KeyboardEvent;
       if (ke.key !== 'Enter' && ke.key !== ' ') return;
       e.preventDefault();
     }
 
-    // Prevent interruption during an active animation cycle
     if (isAnimatingRef.current) return;
 
     isAnimatingRef.current = true;
     startToggledRef.current = isToggled;
     setIsAnimating(true);
 
-    // Step 2: Trigger design change at the exact invisible midpoint seam
+    // Step 2: Swap the design at the invisible seam (all letters vanished)
     midpointTimeoutRef.current = setTimeout(() => {
       setIsToggled(prev => !prev);
     }, midpoint);
 
-    // Step 3: Reset animation state after the full cycle (outgoing + incoming) completes
+    // Step 3: Re-enable interactions after the glorious landing is complete
     endTimeoutRef.current = setTimeout(() => {
       setIsAnimating(false);
       isAnimatingRef.current = false;
@@ -76,14 +76,12 @@ export function LogoToggle() {
     >
       <div className="relative flex items-center font-bold text-xl sm:text-2xl tracking-tighter">
         {letters.map((char, index) => {
-          // Phase detection:
-          // isExiting: We are animating and still have the 'start' design state
-          // isEntering: We are animating and the state has flipped to the 'target' design state
+          // Phase synchronization logic
           const isExiting = isAnimating && isToggled === startToggledRef.current;
           const isEntering = isAnimating && isToggled !== startToggledRef.current;
           const isLast = index === letters.length - 1;
 
-          // Determine design classes based on the current toggle state
+          // Design variant styles
           const activeColorClass = isToggled 
             ? "bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50" 
             : "text-primary";
@@ -100,7 +98,6 @@ export function LogoToggle() {
               )}
               style={{
                 animationDelay: `${index * staggerDelay}ms`,
-                // Ensure text clipping works correctly for the gradient text state
                 WebkitBackgroundClip: isToggled ? 'text' : 'unset'
               }}
             >
