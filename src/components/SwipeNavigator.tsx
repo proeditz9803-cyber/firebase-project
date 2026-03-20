@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,10 +13,11 @@ import GuidePage from '@/app/guide/page';
 /**
  * SwipeNavigator Component
  * Implements a 300vw horizontal sliding layout with parallel animations.
- * State Management: Architecture A (Internal state is authoritative for swipes/arrows).
+ * State Management: Synchronized with URL for navigation highlighting.
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const pages = useMemo(() => [
     { path: '/', component: TimerPage },
@@ -50,13 +51,14 @@ export function SwipeNavigator() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Synchronize state ONLY when URL changes (from external Top Nav)
+  // Synchronize state when URL changes (from external Top Nav)
+  // The guard prevents double-animation when swiping updates the URL.
   useEffect(() => {
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
       setCurrentPage(index);
     }
-  }, [pathname, getPageIndex]);
+  }, [pathname, getPageIndex, currentPage]);
 
   const handleStart = (clientX: number, clientY: number) => {
     startX.current = clientX;
@@ -113,8 +115,9 @@ export function SwipeNavigator() {
       }
 
       if (nextIndex !== currentPage) {
-        // Architecture A: Update state directly, NO router.push
         setCurrentPage(nextIndex);
+        // Update URL so navigation highlights stay in sync
+        router.replace(pages[nextIndex].path, { scroll: false });
       }
     }
 
@@ -123,7 +126,7 @@ export function SwipeNavigator() {
     directionLocked.current = null;
     currentDelta.current = 0;
     setLiveDelta(0);
-  }, [currentPage, pages.length]);
+  }, [currentPage, pages, router]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -158,8 +161,8 @@ export function SwipeNavigator() {
 
   const handlePageChange = (index: number) => {
     if (index < 0 || index >= pages.length) return;
-    // Architecture A: Update state directly, NO router.push
     setCurrentPage(index);
+    router.replace(pages[index].path, { scroll: false });
   };
 
   const isSwiping = liveDelta !== 0;
@@ -207,7 +210,7 @@ export function SwipeNavigator() {
         })}
       </div>
 
-      {/* Visual Navigation Indicators - Positioned absolutely */}
+      {/* Visual Navigation Indicators */}
       <div className="pointer-events-none absolute inset-0 z-[50]">
         {/* Left Indicator */}
         <button 
