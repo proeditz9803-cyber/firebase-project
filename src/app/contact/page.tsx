@@ -102,9 +102,9 @@ export default function ContactPage() {
             href="mailto:proeditz9803@gmail.com"
             className={cn(
               "group relative w-full max-w-sm flex flex-col items-center justify-center p-8 md:p-12",
-              "bg-[#0a0a0a] text-white border border-border rounded-xl",
-              "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150",
-              "hover:bg-white hover:text-[#0a0a0a] hover:scale-[1.02] active:scale-[0.98] active:duration-100",
+              "bg-background text-foreground border border-border rounded-xl",
+              "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 hover:duration-300",
+              "hover:bg-foreground hover:text-background hover:scale-[1.02] active:scale-[0.98] active:duration-100",
               "will-change-[transform,opacity] cursor-pointer no-underline overflow-hidden",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             )}

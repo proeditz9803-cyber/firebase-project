@@ -432,8 +432,8 @@ export default function TimerPage() {
         <button
           onClick={handleToggleMode}
           className={cn(
-            "group relative w-full flex flex-col items-center justify-center p-8 bg-[#0a0a0a] text-white border border-border transition-all duration-300 will-change-[transform,opacity]",
-            "hover:bg-white hover:text-black hover:scale-[1.015] active:scale-[0.985] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            "group relative w-full flex flex-col items-center justify-center p-8 bg-background text-foreground border border-border transition-all duration-300 will-change-[transform,opacity]",
+            "hover:bg-foreground hover:text-background hover:scale-[1.015] active:scale-[0.985] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           )}
           aria-label={activeMode === 'fasting' ? "Switch to Eating Period" : "Switch to Fasting Period"}
         >
