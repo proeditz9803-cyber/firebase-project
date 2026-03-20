@@ -13,7 +13,7 @@ import GuidePage from '@/app/guide/page';
 /**
  * SwipeNavigator Component
  * Implements a 300vw horizontal sliding layout with parallel animations.
- * State Management: Synchronized with URL for navigation highlighting.
+ * Optimized for immediate responsiveness with a 5px engagement threshold.
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
@@ -35,7 +35,7 @@ export function SwipeNavigator() {
   const [liveDelta, setLiveDelta] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
 
-  // Gesture tracking refs
+  // Gesture tracking refs for high-performance 60fps tracking
   const startX = useRef(0);
   const startY = useRef(0);
   const currentDelta = useRef(0);
@@ -52,7 +52,6 @@ export function SwipeNavigator() {
   }, []);
 
   // Synchronize state when URL changes (from external Top Nav)
-  // The guard prevents double-animation when swiping updates the URL.
   useEffect(() => {
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
@@ -75,7 +74,8 @@ export function SwipeNavigator() {
     const deltaY = clientY - startY.current;
 
     if (directionLocked.current === null) {
-      if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+      // Immediate engagement threshold (5px)
+      if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           directionLocked.current = 'horizontal';
         } else {
@@ -93,7 +93,7 @@ export function SwipeNavigator() {
 
     let adjustedDelta = deltaX;
     if ((currentPage === 0 && deltaX > 0) || (currentPage === pages.length - 1 && deltaX < 0)) {
-      adjustedDelta = deltaX * 0.3;
+      adjustedDelta = deltaX * 0.3; // Edge resistance
     }
     
     currentDelta.current = adjustedDelta;
@@ -116,7 +116,6 @@ export function SwipeNavigator() {
 
       if (nextIndex !== currentPage) {
         setCurrentPage(nextIndex);
-        // Update URL so navigation highlights stay in sync
         router.replace(pages[nextIndex].path, { scroll: false });
       }
     }
@@ -177,16 +176,15 @@ export function SwipeNavigator() {
       <div 
         className={cn(
           "flex w-[300vw] h-full will-change-transform",
-          !isSwiping && "transition-transform duration-700 ease-reveal"
+          !isSwiping && "transition-transform duration-600 ease-reveal" // Optimized to 600ms for responsiveness
         )}
         style={{ transform: `translateX(${translateX})` }}
       >
         {pages.map((page, index) => {
-          // Parallel Animation Calculation:
+          // Parallel Parallax and Opacity Calculation
           const offsetFromCenter = (index - currentPage) * (windowWidth || 1) + liveDelta;
           const normalizedDistance = Math.abs(offsetFromCenter) / (windowWidth || 1);
           
-          // Layered Effects:
           const opacity = Math.max(0, 1 - normalizedDistance * 1.5);
           const parallaxShift = (index - currentPage) * (windowWidth * 0.1) + (liveDelta * 0.15);
 
@@ -199,7 +197,7 @@ export function SwipeNavigator() {
               <div 
                 className={cn(
                   "container mx-auto will-change-transform",
-                  !isSwiping && "transition-transform duration-700 ease-reveal"
+                  !isSwiping && "transition-transform duration-600 ease-reveal"
                 )}
                 style={{ transform: `translateX(${parallaxShift}px)` }}
               >
@@ -212,11 +210,10 @@ export function SwipeNavigator() {
 
       {/* Visual Navigation Indicators */}
       <div className="pointer-events-none absolute inset-0 z-[50]">
-        {/* Left Indicator */}
         <button 
           onClick={() => handlePageChange(currentPage - 1)}
           className={cn(
-            "absolute left-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 will-change-[transform,opacity] transition-all duration-700 ease-reveal",
+            "absolute left-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 will-change-[transform,opacity] transition-all duration-600 ease-reveal",
             currentPage === 0 ? "opacity-0 -translate-x-4" : "opacity-100 translate-x-0",
             isSwiping ? "opacity-30 scale-90" : "animate-pulse-slow hover:opacity-100 hover:scale-110"
           )}
@@ -226,11 +223,10 @@ export function SwipeNavigator() {
           <ChevronLeft className="w-8 h-8 text-primary" />
         </button>
 
-        {/* Right Indicator */}
         <button 
           onClick={() => handlePageChange(currentPage + 1)}
           className={cn(
-            "absolute right-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 will-change-[transform,opacity] transition-all duration-700 ease-reveal",
+            "absolute right-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 will-change-[transform,opacity] transition-all duration-600 ease-reveal",
             currentPage === pages.length - 1 ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0",
             isSwiping ? "opacity-30 scale-90" : "animate-pulse-slow hover:opacity-100 hover:scale-110"
           )}
