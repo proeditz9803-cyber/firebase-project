@@ -18,10 +18,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2, History, Award, Clock } from 'lucide-react';
+import useScrollReveal from '@/hooks/useScrollReveal';
 
 export default function LogPage() {
   const [history, setHistory] = useState<FastRecord[]>([]);
   const [isClient, setIsClient] = useState(false);
+
+  // Scroll Reveal Hooks
+  const [headerRef, headerVisible] = useScrollReveal({ delay: 0 });
+  const [statsRef, statsVisible] = useScrollReveal({ delay: 150 });
+  const [listRef, listVisible] = useScrollReveal({ delay: 300 });
 
   useEffect(() => {
     setIsClient(true);
@@ -48,7 +54,13 @@ export default function LogPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+      <div 
+        ref={headerRef}
+        className={cn(
+          "flex items-center justify-between transition-all",
+          headerVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+        )}
+      >
         <h1 className="text-3xl font-bold tracking-tight">Fasting History</h1>
         {totalFasts > 0 && (
           <AlertDialog>
@@ -74,7 +86,13 @@ export default function LogPage() {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div 
+        ref={statsRef}
+        className={cn(
+          "grid grid-cols-1 md:grid-cols-3 gap-4 transition-all",
+          statsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+        )}
+      >
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
@@ -108,7 +126,13 @@ export default function LogPage() {
       </div>
 
       {/* History List */}
-      <div className="space-y-4">
+      <div 
+        ref={listRef}
+        className={cn(
+          "space-y-4 transition-all",
+          listVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+        )}
+      >
         {history.length === 0 ? (
           <div className="text-center py-20 bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
             <History className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
