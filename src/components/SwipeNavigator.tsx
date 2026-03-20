@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,23 +13,23 @@ import GuidePage from '@/app/guide/page';
 /**
  * SwipeNavigator Component
  * Implements a 300vw horizontal sliding layout with parallel animations.
- * Features parallax content offsets, opacity cross-fades, and synchronized indicators.
+ * State Management: Architecture A (Internal state is authoritative for swipes/arrows).
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
-  const router = useRouter();
 
-  const pages = [
+  const pages = useMemo(() => [
     { path: '/', component: TimerPage },
     { path: '/log', component: LogPage },
     { path: '/guide', component: GuidePage },
-  ];
+  ], []);
 
   const getPageIndex = useCallback((path: string) => {
     const index = pages.findIndex((p) => p.path === path);
     return index === -1 ? 0 : index;
   }, [pages]);
 
+  // Initial state derived from URL
   const [currentPage, setCurrentPage] = useState(() => getPageIndex(pathname));
   const [liveDelta, setLiveDelta] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
@@ -41,9 +41,6 @@ export function SwipeNavigator() {
   const isGestureActive = useRef(false);
   const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
   
-  // Navigation source tracking ref to prevent double-animation bug
-  const navigationSource = useRef<'swipe' | 'external' | ''>('');
-  
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,25 +50,13 @@ export function SwipeNavigator() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Synchronize state with URL changes (authoritative guard)
+  // Synchronize state ONLY when URL changes (from external Top Nav)
   useEffect(() => {
-    // If navigation was initiated by a swipe or arrow click, skip the redundant state update
-    if (navigationSource.current === 'swipe') {
-      navigationSource.current = '';
-      return;
-    }
-
-    // Mark as external navigation (from top nav bar)
-    navigationSource.current = 'external';
-
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
       setCurrentPage(index);
     }
-
-    // Reset source after processing
-    navigationSource.current = '';
-  }, [pathname, getPageIndex, currentPage]);
+  }, [pathname, getPageIndex]);
 
   const handleStart = (clientX: number, clientY: number) => {
     startX.current = clientX;
@@ -128,10 +113,8 @@ export function SwipeNavigator() {
       }
 
       if (nextIndex !== currentPage) {
-        // Set authoritative source BEFORE updating state and URL
-        navigationSource.current = 'swipe';
+        // Architecture A: Update state directly, NO router.push
         setCurrentPage(nextIndex);
-        router.push(pages[nextIndex].path);
       }
     }
 
@@ -140,7 +123,7 @@ export function SwipeNavigator() {
     directionLocked.current = null;
     currentDelta.current = 0;
     setLiveDelta(0);
-  }, [currentPage, pages, router]);
+  }, [currentPage, pages.length]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -175,10 +158,8 @@ export function SwipeNavigator() {
 
   const handlePageChange = (index: number) => {
     if (index < 0 || index >= pages.length) return;
-    // Mark as swipe (internal) to prevent double trigger on arrow click
-    navigationSource.current = 'swipe';
+    // Architecture A: Update state directly, NO router.push
     setCurrentPage(index);
-    router.push(pages[index].path);
   };
 
   const isSwiping = liveDelta !== 0;
