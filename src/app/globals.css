@@ -44,12 +44,40 @@
   transition: stroke-dashoffset 0.3s ease;
 }
 
+/* Dual Timer Redesign Keyframes */
+@keyframes notificationSlideDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes notificationSlideUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+.animate-notification-in {
+  animation: notificationSlideDown 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-notification-out {
+  animation: notificationSlideUp 350ms ease-in forwards;
+}
+
 /* 
   LogoToggle Premium "Letter Pop" Reveal
   --------------------------------------
-  Refined with dramatic displacement (30px) and 
-  luxurious cubic-bezier curves for a natural, 
-  high-end physical feel.
 */
 
 @keyframes letterPopOut {
@@ -74,17 +102,14 @@
   }
 }
 
-/* Luxurious Quintic Ease-In for exit acceleration */
 .animate-letter-out {
   animation: letterPopOut 450ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
 }
 
-/* Smooth Decelerating Ease-Out for standard landing */
 .animate-letter-in {
   animation: letterPopIn 450ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
 }
 
-/* Magnetic snap effect for the last letter overshoot */
 .animate-letter-in-snap {
   animation: letterPopIn 550ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
