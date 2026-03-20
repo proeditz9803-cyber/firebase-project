@@ -64,6 +64,13 @@ export default function KebabMenu() {
         >
           Terms and Conditions
         </Link>
+        <Link
+          href="/contact"
+          onClick={closeMenu}
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          Contact Us
+        </Link>
       </div>
     </div>
   );
