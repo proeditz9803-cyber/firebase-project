@@ -1,4 +1,5 @@
 export type ProtocolType = '16:8' | '18:6' | '20:4' | 'OMAD' | 'Custom';
+export type TimerMode = 'fasting' | 'eating';
 
 export interface FastRecord {
   id: string;
