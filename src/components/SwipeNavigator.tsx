@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,11 +13,11 @@ import GuidePage from '@/app/guide/page';
 /**
  * SwipeNavigator Component
  * Implements a 300vw horizontal sliding layout with parallel animations.
- * Optimized for immediate responsiveness with a 5px engagement threshold.
+ * Restructured with Architecture A to eliminate double animation bugs.
+ * State is the single authoritative source of truth for internal navigation.
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const pages = useMemo(() => [
     { path: '/', component: TimerPage },
@@ -30,7 +30,7 @@ export function SwipeNavigator() {
     return index === -1 ? 0 : index;
   }, [pages]);
 
-  // Initial state derived from URL
+  // Architecture A: Authoritative state initialization from pathname
   const [currentPage, setCurrentPage] = useState(() => getPageIndex(pathname));
   const [liveDelta, setLiveDelta] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
@@ -51,7 +51,8 @@ export function SwipeNavigator() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Synchronize state when URL changes (from external Top Nav)
+  // Synchronize state ONLY for external navigation (from Top Nav buttons clicking links)
+  // Internal navigation (swipes, chevrons) handles state directly without router.push
   useEffect(() => {
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
@@ -115,8 +116,9 @@ export function SwipeNavigator() {
       }
 
       if (nextIndex !== currentPage) {
+        // Architecture A: Update local state ONLY. 
+        // No router.push/replace here to eliminate race conditions with usePathname.
         setCurrentPage(nextIndex);
-        router.replace(pages[nextIndex].path, { scroll: false });
       }
     }
 
@@ -125,7 +127,7 @@ export function SwipeNavigator() {
     directionLocked.current = null;
     currentDelta.current = 0;
     setLiveDelta(0);
-  }, [currentPage, pages, router]);
+  }, [currentPage, pages.length]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -160,8 +162,8 @@ export function SwipeNavigator() {
 
   const handlePageChange = (index: number) => {
     if (index < 0 || index >= pages.length) return;
+    // Architecture A: Update local state ONLY.
     setCurrentPage(index);
-    router.replace(pages[index].path, { scroll: false });
   };
 
   const isSwiping = liveDelta !== 0;
@@ -176,7 +178,7 @@ export function SwipeNavigator() {
       <div 
         className={cn(
           "flex w-[300vw] h-full will-change-transform",
-          !isSwiping && "transition-transform duration-600 ease-reveal" // Optimized to 600ms for responsiveness
+          !isSwiping && "transition-transform duration-600 ease-reveal"
         )}
         style={{ transform: `translateX(${translateX})` }}
       >
