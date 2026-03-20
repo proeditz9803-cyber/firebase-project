@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function KebabMenu() {
@@ -44,9 +44,17 @@ export default function KebabMenu() {
         )}
       >
         <Link
+          href="/settings"
+          onClick={closeMenu}
+          className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          <Settings className="w-4 h-4" />
+          Settings
+        </Link>
+        <Link
           href="/about"
           onClick={closeMenu}
-          className="block px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           About Us
         </Link>

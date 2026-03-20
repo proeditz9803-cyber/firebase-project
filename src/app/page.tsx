@@ -10,6 +10,8 @@ import { cn } from '@/lib/utils';
 import { Play, Square, RotateCcw, X, ArrowDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import useScrollReveal from '@/hooks/useScrollReveal';
+import { useNotificationSettings } from '@/hooks/useNotificationSettings';
+import { triggerCompletionNotifications } from '@/utils/notifications';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,12 +34,14 @@ const PROTOCOLS: { label: string; value: ProtocolType; fasting: number; eating: 
 
 export default function TimerPage() {
   const [isClient, setIsClient] = useState(false);
+  const { settings, isLoaded: settingsLoaded } = useNotificationSettings();
   
   // Mode & Global State
   const [activeMode, setActiveMode] = useState<TimerMode>('fasting');
   const [protocol, setProtocol] = useState<ProtocolType>('16:8');
   const [history, setHistory] = useState<FastRecord[]>([]);
   const [showNotification, setShowNotification] = useState(false);
+  const [notificationType, setNotificationType] = useState<'fasting' | 'eating'>('fasting');
   const [isDismissing, setIsDismissing] = useState(false);
 
   // Entrance Animation States
@@ -82,6 +86,7 @@ export default function TimerPage() {
     const savedCustomEM = localStorage.getItem('fastrack-eating-minutes');
     const savedHistory = localStorage.getItem('fastHistory');
     const savedNotification = localStorage.getItem('fastrack-fasting-complete');
+    const savedNotifyType = localStorage.getItem('fastrack-notify-type') as 'fasting' | 'eating';
 
     if (savedActiveMode) setActiveMode(savedActiveMode);
     if (savedFastStart) setFastStart(savedFastStart);
@@ -93,6 +98,7 @@ export default function TimerPage() {
     if (savedCustomEM) setCustomEatingMinutes(parseInt(savedCustomEM));
     if (savedHistory) setHistory(JSON.parse(savedHistory));
     if (savedNotification === 'true') setShowNotification(true);
+    if (savedNotifyType) setNotificationType(savedNotifyType);
   }, []);
 
   useEffect(() => {
@@ -104,8 +110,9 @@ export default function TimerPage() {
       localStorage.setItem('fastrack-eating-hours', customEatingHours.toString());
       localStorage.setItem('fastrack-eating-minutes', customEatingMinutes.toString());
       localStorage.setItem('fastrack-fasting-complete', showNotification.toString());
+      localStorage.setItem('fastrack-notify-type', notificationType);
     }
-  }, [activeMode, protocol, customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes, showNotification, isClient]);
+  }, [activeMode, protocol, customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes, showNotification, notificationType, isClient]);
 
   // Entrance Animation Setup
   useEffect(() => {
@@ -187,10 +194,14 @@ export default function TimerPage() {
     setFastElapsedSeconds(0);
 
     if (completed) {
+      setNotificationType('fasting');
       setShowNotification(true);
       setIsDismissing(false);
+      if (settingsLoaded) {
+        triggerCompletionNotifications('fasting', settings);
+      }
     }
-  }, [fastStart, protocol, getPlannedSeconds, history, saveHistory]);
+  }, [fastStart, protocol, getPlannedSeconds, history, saveHistory, settings, settingsLoaded]);
 
   const startTimer = (mode: TimerMode) => {
     if (getPlannedSeconds(mode) <= 0) return;
@@ -263,11 +274,18 @@ export default function TimerPage() {
           setEatingStart(null);
           localStorage.removeItem('fastrack-eating-start');
           setEatingElapsedSeconds(0);
+          
+          setNotificationType('eating');
+          setShowNotification(true);
+          setIsDismissing(false);
+          if (settingsLoaded) {
+            triggerCompletionNotifications('eating', settings);
+          }
         }
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [eatingStart, activeMode, getPlannedSeconds]);
+  }, [eatingStart, activeMode, getPlannedSeconds, settings, settingsLoaded]);
 
   const handleMinutesChange = (val: string, type: 'fasting' | 'eating') => {
     const rawValue = parseInt(val) || 0;
@@ -292,13 +310,21 @@ export default function TimerPage() {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleStartEatingFromNotification = () => {
+  const handleNotificationAction = () => {
     dismissNotification();
-    setActiveMode('eating');
-    startTimer('eating');
-    setTimeout(() => {
-      eatingSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
+    if (notificationType === 'fasting') {
+      setActiveMode('eating');
+      startTimer('eating');
+      setTimeout(() => {
+        eatingSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    } else {
+      setActiveMode('fasting');
+      startTimer('fasting');
+      setTimeout(() => {
+        fastingSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
   };
 
   if (!isClient) return null;
@@ -317,9 +343,13 @@ export default function TimerPage() {
           <div className="bg-[#0a0f0a] border-l-4 border-primary p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] container mx-auto max-w-xl">
             <div className="flex items-start justify-between gap-6">
               <div className="space-y-2">
-                <h3 className="text-2xl font-bold tracking-tight text-white font-outfit">Fasting Complete</h3>
+                <h3 className="text-2xl font-bold tracking-tight text-white font-outfit">
+                  {notificationType === 'fasting' ? 'Fasting Complete' : 'Eating Period Complete'}
+                </h3>
                 <p className="text-sm font-medium text-white/70 leading-relaxed max-w-md">
-                  Your fasting period has ended. Your eating period is ready to begin.
+                  {notificationType === 'fasting' 
+                    ? 'Your fasting period has ended. Your eating period is ready to begin.' 
+                    : 'Your eating period has ended. Ready to begin your fast?'}
                 </p>
               </div>
               <button 
@@ -331,10 +361,10 @@ export default function TimerPage() {
             </div>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Button 
-                onClick={handleStartEatingFromNotification}
+                onClick={handleNotificationAction}
                 className="flex-1 bg-white text-black hover:bg-white/90 font-bold uppercase tracking-widest text-[10px] h-14 rounded-none transition-all duration-300"
               >
-                Start Eating Period <ArrowDown className="w-4 h-4 ml-2" />
+                {notificationType === 'fasting' ? 'Start Eating Period' : 'Start Fasting Period'} <ArrowDown className="w-4 h-4 ml-2" />
               </Button>
               <Button 
                 variant="outline"
