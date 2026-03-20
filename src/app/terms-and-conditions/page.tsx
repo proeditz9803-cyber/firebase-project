@@ -8,16 +8,16 @@ import { cn } from '@/lib/utils';
 export default function TermsAndConditionsPage() {
   // Scroll Reveal Hooks for sections
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
-  const [s1Ref, s1Vis] = useScrollReveal({ delay: 100 });
-  const [s2Ref, s2Vis] = useScrollReveal({ delay: 200 });
-  const [s3Ref, s3Vis] = useScrollReveal({ delay: 300 });
-  const [s4Ref, s4Vis] = useScrollReveal({ delay: 400 });
-  const [s5Ref, s5Vis] = useScrollReveal({ delay: 500 });
-  const [s6Ref, s6Vis] = useScrollReveal({ delay: 600 });
-  const [s7Ref, s7Vis] = useScrollReveal({ delay: 700 });
-  const [s8Ref, s8Vis] = useScrollReveal({ delay: 800 });
-  const [s9Ref, s9Vis] = useScrollReveal({ delay: 900 });
-  const [s10Ref, s10Vis] = useScrollReveal({ delay: 1000 });
+  const [s1Ref, s1Vis] = useScrollReveal({ delay: 150 });
+  const [s2Ref, s2Vis] = useScrollReveal({ delay: 300 });
+  const [s3Ref, s3Vis] = useScrollReveal({ delay: 450 });
+  const [s4Ref, s4Vis] = useScrollReveal({ delay: 600 });
+  const [s5Ref, s5Vis] = useScrollReveal({ delay: 750 });
+  const [s6Ref, s6Vis] = useScrollReveal({ delay: 900 });
+  const [s7Ref, s7Vis] = useScrollReveal({ delay: 1050 });
+  const [s8Ref, s8Vis] = useScrollReveal({ delay: 1200 });
+  const [s9Ref, s9Vis] = useScrollReveal({ delay: 1350 });
+  const [s10Ref, s10Vis] = useScrollReveal({ delay: 1500 });
 
   return (
     <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">
@@ -41,7 +41,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 1. Health and Safety Terms */}
-      <section ref={s1Ref} className={cn("space-y-4 transition-all", s1Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s1Ref} 
+        className={cn("space-y-4 transition-all", s1Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">1. Health and Safety Terms</h2>
         <div className="leading-relaxed text-muted-foreground space-y-4">
           <p>
@@ -70,7 +73,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 2. Fasting Timer Accuracy Terms */}
-      <section ref={s2Ref} className={cn("space-y-4 transition-all", s2Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s2Ref} 
+        className={cn("space-y-4 transition-all", s2Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">2. Fasting Timer Accuracy Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           We have worked hard to make FasTrack's timer as 
@@ -91,7 +97,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 3. Nutritional Information Terms */}
-      <section ref={s3Ref} className={cn("space-y-4 transition-all", s3Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s3Ref} 
+        className={cn("space-y-4 transition-all", s3Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">3. Nutritional Information Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           We share fasting and nutrition related information 
@@ -110,7 +119,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 4. User Responsibility Terms */}
-      <section ref={s4Ref} className={cn("space-y-4 transition-all", s4Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s4Ref} 
+        className={cn("space-y-4 transition-all", s4Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">4. User Responsibility Terms</h2>
         <div className="leading-relaxed text-muted-foreground space-y-4">
           <p>
@@ -134,7 +146,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 5. No Guarantee of Results Terms */}
-      <section ref={s5Ref} className={cn("space-y-4 transition-all", s5Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s5Ref} 
+        className={cn("space-y-4 transition-all", s5Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">5. No Guarantee of Results Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           We would love to promise you that FasTrack will 
@@ -152,7 +167,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 6. Emergency Situations */}
-      <section ref={s6Ref} className={cn("space-y-4 transition-all", s6Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s6Ref} 
+        className={cn("space-y-4 transition-all", s6Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">6. Emergency Situations</h2>
         <p className="leading-relaxed text-muted-foreground">
           FasTrack is a fasting tracker not a medical 
@@ -170,7 +188,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 7. Fasting Content Terms */}
-      <section ref={s7Ref} className={cn("space-y-4 transition-all", s7Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s7Ref} 
+        className={cn("space-y-4 transition-all", s7Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">7. Fasting Content Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           The fasting tips guides and educational content 
@@ -188,7 +209,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 8. Data and Local Storage */}
-      <section ref={s8Ref} className={cn("space-y-4 transition-all", s8Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s8Ref} 
+        className={cn("space-y-4 transition-all", s8Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">8. Data and Local Storage</h2>
         <p className="leading-relaxed text-muted-foreground">
           Everything you track on FasTrack stays on your 
@@ -207,7 +231,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 9. Changes to These Terms */}
-      <section ref={s9Ref} className={cn("space-y-4 transition-all", s9Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s9Ref} 
+        className={cn("space-y-4 transition-all", s9Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">9. Changes to These Terms</h2>
         <p className="leading-relaxed text-muted-foreground">
           As FasTrack grows and evolves these terms may 
@@ -221,7 +248,10 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* 10. Contact Us */}
-      <section ref={s10Ref} className={cn("space-y-4 pb-12 transition-all", s10Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section 
+        ref={s10Ref} 
+        className={cn("space-y-4 pb-12 transition-all", s10Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold text-primary">10. Contact Us</h2>
         <p className="leading-relaxed text-muted-foreground">
           Have a question about these terms or anything 
