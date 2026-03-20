@@ -28,19 +28,23 @@ export function SwipeNavigator() {
   const getPageIndex = useCallback((path: string) => {
     const index = pages.findIndex((p) => p.path === path);
     return index === -1 ? 0 : index;
-  }, []);
+  }, [pages]);
 
+  // Page index state for visual transition - drives the main slider position
   const [currentPage, setCurrentPage] = useState(getPageIndex(pathname));
-  const [isSwiping, setIsSwiping] = useState(false);
-  const [swipeDelta, setSwipeDelta] = useState(0);
-  const [directionLocked, setDirectionLocked] = useState<'horizontal' | 'vertical' | null>(null);
+  // liveDelta is the only state updated during active movement for minimal re-renders
+  const [liveDelta, setLiveDelta] = useState(0);
 
+  // Gesture tracking refs to ensure high-performance tracking and avoid stale closure issues
   const startX = useRef(0);
   const startY = useRef(0);
+  const currentDelta = useRef(0);
+  const isGestureActive = useRef(false);
+  const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
+  
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInternalNavigation = useRef(false);
 
-  // Sync state with URL changes (from nav buttons)
+  // Sync state with URL changes (e.g. from top navigation bar buttons)
   useEffect(() => {
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
@@ -48,104 +52,125 @@ export function SwipeNavigator() {
     }
   }, [pathname, getPageIndex, currentPage]);
 
-  // Sync URL with state changes (from swipes)
-  useEffect(() => {
-    if (isInternalNavigation.current) {
-      router.push(pages[currentPage].path);
-      isInternalNavigation.current = false;
-    }
-  }, [currentPage, router]);
-
   const handleStart = (clientX: number, clientY: number) => {
     startX.current = clientX;
     startY.current = clientY;
-    setIsSwiping(true);
-    setDirectionLocked(null);
+    isGestureActive.current = true;
+    directionLocked.current = null;
+    currentDelta.current = 0;
   };
 
-  const handleMove = (clientX: number, clientY: number, e?: TouchEvent | React.TouchEvent | React.MouseEvent) => {
-    if (!isSwiping) return;
+  const handleMove = useCallback((clientX: number, clientY: number, e?: TouchEvent | MouseEvent) => {
+    if (!isGestureActive.current) return;
 
     const deltaX = clientX - startX.current;
     const deltaY = clientY - startY.current;
 
-    // Determine direction lock on first significant move
-    if (!directionLocked) {
+    // Determine direction lock on first significant move (10px threshold)
+    if (directionLocked.current === null) {
       if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          setDirectionLocked('horizontal');
+          directionLocked.current = 'horizontal';
         } else {
-          setDirectionLocked('vertical');
+          directionLocked.current = 'vertical';
         }
       }
       return;
     }
 
-    if (directionLocked === 'vertical') return;
+    // If locked to vertical, let native scrolling take over
+    if (directionLocked.current === 'vertical') return;
 
-    // If horizontal, suppress vertical scroll
-    if (e && 'preventDefault' in e && typeof e.preventDefault === 'function') {
-      try { e.preventDefault(); } catch (err) {}
+    // If locked to horizontal, suppress vertical scroll (requires { passive: false } on listener)
+    if (e && e.cancelable) {
+      e.preventDefault();
     }
 
-    // Resistance at edges
+    // Resistance at edges to communicate boundaries
     let adjustedDelta = deltaX;
     if ((currentPage === 0 && deltaX > 0) || (currentPage === pages.length - 1 && deltaX < 0)) {
       adjustedDelta = deltaX * 0.3;
     }
-    setSwipeDelta(adjustedDelta);
-  };
+    
+    currentDelta.current = adjustedDelta;
+    setLiveDelta(adjustedDelta);
+  }, [currentPage, pages.length]);
 
-  const handleEnd = () => {
-    if (!isSwiping) return;
+  const handleEnd = useCallback(() => {
+    if (!isGestureActive.current) return;
 
-    if (directionLocked === 'horizontal') {
+    if (directionLocked.current === 'horizontal') {
       const threshold = 80;
-      if (swipeDelta < -threshold && currentPage < pages.length - 1) {
-        isInternalNavigation.current = true;
-        setCurrentPage((p) => p + 1);
-      } else if (swipeDelta > threshold && currentPage > 0) {
-        isInternalNavigation.current = true;
-        setCurrentPage((p) => p - 1);
+      const delta = currentDelta.current;
+      
+      let nextIndex = currentPage;
+      if (delta < -threshold && currentPage < pages.length - 1) {
+        nextIndex = currentPage + 1;
+      } else if (delta > threshold && currentPage > 0) {
+        nextIndex = currentPage - 1;
+      }
+
+      if (nextIndex !== currentPage) {
+        setCurrentPage(nextIndex);
+        router.push(pages[nextIndex].path);
       }
     }
 
-    setIsSwiping(false);
-    setSwipeDelta(0);
-    setDirectionLocked(null);
+    // Reset all tracking variables
+    isGestureActive.current = false;
+    directionLocked.current = null;
+    currentDelta.current = 0;
+    setLiveDelta(0);
+  }, [currentPage, pages, router]);
+
+  // Imperative event listener attachment to handle { passive: false } for touchmove
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onTouchStart = (e: TouchEvent) => handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    const onTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX, e.touches[0].clientY, e);
+    const onTouchEnd = () => handleEnd();
+
+    const onMouseDown = (e: MouseEvent) => handleStart(e.clientX, e.clientY);
+    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY, e);
+    const onMouseUp = () => handleEnd();
+
+    // Attach to container for local detection
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
+    container.addEventListener('touchend', onTouchEnd, { passive: true });
+    container.addEventListener('mousedown', onMouseDown, { passive: true });
+    
+    // Attach to document for global follow-through (avoids "losing" the gesture on fast drags)
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('mouseup', onMouseUp, { passive: true });
+
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('mousedown', onMouseDown);
+      
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [handleMove, handleEnd]);
+
+  const handlePageChange = (index: number) => {
+    if (index < 0 || index >= pages.length) return;
+    setCurrentPage(index);
+    router.push(pages[index].path);
   };
 
-  // Event Listeners
-  const onTouchStart = (e: React.TouchEvent) => handleStart(e.touches[0].clientX, e.touches[0].clientY);
-  const onTouchMove = (e: React.TouchEvent) => handleMove(e.touches[0].clientX, e.touches[0].clientY, e);
-  const onTouchEnd = () => handleEnd();
-
-  const onMouseDown = (e: React.MouseEvent) => handleStart(e.clientX, e.clientY);
-
-  useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
-    const handleGlobalMouseUp = () => handleEnd();
-
-    if (isSwiping) {
-      window.addEventListener('mousemove', handleGlobalMouseMove);
-      window.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleGlobalMouseMove);
-      window.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [isSwiping, handleMove, handleEnd]);
-
-  const translateX = `calc(-${currentPage * 100}vw + ${swipeDelta}px)`;
+  const isSwiping = liveDelta !== 0;
+  // Calculate final transform based on current page + live drag offset
+  const translateX = `calc(-${currentPage * 100}vw + ${liveDelta}px)`;
 
   return (
     <div 
       className="relative w-full h-full overflow-hidden touch-none"
       ref={containerRef}
-      onMouseDown={onMouseDown}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
     >
       {/* Sliding Content Container */}
       <div 
@@ -155,7 +180,7 @@ export function SwipeNavigator() {
         )}
         style={{ transform: `translateX(${translateX})` }}
       >
-        {pages.map((page, idx) => (
+        {pages.map((page) => (
           <div key={page.path} className="w-[100vw] h-full overflow-y-auto px-4 py-8">
             <div className="container mx-auto">
               <page.component />
@@ -164,20 +189,28 @@ export function SwipeNavigator() {
         ))}
       </div>
 
-      {/* Visual Navigation Indicators */}
+      {/* Visual Navigation Indicators - Positioned absolutely as direct children of the outer container */}
       {!isSwiping && (
         <>
           {currentPage > 0 && (
-            <div className="fixed left-2 top-1/2 -translate-y-1/2 z-40 pointer-events-none opacity-50 animate-pulse-slow">
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-[50] opacity-50 animate-pulse-slow pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 transition-all hover:opacity-100 hover:scale-110"
+              aria-label="Previous Page"
+            >
               <ChevronLeft className="w-8 h-8 text-primary" />
-              <span className="sr-only">Swipe for previous page</span>
-            </div>
+              <span className="sr-only">Go to previous page</span>
+            </button>
           )}
           {currentPage < pages.length - 1 && (
-            <div className="fixed right-2 top-1/2 -translate-y-1/2 z-40 pointer-events-none opacity-50 animate-pulse-slow">
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-[50] opacity-50 animate-pulse-slow pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 transition-all hover:opacity-100 hover:scale-110"
+              aria-label="Next Page"
+            >
               <ChevronRight className="w-8 h-8 text-primary" />
-              <span className="sr-only">Swipe for next page</span>
-            </div>
+              <span className="sr-only">Go to next page</span>
+            </button>
           )}
         </>
       )}
