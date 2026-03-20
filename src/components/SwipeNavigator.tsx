@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,12 +13,12 @@ import GuidePage from '@/app/guide/page';
 
 /**
  * SwipeNavigator Component
- * Implements a 300vw horizontal sliding layout with parallel animations.
- * Restructured with Architecture A to eliminate double animation bugs.
- * State is the single authoritative source of truth for internal navigation.
+ * Standardized horizontal sliding layout that matches menu button animations.
+ * Synchronizes with URL for active navigation highlights.
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const pages = useMemo(() => [
     { path: '/', component: TimerPage },
@@ -30,12 +31,10 @@ export function SwipeNavigator() {
     return index === -1 ? 0 : index;
   }, [pages]);
 
-  // Architecture A: Authoritative state initialization from pathname
   const [currentPage, setCurrentPage] = useState(() => getPageIndex(pathname));
   const [liveDelta, setLiveDelta] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(0);
 
-  // Gesture tracking refs for high-performance 60fps tracking
+  // Gesture tracking refs
   const startX = useRef(0);
   const startY = useRef(0);
   const currentDelta = useRef(0);
@@ -44,15 +43,7 @@ export function SwipeNavigator() {
   
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Synchronize state ONLY for external navigation (from Top Nav buttons clicking links)
-  // Internal navigation (swipes, chevrons) handles state directly without router.push
+  // Synchronize state for external navigation (Top Nav clicks)
   useEffect(() => {
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
@@ -75,7 +66,7 @@ export function SwipeNavigator() {
     const deltaY = clientY - startY.current;
 
     if (directionLocked.current === null) {
-      // Immediate engagement threshold (5px)
+      // Immediate engagement threshold (5px) for responsiveness
       if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           directionLocked.current = 'horizontal';
@@ -116,18 +107,17 @@ export function SwipeNavigator() {
       }
 
       if (nextIndex !== currentPage) {
-        // Architecture A: Update local state ONLY. 
-        // No router.push/replace here to eliminate race conditions with usePathname.
         setCurrentPage(nextIndex);
+        // Update URL to trigger menu highlights
+        router.replace(pages[nextIndex].path);
       }
     }
 
-    // Synchronously batch cleanup and visual reset
     isGestureActive.current = false;
     directionLocked.current = null;
     currentDelta.current = 0;
     setLiveDelta(0);
-  }, [currentPage, pages.length]);
+  }, [currentPage, pages.length, router]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -162,11 +152,12 @@ export function SwipeNavigator() {
 
   const handlePageChange = (index: number) => {
     if (index < 0 || index >= pages.length) return;
-    // Architecture A: Update local state ONLY.
     setCurrentPage(index);
+    router.replace(pages[index].path);
   };
 
   const isSwiping = liveDelta !== 0;
+  // Match the animation feel of the menu buttons
   const translateX = `calc(-${currentPage * 100}vw + ${liveDelta}px)`;
 
   return (
@@ -182,32 +173,16 @@ export function SwipeNavigator() {
         )}
         style={{ transform: `translateX(${translateX})` }}
       >
-        {pages.map((page, index) => {
-          // Parallel Parallax and Opacity Calculation
-          const offsetFromCenter = (index - currentPage) * (windowWidth || 1) + liveDelta;
-          const normalizedDistance = Math.abs(offsetFromCenter) / (windowWidth || 1);
-          
-          const opacity = Math.max(0, 1 - normalizedDistance * 1.5);
-          const parallaxShift = (index - currentPage) * (windowWidth * 0.1) + (liveDelta * 0.15);
-
-          return (
-            <div 
-              key={page.path} 
-              className="w-[100vw] h-full overflow-y-auto px-4 py-8 will-change-[transform,opacity]"
-              style={{ opacity }}
-            >
-              <div 
-                className={cn(
-                  "container mx-auto will-change-transform",
-                  !isSwiping && "transition-transform duration-600 ease-reveal"
-                )}
-                style={{ transform: `translateX(${parallaxShift}px)` }}
-              >
-                <page.component />
-              </div>
+        {pages.map((page) => (
+          <div 
+            key={page.path} 
+            className="w-[100vw] h-full overflow-y-auto px-4 py-8"
+          >
+            <div className="container mx-auto">
+              <page.component />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* Visual Navigation Indicators */}
@@ -215,7 +190,7 @@ export function SwipeNavigator() {
         <button 
           onClick={() => handlePageChange(currentPage - 1)}
           className={cn(
-            "absolute left-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 will-change-[transform,opacity] transition-all duration-600 ease-reveal",
+            "absolute left-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 transition-all duration-600 ease-reveal",
             currentPage === 0 ? "opacity-0 -translate-x-4" : "opacity-100 translate-x-0",
             isSwiping ? "opacity-30 scale-90" : "animate-pulse-slow hover:opacity-100 hover:scale-110"
           )}
@@ -228,7 +203,7 @@ export function SwipeNavigator() {
         <button 
           onClick={() => handlePageChange(currentPage + 1)}
           className={cn(
-            "absolute right-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 will-change-[transform,opacity] transition-all duration-600 ease-reveal",
+            "absolute right-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 transition-all duration-600 ease-reveal",
             currentPage === pages.length - 1 ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0",
             isSwiping ? "opacity-30 scale-90" : "animate-pulse-slow hover:opacity-100 hover:scale-110"
           )}
