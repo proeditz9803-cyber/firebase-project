@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProtocolType, FastRecord, TimerMode } from '@/lib/fasting-types';
 import { cn } from '@/lib/utils';
-import { Play, Square, RotateCcw, ArrowUpDown, CheckCircle2, X, ArrowDown } from 'lucide-react';
+import { Play, Square, RotateCcw, X, ArrowDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
@@ -39,6 +39,11 @@ export default function TimerPage() {
   const [showNotification, setShowNotification] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
 
+  // Entrance Animation States
+  const [isFastingSectionVisible, setIsFastingSectionVisible] = useState(false);
+  const [isToggleButtonVisible, setIsToggleButtonVisible] = useState(false);
+  const [isEatingSectionVisible, setIsEatingSectionVisible] = useState(false);
+
   // Fasting Timer State
   const [fastStart, setFastStart] = useState<string | null>(null);
   const [fastElapsedSeconds, setFastElapsedSeconds] = useState(0);
@@ -51,7 +56,14 @@ export default function TimerPage() {
   const [customEatingHours, setCustomEatingHours] = useState(8);
   const [customEatingMinutes, setCustomEatingMinutes] = useState(0);
 
+  // Refs for Scroll Animations
+  const fastingSectionRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const eatingSectionRef = useRef<HTMLDivElement>(null);
+
+  const fastingObserverRef = useRef<IntersectionObserver | null>(null);
+  const toggleObserverRef = useRef<IntersectionObserver | null>(null);
+  const eatingObserverRef = useRef<IntersectionObserver | null>(null);
 
   // Persistence
   useEffect(() => {
@@ -90,6 +102,49 @@ export default function TimerPage() {
       localStorage.setItem('fastrack-fasting-complete', showNotification.toString());
     }
   }, [activeMode, protocol, customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes, showNotification, isClient]);
+
+  // Entrance Animation Setup
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Fasting Section Observer (0ms delay)
+    const fastingObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsFastingSectionVisible(true);
+        fastingObserver.disconnect();
+      }
+    }, { threshold: 0.3 });
+
+    // Toggle Button Observer (150ms delay)
+    const toggleObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => setIsToggleButtonVisible(true), 150);
+        toggleObserver.disconnect();
+      }
+    }, { threshold: 0.3 });
+
+    // Eating Section Observer (300ms delay)
+    const eatingObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => setIsEatingSectionVisible(true), 300);
+        eatingObserver.disconnect();
+      }
+    }, { threshold: 0.3 });
+
+    if (fastingSectionRef.current) fastingObserver.observe(fastingSectionRef.current);
+    if (toggleButtonRef.current) toggleObserver.observe(toggleButtonRef.current);
+    if (eatingSectionRef.current) eatingObserver.observe(eatingSectionRef.current);
+
+    fastingObserverRef.current = fastingObserver;
+    toggleObserverRef.current = toggleObserver;
+    eatingObserverRef.current = eatingObserver;
+
+    return () => {
+      fastingObserverRef.current?.disconnect();
+      toggleObserverRef.current?.disconnect();
+      eatingObserverRef.current?.disconnect();
+    };
+  }, [isClient]);
 
   const getPlannedSeconds = useCallback((mode: TimerMode) => {
     const h = mode === 'fasting' ? customFastingHours : customEatingHours;
@@ -324,10 +379,12 @@ export default function TimerPage() {
 
       {/* Fasting Timer Section */}
       <div 
+        ref={fastingSectionRef}
         className={cn(
-          "transition-all duration-400 border-l-4 p-6 sm:p-8 bg-card/20 group",
+          "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
+          isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
           activeMode === 'fasting' 
-            ? "border-primary bg-primary/5 opacity-100" 
+            ? "border-primary bg-primary/5" 
             : "border-border/20 opacity-50 grayscale-[0.3]"
         )}
         aria-label="Fasting Period Timer"
@@ -430,10 +487,12 @@ export default function TimerPage() {
       {/* Mode Toggle Button */}
       <div className="flex justify-center px-4 sm:px-0">
         <button
+          ref={toggleButtonRef}
           onClick={handleToggleMode}
           className={cn(
-            "group relative w-full flex flex-col items-center justify-center p-8 bg-background text-foreground border border-border transition-all duration-300 will-change-[transform,opacity]",
-            "hover:bg-foreground hover:text-background hover:scale-[1.015] active:scale-[0.985] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            "group relative w-full flex flex-col items-center justify-center p-8 bg-background text-foreground border border-border transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 will-change-[transform,opacity] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
+            "hover:bg-foreground hover:text-background hover:scale-[1.015] active:scale-[0.985] hover:duration-300"
           )}
           aria-label={activeMode === 'fasting' ? "Switch to Eating Period" : "Switch to Fasting Period"}
         >
@@ -459,10 +518,12 @@ export default function TimerPage() {
 
       {/* Eating Timer Section */}
       <div 
+        ref={eatingSectionRef}
         className={cn(
-          "transition-all duration-400 border-l-4 p-6 sm:p-8 bg-card/20 group",
+          "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-300 border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
+          isEatingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
           activeMode === 'eating' 
-            ? "border-amber-500 bg-amber-500/5 opacity-100" 
+            ? "border-amber-500 bg-amber-500/5" 
             : "border-border/20 opacity-50 grayscale-[0.3]"
         )}
         aria-label="Eating Period Timer"
