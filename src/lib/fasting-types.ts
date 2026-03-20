@@ -14,6 +14,8 @@ export interface FastState {
   fastStart: string | null;
   selectedProtocol: ProtocolType;
   customFastingHours: number;
+  customFastingMinutes: number;
   customEatingHours: number;
+  customEatingMinutes: number;
   history: FastRecord[];
 }

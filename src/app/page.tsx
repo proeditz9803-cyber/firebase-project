@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProtocolType, FastRecord, FastState } from '@/lib/fasting-types';
+import { ProtocolType, FastRecord } from '@/lib/fasting-types';
 import { cn } from '@/lib/utils';
-import { AlertCircle, Play, Square, RotateCcw } from 'lucide-react';
+import { Play, Square, RotateCcw } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,8 +32,13 @@ export default function TimerPage() {
   const [isClient, setIsClient] = useState(false);
   const [fastStart, setFastStart] = useState<string | null>(null);
   const [protocol, setProtocol] = useState<ProtocolType>('16:8');
+  
+  // Hours and Minutes State
   const [customFastingHours, setCustomFastingHours] = useState(16);
+  const [customFastingMinutes, setCustomFastingMinutes] = useState(0);
   const [customEatingHours, setCustomEatingHours] = useState(8);
+  const [customEatingMinutes, setCustomEatingMinutes] = useState(0);
+  
   const [history, setHistory] = useState<FastRecord[]>([]);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
@@ -42,14 +47,18 @@ export default function TimerPage() {
     setIsClient(true);
     const savedStart = localStorage.getItem('fastStart');
     const savedProtocol = localStorage.getItem('fastProtocol') as ProtocolType;
-    const savedCustomF = localStorage.getItem('customFastingHours');
-    const savedCustomE = localStorage.getItem('customEatingHours');
+    const savedCustomFH = localStorage.getItem('customFastingHours');
+    const savedCustomFM = localStorage.getItem('customFastingMinutes');
+    const savedCustomEH = localStorage.getItem('customEatingHours');
+    const savedCustomEM = localStorage.getItem('customEatingMinutes');
     const savedHistory = localStorage.getItem('fastHistory');
 
     if (savedStart) setFastStart(savedStart);
     if (savedProtocol) setProtocol(savedProtocol);
-    if (savedCustomF) setCustomFastingHours(parseInt(savedCustomF));
-    if (savedCustomE) setCustomEatingHours(parseInt(savedCustomE));
+    if (savedCustomFH) setCustomFastingHours(parseInt(savedCustomFH));
+    if (savedCustomFM) setCustomFastingMinutes(parseInt(savedCustomFM));
+    if (savedCustomEH) setCustomEatingHours(parseInt(savedCustomEH));
+    if (savedCustomEM) setCustomEatingMinutes(parseInt(savedCustomEM));
     if (savedHistory) setHistory(JSON.parse(savedHistory));
   }, []);
 
@@ -62,19 +71,25 @@ export default function TimerPage() {
     if (isClient) {
       localStorage.setItem('fastProtocol', protocol);
       localStorage.setItem('customFastingHours', customFastingHours.toString());
+      localStorage.setItem('customFastingMinutes', customFastingMinutes.toString());
       localStorage.setItem('customEatingHours', customEatingHours.toString());
+      localStorage.setItem('customEatingMinutes', customEatingMinutes.toString());
     }
-  }, [protocol, customFastingHours, customEatingHours, isClient]);
+  }, [protocol, customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes, isClient]);
 
-  const getPlannedHours = () => {
-    if (protocol === 'Custom') return customFastingHours;
-    return PROTOCOLS.find(p => p.value === protocol)?.fasting || 16;
-  };
+  const getPlannedSeconds = useCallback(() => {
+    if (protocol === 'Custom') {
+      return (customFastingHours * 3600) + (customFastingMinutes * 60);
+    }
+    const p = PROTOCOLS.find(p => p.value === protocol);
+    return (p?.fasting || 16) * 3600;
+  }, [protocol, customFastingHours, customFastingMinutes]);
 
   const endFast = useCallback((early = false) => {
     if (!fastStart) return;
 
-    const plannedHours = getPlannedHours();
+    const totalSeconds = getPlannedSeconds();
+    const plannedHours = totalSeconds / 3600;
     const startTime = new Date(fastStart);
     const endTime = new Date();
     const actualHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
@@ -93,7 +108,7 @@ export default function TimerPage() {
     saveHistory([newRecord, ...history]);
     setFastStart(null);
     localStorage.removeItem('fastStart');
-  }, [fastStart, protocol, customFastingHours, history, saveHistory]);
+  }, [fastStart, protocol, getPlannedSeconds, history, saveHistory]);
 
   // Timer loop
   useEffect(() => {
@@ -106,7 +121,7 @@ export default function TimerPage() {
         setElapsedSeconds(diff);
 
         // Auto end if completed
-        const plannedSec = getPlannedHours() * 3600;
+        const plannedSec = getPlannedSeconds();
         if (diff >= plannedSec) {
           endFast(false);
         }
@@ -115,9 +130,10 @@ export default function TimerPage() {
       setElapsedSeconds(0);
     }
     return () => clearInterval(interval);
-  }, [fastStart, endFast, getPlannedHours]);
+  }, [fastStart, endFast, getPlannedSeconds]);
 
   const startFast = () => {
+    if (getPlannedSeconds() <= 0) return;
     const now = new Date().toISOString();
     setFastStart(now);
     localStorage.setItem('fastStart', now);
@@ -129,12 +145,34 @@ export default function TimerPage() {
     setElapsedSeconds(0);
   };
 
+  // Normalization logic for minutes
+  const handleMinutesChange = (val: string, type: 'fasting' | 'eating') => {
+    const rawValue = parseInt(val) || 0;
+    if (rawValue < 0) return;
+
+    const overflowHours = Math.floor(rawValue / 60);
+    const remainingMinutes = rawValue % 60;
+
+    if (type === 'fasting') {
+      if (overflowHours > 0) {
+        setCustomFastingHours(prev => prev + overflowHours);
+      }
+      setCustomFastingMinutes(remainingMinutes);
+    } else {
+      if (overflowHours > 0) {
+        setCustomEatingHours(prev => prev + overflowHours);
+      }
+      setCustomEatingMinutes(remainingMinutes);
+    }
+  };
+
   if (!isClient) return null;
 
-  const plannedHours = getPlannedHours();
-  const totalPlannedSeconds = plannedHours * 3600;
+  const totalPlannedSeconds = getPlannedSeconds();
   const remainingSeconds = Math.max(0, totalPlannedSeconds - elapsedSeconds);
-  const progressPercent = Math.min(100, (elapsedSeconds / totalPlannedSeconds) * 100);
+  const progressPercent = totalPlannedSeconds > 0 
+    ? Math.min(100, (elapsedSeconds / totalPlannedSeconds) * 100)
+    : 0;
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -151,33 +189,23 @@ export default function TimerPage() {
     return "Elite fasting zone. You are doing exceptional.";
   };
 
-  // Streak calculations
-  const calculateStreaks = () => {
+  const streakData = (() => {
     if (history.length === 0) return { current: 0, longest: 0 };
-    
-    // Sort by end time
     const sorted = [...history]
       .filter(r => r.completed)
       .sort((a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime());
-    
     if (sorted.length === 0) return { current: 0, longest: 0 };
-
     let current = 0;
     let longest = 0;
     let temp = 0;
-    
     const dates = new Set(sorted.map(r => new Date(r.endTime).toDateString()));
     const uniqueDates = Array.from(dates).map(d => new Date(d));
-    
-    // Simplistic streak: daily consecutive dates
     for (let i = 0; i < uniqueDates.length; i++) {
       const today = new Date();
       today.setHours(0,0,0,0);
       const checkDate = new Date(uniqueDates[i]);
       checkDate.setHours(0,0,0,0);
-      
       const dayDiff = Math.floor((today.getTime() - checkDate.getTime()) / (1000 * 60 * 60 * 24));
-      
       if (i === 0) {
         if (dayDiff <= 1) temp = 1;
         else temp = 0;
@@ -191,11 +219,10 @@ export default function TimerPage() {
       if (i === 0 && dayDiff <= 1) current = temp;
       longest = Math.max(longest, temp);
     }
-
     return { current, longest };
-  };
+  })();
 
-  const { current: currentStreak, longest: longestStreak } = calculateStreaks();
+  const isStartDisabled = totalPlannedSeconds <= 0;
 
   return (
     <div className="max-w-xl mx-auto space-y-8">
@@ -221,26 +248,71 @@ export default function TimerPage() {
           </div>
 
           {protocol === 'Custom' && (
-            <div className="grid grid-cols-2 gap-4 mt-4 animate-in fade-in slide-in-from-top-2">
+            <div className="space-y-6 mt-4 animate-in fade-in slide-in-from-top-2">
+              {/* Fasting Duration Row */}
               <div className="space-y-2">
-                <Label htmlFor="customFast" className="text-xs">Fast (Hours)</Label>
-                <Input
-                  id="customFast"
-                  type="number"
-                  value={customFastingHours}
-                  onChange={(e) => setCustomFastingHours(parseInt(e.target.value) || 0)}
-                  disabled={!!fastStart}
-                />
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Fasting Duration</Label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 space-y-1.5">
+                    <Label htmlFor="fastH" className="text-[10px] opacity-70">Hours</Label>
+                    <Input
+                      id="fastH"
+                      type="number"
+                      min="0"
+                      max="99"
+                      value={customFastingHours}
+                      onChange={(e) => setCustomFastingHours(parseInt(e.target.value) || 0)}
+                      disabled={!!fastStart}
+                      className={cn(customFastingHours < 0 && "border-destructive")}
+                    />
+                  </div>
+                  <span className="text-muted-foreground font-bold pt-6">:</span>
+                  <div className="flex-1 space-y-1.5">
+                    <Label htmlFor="fastM" className="text-[10px] opacity-70">Minutes</Label>
+                    <Input
+                      id="fastM"
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={customFastingMinutes}
+                      onChange={(e) => handleMinutesChange(e.target.value, 'fasting')}
+                      disabled={!!fastStart}
+                      className={cn(customFastingMinutes < 0 && "border-destructive")}
+                    />
+                  </div>
+                </div>
               </div>
+
+              {/* Eating Duration Row */}
               <div className="space-y-2">
-                <Label htmlFor="customEat" className="text-xs">Eat (Hours)</Label>
-                <Input
-                  id="customEat"
-                  type="number"
-                  value={customEatingHours}
-                  onChange={(e) => setCustomEatingHours(parseInt(e.target.value) || 0)}
-                  disabled={!!fastStart}
-                />
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Eating Duration</Label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 space-y-1.5">
+                    <Label htmlFor="eatH" className="text-[10px] opacity-70">Hours</Label>
+                    <Input
+                      id="eatH"
+                      type="number"
+                      min="0"
+                      max="99"
+                      value={customEatingHours}
+                      onChange={(e) => setCustomEatingHours(parseInt(e.target.value) || 0)}
+                      disabled={!!fastStart}
+                    />
+                  </div>
+                  <span className="text-muted-foreground font-bold pt-6">:</span>
+                  <div className="flex-1 space-y-1.5">
+                    <Label htmlFor="eatM" className="text-[10px] opacity-70">Minutes</Label>
+                    <Input
+                      id="eatM"
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={customEatingMinutes}
+                      onChange={(e) => handleMinutesChange(e.target.value, 'eating')}
+                      disabled={!!fastStart}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -287,8 +359,14 @@ export default function TimerPage() {
           {!fastStart ? (
             <Button 
               size="lg" 
-              className="h-14 text-lg font-bold bg-primary text-background hover:bg-primary/90 w-full rounded-xl"
+              className={cn(
+                "h-14 text-lg font-bold w-full rounded-xl transition-all",
+                isStartDisabled 
+                  ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50" 
+                  : "bg-primary text-background hover:bg-primary/90"
+              )}
               onClick={startFast}
+              disabled={isStartDisabled}
             >
               <Play className="w-5 h-5 mr-2" /> Start Fast
             </Button>
@@ -353,11 +431,11 @@ export default function TimerPage() {
           
           <div className="flex items-center justify-center gap-8 pt-4 border-t border-border w-full">
             <div className="text-center">
-              <span className="block text-2xl font-bold text-primary">{currentStreak}</span>
+              <span className="block text-2xl font-bold text-primary">{streakData.current}</span>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Current Streak</span>
             </div>
             <div className="text-center">
-              <span className="block text-2xl font-bold text-primary">{longestStreak}</span>
+              <span className="block text-2xl font-bold text-primary">{streakData.longest}</span>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Longest Streak</span>
             </div>
           </div>
