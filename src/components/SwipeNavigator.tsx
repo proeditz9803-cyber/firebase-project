@@ -30,15 +30,19 @@ export function SwipeNavigator() {
     return index === -1 ? 0 : index;
   }, [pages]);
 
-  const [currentPage, setCurrentPage] = useState(getPageIndex(pathname));
+  const [currentPage, setCurrentPage] = useState(() => getPageIndex(pathname));
   const [liveDelta, setLiveDelta] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
 
+  // Gesture tracking refs
   const startX = useRef(0);
   const startY = useRef(0);
   const currentDelta = useRef(0);
   const isGestureActive = useRef(false);
   const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
+  
+  // Navigation source tracking ref to prevent double-animation bug
+  const navigationSource = useRef<'swipe' | 'external' | ''>('');
   
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -49,11 +53,24 @@ export function SwipeNavigator() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Synchronize state with URL changes (authoritative guard)
   useEffect(() => {
+    // If navigation was initiated by a swipe or arrow click, skip the redundant state update
+    if (navigationSource.current === 'swipe') {
+      navigationSource.current = '';
+      return;
+    }
+
+    // Mark as external navigation (from top nav bar)
+    navigationSource.current = 'external';
+
     const index = getPageIndex(pathname);
     if (index !== currentPage) {
       setCurrentPage(index);
     }
+
+    // Reset source after processing
+    navigationSource.current = '';
   }, [pathname, getPageIndex, currentPage]);
 
   const handleStart = (clientX: number, clientY: number) => {
@@ -111,11 +128,14 @@ export function SwipeNavigator() {
       }
 
       if (nextIndex !== currentPage) {
+        // Set authoritative source BEFORE updating state and URL
+        navigationSource.current = 'swipe';
         setCurrentPage(nextIndex);
         router.push(pages[nextIndex].path);
       }
     }
 
+    // Synchronously batch cleanup and visual reset
     isGestureActive.current = false;
     directionLocked.current = null;
     currentDelta.current = 0;
@@ -155,6 +175,8 @@ export function SwipeNavigator() {
 
   const handlePageChange = (index: number) => {
     if (index < 0 || index >= pages.length) return;
+    // Mark as swipe (internal) to prevent double trigger on arrow click
+    navigationSource.current = 'swipe';
     setCurrentPage(index);
     router.push(pages[index].path);
   };
@@ -177,15 +199,11 @@ export function SwipeNavigator() {
       >
         {pages.map((page, index) => {
           // Parallel Animation Calculation:
-          // Distance from the current viewport center (normalized 0 to 1)
-          const offsetFromCenter = (index - currentPage) * windowWidth + liveDelta;
+          const offsetFromCenter = (index - currentPage) * (windowWidth || 1) + liveDelta;
           const normalizedDistance = Math.abs(offsetFromCenter) / (windowWidth || 1);
           
-          // Parallel Layered Effects:
-          // 1. Opacity cross-fade (simultaneous with motion)
+          // Layered Effects:
           const opacity = Math.max(0, 1 - normalizedDistance * 1.5);
-          
-          // 2. Parallax internal shift (content moves at different speed)
           const parallaxShift = (index - currentPage) * (windowWidth * 0.1) + (liveDelta * 0.15);
 
           return (
@@ -209,7 +227,6 @@ export function SwipeNavigator() {
       </div>
 
       {/* Visual Navigation Indicators - Positioned absolutely */}
-      {/* These animate their opacity and horizontal position in parallel with the swipe progress */}
       <div className="pointer-events-none absolute inset-0 z-[50]">
         {/* Left Indicator */}
         <button 
