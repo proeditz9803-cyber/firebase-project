@@ -36,6 +36,19 @@
   }
 }
 
+/* Global Scroll Reveal System */
+.scroll-reveal-hidden {
+  opacity: 0;
+  transform: translateY(30px);
+  will-change: transform, opacity;
+}
+
+.scroll-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1), transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .circular-timer-svg {
   transform: rotate(-90deg);
 }
@@ -75,11 +88,7 @@
   animation: notificationSlideUp 350ms ease-in forwards;
 }
 
-/* 
-  LogoToggle Premium "Letter Pop" Reveal
-  --------------------------------------
-*/
-
+/* LogoToggle Letter Pop Reveal Keyframes */
 @keyframes letterPopOut {
   0% {
     transform: translateY(0);
@@ -125,5 +134,12 @@
     transition-duration: 0s !important;
     transition-delay: 0s !important;
     transform: none !important;
+  }
+  .scroll-reveal-hidden {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .scroll-reveal-visible {
+    transition: none !important;
   }
 }

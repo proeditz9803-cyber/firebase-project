@@ -1,14 +1,19 @@
-'use client';
+"use client";
 
 import { useEffect, useRef, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import useScrollReveal from '@/hooks/useScrollReveal';
 
 export default function ContactPage() {
   const [isVisible, setIsVisible] = useState(false);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // New Global Reveal Hooks
+  const [hRef, hVis] = useScrollReveal({ delay: 0 });
+  const [lRef, lVis] = useScrollReveal({ delay: 150 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,7 +29,7 @@ export default function ContactPage() {
           }
         }
       },
-      { threshold: 0.3 } // Trigger when 30% of the button is visible
+      { threshold: 0.15 } // Updated to 0.15
     );
 
     if (buttonRef.current) {
@@ -42,7 +47,13 @@ export default function ContactPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-12 py-12 px-6">
       {/* Brand Header */}
-      <section className="text-center space-y-6">
+      <section 
+        ref={hRef}
+        className={cn(
+          "text-center space-y-6 transition-all",
+          hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+        )}
+      >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
           Get In Touch
         </Badge>
@@ -56,7 +67,13 @@ export default function ContactPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-12 items-stretch">
         {/* Left Column: Informational Content */}
-        <div className="space-y-8 flex flex-col justify-center">
+        <div 
+          ref={lRef}
+          className={cn(
+            "space-y-8 flex flex-col justify-center transition-all",
+            lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+          )}
+        >
           <section className="space-y-4">
             <p className="leading-relaxed text-muted-foreground">
               We genuinely value user input and invite you to reach out with any questions, suggestions, or feedback about FasTrack. Whether you have a specific inquiry or just want to share your experience, we are here to listen and will respond as promptly as possible.
@@ -103,10 +120,10 @@ export default function ContactPage() {
             className={cn(
               "group relative w-full max-w-sm flex flex-col items-center justify-center p-8 md:p-12",
               "bg-background text-foreground border border-border rounded-xl",
-              "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 hover:duration-300",
+              "transition-all duration-900 ease-reveal delay-150",
               "hover:bg-foreground hover:text-background hover:scale-[1.02] active:scale-[0.98] active:duration-100",
               "will-change-[transform,opacity] cursor-pointer no-underline overflow-hidden",
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]"
             )}
             style={{ transitionProperty: 'transform, opacity, background-color, color, border-color' }}
           >

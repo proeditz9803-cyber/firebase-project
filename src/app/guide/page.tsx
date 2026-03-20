@@ -1,4 +1,15 @@
+"use client";
+
+import useScrollReveal from '@/hooks/useScrollReveal';
+import { cn } from '@/lib/utils';
+
 export default function GuidePage() {
+  const [hRef, hVis] = useScrollReveal({ delay: 0 });
+  const [pRef, pVis] = useScrollReveal({ delay: 150 });
+  const [mRef, mVis] = useScrollReveal({ delay: 300 });
+  const [eRef, eVis] = useScrollReveal({ delay: 450 });
+  const [tipRef, tipVis] = useScrollReveal({ delay: 600 });
+
   const protocols = [
     { name: '16:8 Protocol', desc: 'The most popular method. You fast for 16 hours and eat within an 8-hour window. Ideal for beginners.' },
     { name: '18:6 Protocol', desc: 'An intermediate step with a tighter eating window, providing slightly more time in a fasted state.' },
@@ -16,7 +27,10 @@ export default function GuidePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-12">
-      <section className="space-y-4">
+      <section 
+        ref={hRef}
+        className={cn("space-y-4 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h1 className="text-4xl font-bold tracking-tight text-primary">Intermittent Fasting Guide</h1>
         <p className="text-muted-foreground leading-relaxed">
           Intermittent fasting is an eating pattern that cycles between periods of fasting and eating. 
@@ -25,7 +39,10 @@ export default function GuidePage() {
         </p>
       </section>
 
-      <section className="space-y-6">
+      <section 
+        ref={pRef}
+        className={cn("space-y-6 transition-all", pVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold">Popular Protocols</h2>
         <div className="grid gap-4">
           {protocols.map((p) => (
@@ -37,7 +54,10 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section 
+        ref={mRef}
+        className={cn("space-y-6 transition-all", mVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold">What Happens to Your Body?</h2>
         <div className="space-y-4">
           {milestones.map((m) => (
@@ -51,7 +71,10 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section 
+        ref={eRef}
+        className={cn("space-y-6 transition-all", eVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-2xl font-bold">Common Mistakes</h2>
         <ul className="space-y-4 list-disc pl-6 text-muted-foreground text-sm">
           <li>
@@ -69,7 +92,10 @@ export default function GuidePage() {
         </ul>
       </section>
 
-      <section className="p-8 bg-primary/10 rounded-2xl border border-primary/20">
+      <section 
+        ref={tipRef}
+        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", tipVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
         <h2 className="text-xl font-bold mb-4">Pro Tip for Success</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
           Consistency is more important than perfection. If you have to break your fast early one day, 

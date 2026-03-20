@@ -14,6 +14,7 @@ export default {
         body: ['var(--font-dm-sans)', 'sans-serif'],
         headline: ['var(--font-dm-sans)', 'sans-serif'],
         code: ['monospace'],
+        clash: ['var(--font-clash-display)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -93,6 +94,12 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+      transitionDuration: {
+        '900': '900ms',
+      },
+      transitionTimingFunction: {
+        'reveal': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
     },
   },

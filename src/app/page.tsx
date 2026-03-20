@@ -9,6 +9,7 @@ import { ProtocolType, FastRecord, TimerMode } from '@/lib/fasting-types';
 import { cn } from '@/lib/utils';
 import { Play, Square, RotateCcw, X, ArrowDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import useScrollReveal from '@/hooks/useScrollReveal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,6 +66,9 @@ export default function TimerPage() {
   const toggleObserverRef = useRef<IntersectionObserver | null>(null);
   const eatingObserverRef = useRef<IntersectionObserver | null>(null);
 
+  // New Global Reveal Hook for heading
+  const [hRef, hVis] = useScrollReveal({ delay: 0 });
+
   // Persistence
   useEffect(() => {
     setIsClient(true);
@@ -113,7 +117,7 @@ export default function TimerPage() {
         setIsFastingSectionVisible(true);
         fastingObserver.disconnect();
       }
-    }, { threshold: 0.3 });
+    }, { threshold: 0.15 });
 
     // Toggle Button Observer (150ms delay)
     const toggleObserver = new IntersectionObserver(([entry]) => {
@@ -121,7 +125,7 @@ export default function TimerPage() {
         setTimeout(() => setIsToggleButtonVisible(true), 150);
         toggleObserver.disconnect();
       }
-    }, { threshold: 0.3 });
+    }, { threshold: 0.15 });
 
     // Eating Section Observer (300ms delay)
     const eatingObserver = new IntersectionObserver(([entry]) => {
@@ -129,7 +133,7 @@ export default function TimerPage() {
         setTimeout(() => setIsEatingSectionVisible(true), 300);
         eatingObserver.disconnect();
       }
-    }, { threshold: 0.3 });
+    }, { threshold: 0.15 });
 
     if (fastingSectionRef.current) fastingObserver.observe(fastingSectionRef.current);
     if (toggleButtonRef.current) toggleObserver.observe(toggleButtonRef.current);
@@ -313,7 +317,7 @@ export default function TimerPage() {
           <div className="bg-[#0a0f0a] border-l-4 border-primary p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] container mx-auto max-w-xl">
             <div className="flex items-start justify-between gap-6">
               <div className="space-y-2">
-                <h3 className="text-2xl font-bold tracking-tight text-white font-clash">Fasting Complete</h3>
+                <h3 className="text-2xl font-bold tracking-tight text-white font-outfit">Fasting Complete</h3>
                 <p className="text-sm font-medium text-white/70 leading-relaxed max-w-md">
                   Your fasting period has ended. Your eating period is ready to begin.
                 </p>
@@ -345,7 +349,13 @@ export default function TimerPage() {
       )}
 
       {/* Protocol Selector */}
-      <Card className="border-none shadow-xl bg-card/40">
+      <Card 
+        ref={hRef}
+        className={cn(
+          "border-none shadow-xl bg-card/40 transition-all",
+          hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+        )}
+      >
         <CardContent className="pt-6 space-y-4">
           <Label className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">Select Protocol</Label>
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -381,8 +391,8 @@ export default function TimerPage() {
       <div 
         ref={fastingSectionRef}
         className={cn(
-          "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
-          isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
+          "transition-all duration-900 ease-reveal border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
+          isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]",
           activeMode === 'fasting' 
             ? "border-primary bg-primary/5" 
             : "border-border/20 opacity-50 grayscale-[0.3]"
@@ -393,7 +403,7 @@ export default function TimerPage() {
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h2 className="text-3xl font-bold tracking-tight font-clash">Fasting Period</h2>
+              <h2 className="text-3xl font-bold tracking-tight font-outfit">Fasting Period</h2>
               <Badge 
                 className={cn(
                   "transition-all duration-400 font-bold tracking-widest text-[10px] px-3 py-1 rounded-full",
@@ -442,7 +452,7 @@ export default function TimerPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold tracking-tighter tabular-nums font-clash">
+                <span className="text-xl font-bold tracking-tighter tabular-nums font-outfit">
                   {formatTime(Math.max(0, getPlannedSeconds('fasting') - fastElapsedSeconds))}
                 </span>
                 <span className="text-[8px] font-bold text-muted-foreground mt-0.5 tracking-widest uppercase">REMAINING</span>
@@ -467,7 +477,7 @@ export default function TimerPage() {
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className="rounded-none border-primary/20">
-                      <AlertDialogHeader><AlertDialogTitle className="font-clash uppercase">End Fast Early?</AlertDialogTitle></AlertDialogHeader>
+                      <AlertDialogHeader><AlertDialogTitle className="font-outfit uppercase">End Fast Early?</AlertDialogTitle></AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel className="rounded-none">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => endFast(true)} className="rounded-none bg-primary text-background">End Fast</AlertDialogAction>
@@ -490,8 +500,8 @@ export default function TimerPage() {
           ref={toggleButtonRef}
           onClick={handleToggleMode}
           className={cn(
-            "group relative w-full flex flex-col items-center justify-center p-8 bg-background text-foreground border border-border transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 will-change-[transform,opacity] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-            isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
+            "group relative w-full flex flex-col items-center justify-center p-8 bg-background text-foreground border border-border transition-all duration-900 ease-reveal delay-150 will-change-[transform,opacity] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+            isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]",
             "hover:bg-foreground hover:text-background hover:scale-[1.015] active:scale-[0.985] hover:duration-300"
           )}
           aria-label={activeMode === 'fasting' ? "Switch to Eating Period" : "Switch to Fasting Period"}
@@ -505,7 +515,7 @@ export default function TimerPage() {
           </div>
 
           <div className="flex items-center justify-center gap-4 mt-2">
-            <span className="text-xl md:text-2xl font-bold uppercase tracking-tighter font-clash">
+            <span className="text-xl md:text-2xl font-bold uppercase tracking-tighter font-outfit">
               {activeMode === 'fasting' ? 'Switch to Eating Period' : 'Switch to Fasting Period'}
             </span>
             <ArrowDown className="w-6 h-6 transition-transform duration-500 group-hover:translate-y-1.5" />
@@ -520,8 +530,8 @@ export default function TimerPage() {
       <div 
         ref={eatingSectionRef}
         className={cn(
-          "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-300 border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
-          isEatingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10",
+          "transition-all duration-900 ease-reveal delay-300 border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
+          isEatingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]",
           activeMode === 'eating' 
             ? "border-amber-500 bg-amber-500/5" 
             : "border-border/20 opacity-50 grayscale-[0.3]"
@@ -532,7 +542,7 @@ export default function TimerPage() {
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h2 className="text-3xl font-bold tracking-tight font-clash">Eating Period</h2>
+              <h2 className="text-3xl font-bold tracking-tight font-outfit">Eating Period</h2>
               <Badge 
                 className={cn(
                   "transition-all duration-400 font-bold tracking-widest text-[10px] px-3 py-1 rounded-full",
@@ -581,7 +591,7 @@ export default function TimerPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold tracking-tighter tabular-nums font-clash">
+                <span className="text-xl font-bold tracking-tighter tabular-nums font-outfit">
                   {formatTime(Math.max(0, getPlannedSeconds('eating') - eatingElapsedSeconds))}
                 </span>
                 <span className="text-[8px] font-bold text-muted-foreground mt-0.5 tracking-widest uppercase">REMAINING</span>
