@@ -123,6 +123,16 @@
   animation: letterPopIn 550ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+/* Swipe Navigation Indicators Pulse */
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-opacity 2s ease-in-out infinite;
+}
+
 /* Accessibility: Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

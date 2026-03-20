@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, RefObject } from 'react';
 
 /**
  * @fileOverview A reusable hook for scroll-triggered entrance animations.
+ * Updated with premium 900ms duration and refined easing.
  */
 
 interface ScrollRevealOptions {
