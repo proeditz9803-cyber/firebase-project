@@ -13,8 +13,8 @@ import GuidePage from '@/app/guide/page';
 
 /**
  * SwipeNavigator Component
- * Implements a premium "Card Swipe" navigation system where each page behaves as an independent card.
- * Features simultaneous translation, depth scaling, and elevated shadowing.
+ * Implements a premium "Card Swipe" navigation system.
+ * Navigation buttons are now positioned exactly at the viewport edges, vertically centered.
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
@@ -38,7 +38,7 @@ export function SwipeNavigator() {
   const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward' | 'none'>('none');
   const [screenWidth, setScreenWidth] = useState(0);
   
-  // Entrance reveal hook for the new bottom controls
+  // Entrance reveal hooks for controls
   const [controlsRef, controlsVisible] = useScrollReveal({ delay: 300 });
 
   // Gesture tracking refs
@@ -48,9 +48,10 @@ export function SwipeNavigator() {
   const isGestureActive = useRef(false);
   const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const navigationSource = useRef<'swipe' | 'external' | ''>('');
+  const navigationSource = useRef<'internal' | 'external' | ''>('');
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     setScreenWidth(window.innerWidth);
     const handleResize = () => setScreenWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
@@ -59,7 +60,7 @@ export function SwipeNavigator() {
 
   // Synchronize state for external navigation (Top Nav clicks)
   useEffect(() => {
-    if (navigationSource.current === 'swipe') {
+    if (navigationSource.current === 'internal') {
       navigationSource.current = '';
       return;
     }
@@ -70,21 +71,23 @@ export function SwipeNavigator() {
   }, [pathname, getPageIndex, currentPage]);
 
   /**
-   * Authoritative source of truth for committing a page transition.
-   * Shared by gestures, bottom buttons, and side indicators.
+   * Unified transition trigger for all navigation methods.
    */
   const commitPageTransition = useCallback((targetIndex: number) => {
     if (isTransitioning || targetIndex === currentPage || targetIndex < 0 || targetIndex >= pages.length) return;
     
-    navigationSource.current = 'swipe';
+    navigationSource.current = 'internal';
     const direction = targetIndex > currentPage ? 'forward' : 'backward';
     
-    // Batch updates to trigger a single re-render for the animation
     setTransitionDirection(direction);
     setIsTransitioning(true);
     setCurrentPage(targetIndex);
     setLiveDelta(0);
-  }, [currentPage, isTransitioning, pages.length]);
+
+    // Sync URL
+    const targetPath = pages[targetIndex].path;
+    router.replace(targetPath);
+  }, [currentPage, isTransitioning, pages, router]);
 
   const handleStart = (clientX: number, clientY: number) => {
     if (isTransitioning) return;
@@ -102,7 +105,6 @@ export function SwipeNavigator() {
     const deltaY = clientY - startY.current;
 
     if (directionLocked.current === null) {
-      // Immediate engagement threshold (5px)
       if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           directionLocked.current = 'horizontal';
@@ -120,16 +122,12 @@ export function SwipeNavigator() {
     }
 
     let adjustedDelta = deltaX;
-    // Edge resistance (0.3 factor)
     if ((currentPage === 0 && deltaX > 0) || (currentPage === pages.length - 1 && deltaX < 0)) {
       adjustedDelta = deltaX * 0.3;
     }
     
     currentDelta.current = adjustedDelta;
     setLiveDelta(adjustedDelta);
-    if (adjustedDelta < 0) setTransitionDirection('forward');
-    else if (adjustedDelta > 0) setTransitionDirection('backward');
-    else setTransitionDirection('none');
   }, [currentPage, pages.length, isTransitioning]);
 
   const handleEnd = useCallback(() => {
@@ -144,7 +142,6 @@ export function SwipeNavigator() {
       } else if (delta > threshold && currentPage > 0) {
         commitPageTransition(currentPage - 1);
       } else {
-        // Snap back
         setIsTransitioning(true);
         setLiveDelta(0);
         setTransitionDirection('none');
@@ -203,29 +200,22 @@ export function SwipeNavigator() {
         const isForward = transitionDirection === 'forward';
         const isBackward = transitionDirection === 'backward';
         
-        // Identify the outgoing card (the one sliding away)
         const isOutgoing = (isForward && i === currentPage - 1) || (isBackward && i === currentPage + 1);
-        const isVisibleAsIncoming = (isForward && i === currentPage) || (isBackward && i === currentPage);
         
         let zIndex = 0;
-        let opacity = 1;
         let transform = i < currentPage ? 'translateX(-100vw)' : 'translateX(100vw)';
         let shadow = 'none';
         let pointerEvents: 'auto' | 'none' = 'none';
         
-        // Standardized transition for non-gesture events
         const isSwiping = liveDelta !== 0;
         const transitionStyle = isSwiping ? 'none' : 'transform 700ms cubic-bezier(0.16, 1, 0.3, 1)';
 
         if (isActive) {
-          zIndex = 2; // Incoming card is on top
+          zIndex = 2;
           pointerEvents = 'auto';
           
           if (isSwiping) {
-            const offset = isForward ? `calc(100vw + ${liveDelta}px)` : `calc(-100vw + ${liveDelta}px)`;
-            const scale = 0.97 + (Math.abs(liveDelta) / screenWidth * 0.03); 
-            transform = `translateX(${offset}) scale(${Math.min(1, scale)})`;
-            shadow = '0 8px 32px rgba(0,0,0,0.18)';
+            transform = `translateX(${liveDelta}px) scale(1)`;
           } else if (isTransitioning) {
             transform = 'translateX(0) scale(1)';
             shadow = '0 8px 32px rgba(0,0,0,0.18)';
@@ -244,6 +234,17 @@ export function SwipeNavigator() {
             const offset = i < currentPage ? '-100vw' : '100vw';
             transform = `translateX(${offset}) scale(0.95)`;
           }
+        } else {
+            // Incoming card logic for gesture visualization
+            if (isSwiping) {
+                const incomingTarget = liveDelta < 0 ? currentPage + 1 : currentPage - 1;
+                if (i === incomingTarget) {
+                    zIndex = 2;
+                    const basePos = liveDelta < 0 ? screenWidth : -screenWidth;
+                    transform = `translateX(${basePos + liveDelta}px) scale(0.97)`;
+                    shadow = '0 8px 32px rgba(0,0,0,0.18)';
+                }
+            }
         }
 
         return (
@@ -253,7 +254,6 @@ export function SwipeNavigator() {
             style={{ 
               transform, 
               zIndex, 
-              opacity, 
               boxShadow: shadow, 
               pointerEvents,
               transition: transitionStyle,
@@ -268,73 +268,45 @@ export function SwipeNavigator() {
         );
       })}
 
-      {/* Side Navigation Indicators (Pulsing Arrows) */}
-      <div className="pointer-events-none absolute inset-0 z-[40]">
-        <button 
+      {/* Repositioned Navigation Buttons: Center Vertically at Edges */}
+      <div className="pointer-events-none fixed inset-0 z-[50]">
+        <button
           onClick={() => commitPageTransition(currentPage - 1)}
-          className={cn(
-            "absolute left-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 transition-all duration-700 ease-reveal",
-            currentPage === 0 ? "opacity-0 -translate-x-4" : "opacity-100 translate-x-0",
-            (isTransitioning) ? "opacity-30 scale-90" : "animate-pulse-slow hover:opacity-100 hover:scale-110"
-          )}
-          aria-label="Previous Page"
           disabled={currentPage === 0 || isTransitioning}
+          aria-label="Navigate to previous page"
+          className={cn(
+            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/25 bg-background/15 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-background/30 hover:border-white/50 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
+            currentPage === 0 ? "opacity-20 cursor-not-allowed" : "opacity-100",
+            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+          )}
+          style={{ WebkitBackdropFilter: 'blur(12px)', transitionProperty: 'transform, opacity, background-color, border-color, box-shadow' }}
         >
-          <ChevronLeft className="w-8 h-8 text-primary" />
+          <ChevronLeft className="w-4 h-4 text-white stroke-[1.5] transition-transform duration-250 group-hover:-translate-x-0.5" />
         </button>
 
-        <button 
+        <button
           onClick={() => commitPageTransition(currentPage + 1)}
-          className={cn(
-            "absolute right-2 top-1/2 -translate-y-1/2 pointer-events-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full p-2 bg-background/20 transition-all duration-700 ease-reveal",
-            currentPage === pages.length - 1 ? "opacity-0 translate-x-4" : "opacity-100 translate-x-0",
-            (isTransitioning) ? "opacity-30 scale-90" : "animate-pulse-slow hover:opacity-100 hover:scale-110"
-          )}
-          aria-label="Next Page"
           disabled={currentPage === pages.length - 1 || isTransitioning}
+          aria-label="Navigate to next page"
+          className={cn(
+            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/25 bg-background/15 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-background/30 hover:border-white/50 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
+            currentPage === pages.length - 1 ? "opacity-20 cursor-not-allowed" : "opacity-100",
+            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+          )}
+          style={{ WebkitBackdropFilter: 'blur(12px)', transitionProperty: 'transform, opacity, background-color, border-color, box-shadow' }}
         >
-          <ChevronRight className="w-8 h-8 text-primary" />
+          <ChevronRight className="w-4 h-4 text-white stroke-[1.5] transition-transform duration-250 group-hover:translate-x-0.5" />
         </button>
       </div>
 
-      {/* NEW: Bottom Frosted Controls & Indicators */}
+      {/* Page Indicator Dots (Remains at bottom) */}
       <div 
         ref={controlsRef}
         className={cn(
-          "fixed bottom-5 md:bottom-8 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center gap-2.5 transition-all",
+          "fixed bottom-5 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center gap-2.5 transition-all pointer-events-none",
           controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
         )}
       >
-        {/* Navigation Button Pair */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => commitPageTransition(currentPage - 1)}
-            disabled={currentPage === 0 || isTransitioning}
-            aria-label="Navigate to previous page"
-            className={cn(
-              "w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/25 bg-background/15 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-background/30 hover:border-white/50 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
-              currentPage === 0 ? "opacity-20 pointer-events-none" : "opacity-100"
-            )}
-            style={{ WebkitBackdropFilter: 'blur(12px)' }}
-          >
-            <ChevronLeft className="w-4 h-4 text-white stroke-[1.5] transition-transform duration-250 group-hover:-translate-x-0.5" />
-          </button>
-
-          <button
-            onClick={() => commitPageTransition(currentPage + 1)}
-            disabled={currentPage === pages.length - 1 || isTransitioning}
-            aria-label="Navigate to next page"
-            className={cn(
-              "w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/25 bg-background/15 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-background/30 hover:border-white/50 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
-              currentPage === pages.length - 1 ? "opacity-20 pointer-events-none" : "opacity-100"
-            )}
-            style={{ WebkitBackdropFilter: 'blur(12px)' }}
-          >
-            <ChevronRight className="w-4 h-4 text-white stroke-[1.5] transition-transform duration-250 group-hover:translate-x-0.5" />
-          </button>
-        </div>
-
-        {/* Page Indicator Dots */}
         <div className="flex items-center gap-1.5" aria-label="Page indicator">
           {pages.map((p, idx) => (
             <div
