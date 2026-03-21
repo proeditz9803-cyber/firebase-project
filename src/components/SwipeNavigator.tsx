@@ -13,7 +13,7 @@ import GuidePage from '@/app/guide/page';
 /**
  * SwipeNavigator Component
  * Implements a premium "Card Swipe" navigation system where each page behaves as an independent card.
- * Transitions incorporate simultaneous translation, scaling, and shadowing for a high-end feel.
+ * Features simultaneous translation, depth scaling, and elevated shadowing.
  */
 export function SwipeNavigator() {
   const pathname = usePathname();
@@ -30,6 +30,7 @@ export function SwipeNavigator() {
     return index === -1 ? 0 : index;
   }, [pages]);
 
+  // Persistent States
   const [currentPage, setCurrentPage] = useState(() => getPageIndex(pathname));
   const [liveDelta, setLiveDelta] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -37,21 +38,20 @@ export function SwipeNavigator() {
   const [isSwiping, setIsSwiping] = useState(false);
   const [screenWidth, setScreenWidth] = useState(0);
 
-  useEffect(() => {
-    setScreenWidth(window.innerWidth);
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   // Gesture tracking refs
   const startX = useRef(0);
   const startY = useRef(0);
   const currentDelta = useRef(0);
   const isGestureActive = useRef(false);
   const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
-  
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setScreenWidth(window.innerWidth);
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Synchronize state for external navigation (Top Nav clicks)
   useEffect(() => {
@@ -77,7 +77,7 @@ export function SwipeNavigator() {
     const deltaY = clientY - startY.current;
 
     if (directionLocked.current === null) {
-      // Immediate engagement threshold (5px) for responsiveness
+      // Immediate engagement threshold (5px)
       if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
           directionLocked.current = 'horizontal';
@@ -128,14 +128,10 @@ export function SwipeNavigator() {
       if (nextIndex !== currentPage) {
         setCurrentPage(nextIndex);
       } else {
-        // Snap back if threshold not met
+        // Snap back
         setLiveDelta(0);
         setTransitionDirection('none');
-        if (delta !== 0) {
-          setIsTransitioning(true);
-        } else {
-          setIsTransitioning(false);
-        }
+        setIsTransitioning(true);
       }
     }
 
@@ -191,32 +187,35 @@ export function SwipeNavigator() {
 
   return (
     <div 
-      className="relative w-full h-full overflow-hidden touch-none"
       ref={containerRef}
+      className="relative w-full h-[calc(100vh-64px)] overflow-hidden touch-none"
     >
       {pages.map((page, i) => {
         const isActive = i === currentPage;
         const isForward = transitionDirection === 'forward';
         const isBackward = transitionDirection === 'backward';
+        
+        // Identification of the card that IS sliding OUT
+        // This logic is tricky when currentPage has already updated to the target index.
+        // During a transition, the "outgoing" card is usually the one that ISN'T active but was just active.
         const isOutgoing = (isForward && i === currentPage - 1) || (isBackward && i === currentPage + 1);
         
         let zIndex = 0;
-        let opacity = 0;
-        let transform = i < currentPage ? 'translateX(-100%)' : 'translateX(100%)';
+        let opacity = 1;
+        let transform = i < currentPage ? 'translateX(-100vw)' : 'translateX(100vw)';
         let shadow = 'none';
         let pointerEvents: 'auto' | 'none' = 'none';
-
-        // Normalized progress [0, 1]
+        
+        // Normalized progress [0, 1] for gesture
         const p = screenWidth ? Math.min(1, Math.abs(liveDelta) / screenWidth) : 0;
 
         if (isActive) {
           zIndex = 2; // Incoming card is on top
-          opacity = 1;
           pointerEvents = 'auto';
           
           if (isSwiping) {
             const offset = isForward ? `calc(100vw + ${liveDelta}px)` : `calc(-100vw + ${liveDelta}px)`;
-            const scale = 0.97 + (p * 0.03); // Scale up from 0.97 to 1
+            const scale = 0.97 + (p * 0.03); 
             transform = `translateX(${offset}) scale(${scale})`;
             shadow = '0 8px 32px rgba(0,0,0,0.18)';
           } else if (isTransitioning) {
@@ -227,18 +226,15 @@ export function SwipeNavigator() {
           }
         } else if (isOutgoing) {
           zIndex = 1;
-          opacity = 1;
           if (isSwiping) {
-            const scale = 1 - (p * 0.05); // Scale down from 1 to 0.95
+            const scale = 1 - (p * 0.05); 
             transform = `translateX(${liveDelta}px) scale(${scale})`;
           } else if (isTransitioning) {
             const offset = isForward ? '-100vw' : '100vw';
             transform = `translateX(${offset}) scale(0.95)`;
           } else {
-            // Already exited
             const offset = i < currentPage ? '-100vw' : '100vw';
             transform = `translateX(${offset}) scale(0.95)`;
-            opacity = 0;
           }
         }
 
@@ -246,10 +242,17 @@ export function SwipeNavigator() {
           <div 
             key={page.path}
             className={cn(
-              "absolute inset-0 w-full h-full overflow-y-auto will-change-transform bg-background",
-              !isSwiping && "transition-all duration-700 ease-reveal"
+              "absolute top-0 left-0 w-full h-full overflow-y-auto will-change-transform bg-background",
+              !isSwiping && "transition-transform duration-700 ease-reveal"
             )}
-            style={{ transform, zIndex, opacity, boxShadow: shadow, pointerEvents }}
+            style={{ 
+              transform, 
+              zIndex, 
+              opacity, 
+              boxShadow: shadow, 
+              pointerEvents,
+              transitionProperty: isSwiping ? 'none' : 'transform'
+            }}
             onTransitionEnd={isOutgoing ? handleTransitionEnd : undefined}
           >
             <div className="container mx-auto px-4 py-8">
