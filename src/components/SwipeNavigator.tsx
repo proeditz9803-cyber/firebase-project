@@ -275,7 +275,7 @@ export function SwipeNavigator() {
           disabled={currentPage === 0 || isTransitioning}
           aria-label="Navigate to previous page"
           className={cn(
-            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/25 bg-background/15 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-background/30 hover:border-white/50 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
+            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/20 bg-white/10 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-white/20 hover:border-white/40 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
             currentPage === 0 ? "opacity-20 cursor-not-allowed" : "opacity-100",
             controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
           )}
@@ -289,7 +289,7 @@ export function SwipeNavigator() {
           disabled={currentPage === pages.length - 1 || isTransitioning}
           aria-label="Navigate to next page"
           className={cn(
-            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/25 bg-background/15 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-background/30 hover:border-white/50 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
+            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/20 bg-white/10 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-white/20 hover:border-white/40 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
             currentPage === pages.length - 1 ? "opacity-20 cursor-not-allowed" : "opacity-100",
             controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
           )}
