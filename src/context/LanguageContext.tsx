@@ -1,8 +1,7 @@
 'use client';
 /**
- * @fileOverview Global Language Context for FasTrack.
- * Provides current language state and translation functions to the entire app.
- * Optimized with server-safe initialization and robust window guards.
+ * @fileOverview Definitive Language Context implementation for FasTrack.
+ * Handles site-wide translation state, persistence, and nested key traversal.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
@@ -19,6 +18,7 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState('en');
 
+  // Step 1: Initialize language from localStorage after mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('fastrack-language');
@@ -28,10 +28,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const setLanguage = useCallback((lang: string) => {
+  const setLanguage = useCallback((newLang: string) => {
     if (typeof window === 'undefined') return;
-    setLanguageState(lang);
-    localStorage.setItem('fastrack-language', lang);
+    setLanguageState(newLang);
+    localStorage.setItem('fastrack-language', newLang);
   }, []);
 
   const t = useCallback((key: string): string => {

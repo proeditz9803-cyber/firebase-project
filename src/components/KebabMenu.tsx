@@ -51,35 +51,35 @@ export default function KebabMenu() {
           className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Settings className="w-4 h-4" />
-          {t('nav.settings')}
+          {t('navigation.settings')}
         </Link>
         <Link
           href="/about"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav.about')}
+          {t('navigation.aboutUs')}
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav.privacy')}
+          {t('navigation.privacyPolicy')}
         </Link>
         <Link
           href="/terms-and-conditions"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav.terms')}
+          {t('navigation.terms')}
         </Link>
         <Link
           href="/contact"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav.contact')}
+          {t('navigation.contactUs')}
         </Link>
       </div>
     </div>

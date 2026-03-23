@@ -13,7 +13,6 @@ export const LANGUAGES = [
   { code: 'ja', name: 'Japanese', native: '日本語' },
   { code: 'ko', name: 'Korean', native: '한국어' },
   { code: 'zh-CN', name: 'Chinese Simplified', native: '简体中文' },
-  { code: 'zh-TW', name: 'Chinese Traditional', native: '繁體中文' },
   { code: 'ar', name: 'Arabic', native: 'العربية' },
   { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
   { code: 'bn', name: 'Bengali', native: 'বাংলা' },
@@ -33,89 +32,20 @@ export const LANGUAGES = [
   { code: 'ro', name: 'Romanian', native: 'Română' },
   { code: 'hu', name: 'Hungarian', native: 'Magyar' },
   { code: 'uk', name: 'Ukrainian', native: 'Українська' },
-  { code: 'ms', name: 'Malay', native: 'Bahasa Melayu' },
-  { code: 'af', name: 'Afrikaans', native: 'Afrikaans' },
-  { code: 'sq', name: 'Albanian', native: 'Shqip' },
-  { code: 'am', name: 'Amharic', native: 'አማርኛ' },
-  { code: 'hy', name: 'Armenian', native: 'Հայերեն' },
-  { code: 'az', name: 'Azerbaijani', native: 'Azərbaycan dili' },
-  { code: 'eu', name: 'Basque', native: 'Euskara' },
-  { code: 'be', name: 'Belarusian', native: 'Беларуская' },
-  { code: 'bs', name: 'Bosnian', native: 'Bosanski' },
-  { code: 'bg', name: 'Bulgarian', native: 'Български' },
-  { code: 'ca', name: 'Catalan', native: 'Català' },
-  { code: 'ceb', name: 'Cebuano', native: 'Cebuano' },
-  { code: 'hr', name: 'Croatian', native: 'Hrvatski' },
-  { code: 'eo', name: 'Esperanto', native: 'Esperanto' },
-  { code: 'et', name: 'Estonian', native: 'Eesti' },
-  { code: 'tl', name: 'Filipino', native: 'Tagalog' },
-  { code: 'gl', name: 'Galician', native: 'Galego' },
-  { code: 'ka', name: 'Georgian', native: 'ქართული' },
-  { code: 'gu', name: 'Gujarati', native: 'ગુજરાતી' },
-  { code: 'ht', name: 'Haitian Creole', native: 'Kreyòl ayisyen' },
-  { code: 'ha', name: 'Hausa', native: 'Hausa' },
-  { code: 'he', name: 'Hebrew', native: 'עברית' },
-  { code: 'is', name: 'Icelandic', native: 'Íslenska' },
-  { code: 'ig', name: 'Igbo', native: 'Asụsụ Igbo' },
-  { code: 'ga', name: 'Irish', native: 'Gaeilge' },
-  { code: 'jv', name: 'Javanese', native: 'Basa Jawa' },
-  { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
-  { code: 'kk', name: 'Kazakh', native: 'Қазақ тілі' },
-  { code: 'km', name: 'Khmer', native: 'ខ្មែរ' },
-  { code: 'ku', name: 'Kurdish', native: 'Kurdî' },
-  { code: 'ky', name: 'Kyrgyz', native: 'Кыргызча' },
-  { code: 'lo', name: 'Lao', native: 'ລາວ' },
-  { code: 'la', name: 'Latin', native: 'Latina' },
-  { code: 'lv', name: 'Latvian', native: 'Latviešu' },
-  { code: 'lt', name: 'Lithuanian', native: 'Lietuvių' },
-  { code: 'lb', name: 'Luxembourgish', native: 'Lëtzebuergesch' },
-  { code: 'mk', name: 'Macedonian', native: 'Македонски' },
-  { code: 'mg', name: 'Malagasy', native: 'Malagasy' },
-  { code: 'ml', name: 'Malayalam', native: 'മലയാളം' },
-  { code: 'mt', name: 'Maltese', native: 'Malti' },
-  { code: 'mi', name: 'Maori', native: 'Māori' },
-  { code: 'mr', name: 'Marathi', native: 'मराठी' },
-  { code: 'mn', name: 'Mongolian', native: 'Монгол' },
-  { code: 'my', name: 'Myanmar', native: 'မြန်မာ' },
-  { code: 'ne', name: 'Nepali', native: 'नेपाली' },
-  { code: 'ny', name: 'Nyanja', native: 'Chichewa' },
-  { code: 'ps', name: 'Pashto', native: 'پښتو' },
-  { code: 'fa', name: 'Persian', native: 'فارسی' },
-  { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
-  { code: 'sm', name: 'Samoan', native: 'Gagana Sāmoa' },
-  { code: 'sr', name: 'Serbian', native: 'Српски' },
-  { code: 'st', name: 'Sesotho', native: 'Sesotho' },
-  { code: 'sn', name: 'Shona', native: 'chiShona' },
-  { code: 'sd', name: 'Sindhi', native: 'سنڌي' },
-  { code: 'si', name: 'Sinhala', native: 'සිංහල' },
-  { code: 'sk', name: 'Slovak', native: 'Slovenčina' },
-  { code: 'sl', name: 'Slovenian', native: 'Slovenščina' },
-  { code: 'so', name: 'Somali', native: 'Soomaali' },
-  { code: 'su', name: 'Sundanese', native: 'Basa Sunda' },
-  { code: 'sw', name: 'Swahili', native: 'Kiswahili' },
-  { code: 'tg', name: 'Tajik', native: 'Тоҷикӣ' },
-  { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-  { code: 'te', name: 'Telugu', native: 'తెలుగు' },
-  { code: 'ur', name: 'Urdu', native: 'اردو' },
-  { code: 'uz', name: 'Uzbek', native: 'Oʻzbekcha' },
-  { code: 'cy', name: 'Welsh', native: 'Cymraeg' },
-  { code: 'xh', name: 'Xhosa', native: 'isiXhosa' },
-  { code: 'yi', name: 'Yiddish', native: 'ייִדיש' },
-  { code: 'yo', name: 'Yoruba', native: 'Yorùbá' },
-  { code: 'zu', name: 'Zulu', native: 'isiZulu' }
+  { code: 'ms', name: 'Malay', native: 'Bahasa Melayu' }
 ];
 
 export const translations = {
   en: {
-    nav: {
+    navigation: {
       timer: 'Timer',
       log: 'Log',
       guide: 'Guide',
       settings: 'Settings',
-      about: 'About Us',
-      privacy: 'Privacy Policy',
-      terms: 'Terms and Conditions',
-      contact: 'Contact Us'
+      aboutUs: 'About Us',
+      privacyPolicy: 'Privacy Policy',
+      contactUs: 'Contact Us',
+      terms: 'Terms and Conditions'
     },
     timer: {
       protocolLabel: 'Select Protocol',
@@ -135,7 +65,11 @@ export const translations = {
       confirmEndAction: 'End Fast',
       switchMode: 'Switch to {mode}',
       tapToSwitch: 'Tap to switch your active timer period',
-      currentlyActive: 'Currently Active: {mode}'
+      currentlyActive: 'Currently Active: {mode}',
+      fastingComplete: 'Fasting Complete',
+      fastingCompleteDesc: 'Your fasting period is complete. Time to eat.',
+      eatingComplete: 'Eating Period Complete',
+      eatingCompleteDesc: 'Your eating period has ended. Ready to begin your fast.'
     },
     log: {
       title: 'Fasting History',
@@ -170,19 +104,20 @@ export const translations = {
       pushDenied: 'Browser notifications were denied. Please enable them in your browser settings.'
     },
     common: {
-      dismiss: 'Dismiss'
+      dismiss: 'Dismiss',
+      getInTouch: 'Get In Touch'
     }
   },
   es: {
-    nav: {
+    navigation: {
       timer: 'Temporizador',
       log: 'Registro',
       guide: 'Guía',
       settings: 'Ajustes',
-      about: 'Sobre nosotros',
-      privacy: 'Privacidad',
-      terms: 'Términos',
-      contact: 'Contacto'
+      aboutUs: 'Nosotros',
+      privacyPolicy: 'Privacidad',
+      contactUs: 'Contacto',
+      terms: 'Términos'
     },
     timer: {
       protocolLabel: 'Seleccionar protocolo',
@@ -196,41 +131,19 @@ export const translations = {
       endEarly: 'Terminar antes',
       reset: 'Reiniciar',
       active: 'ACTIVO',
-      inactive: 'INACTIVO',
-      confirmEndTitle: '¿Terminar ayuno?',
-      confirmEndCancel: 'Cancelar',
-      confirmEndAction: 'Terminar',
-      switchMode: 'Cambiar a {mode}',
-      tapToSwitch: 'Toque para cambiar el periodo del temporizador',
-      currentlyActive: 'Activo: {mode}'
-    },
-    log: {
-      title: 'Historial',
-      clearHistory: 'Borrar historial',
-      totalFasts: 'Total ayunos',
-      totalHours: 'Total horas',
-      avgDuration: 'Duración media',
-      noHistory: 'No hay historial aún.',
-      duration: 'Duración',
-      completed: 'Completado',
-      endedEarly: 'Terminado antes'
-    },
-    settings: {
-      title: 'Ajustes',
-      language: 'Idioma',
-      searchPlaceholder: 'Buscar idiomas'
+      inactive: 'INACTIVO'
     }
   },
   fr: {
-    nav: {
+    navigation: {
       timer: 'Minuteur',
       log: 'Journal',
       guide: 'Guide',
       settings: 'Paramètres',
-      about: 'À propos',
-      privacy: 'Confidentialité',
-      terms: 'Conditions',
-      contact: 'Contact'
+      aboutUs: 'À propos',
+      privacyPolicy: 'Confidentialité',
+      contactUs: 'Contact',
+      terms: 'Conditions'
     },
     timer: {
       protocolLabel: 'Choisir le protocole',

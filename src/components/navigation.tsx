@@ -12,9 +12,9 @@ export function Navigation() {
   const { t } = useLanguage();
 
   const navLinks = [
-    { href: '/', label: t('nav.timer'), icon: Timer },
-    { href: '/log', label: t('nav.log'), icon: ClipboardList },
-    { href: '/guide', label: t('nav.guide'), icon: BookOpen },
+    { href: '/', label: t('navigation.timer'), icon: Timer },
+    { href: '/log', label: t('navigation.log'), icon: ClipboardList },
+    { href: '/guide', label: t('navigation.guide'), icon: BookOpen },
   ];
 
   return (

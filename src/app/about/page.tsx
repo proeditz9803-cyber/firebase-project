@@ -5,8 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Timer, Brain, Zap, Heart, Star, ShieldCheck } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AboutPage() {
+  const { t } = useLanguage();
   const [headerRef, headerVisible] = useScrollReveal({ delay: 0 });
   const [missionRef, missionVisible] = useScrollReveal({ delay: 150 });
   const [coverRef, coverVisible] = useScrollReveal({ delay: 300 });
@@ -32,7 +34,7 @@ export default function AboutPage() {
         )}
       >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
-          Who We Are
+          {t('navigation.aboutUs')}
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
           FasTrack

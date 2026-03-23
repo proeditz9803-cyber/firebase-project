@@ -5,8 +5,10 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import useScrollReveal from '@/hooks/useScrollReveal';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -19,17 +21,15 @@ export default function ContactPage() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Subtle entrance delay of 150ms as requested
           setTimeout(() => {
             setIsVisible(true);
           }, 150);
-          // Disconnect after triggering once
           if (observerRef.current) {
             observerRef.current.disconnect();
           }
         }
       },
-      { threshold: 0.15 } // Updated to 0.15
+      { threshold: 0.15 }
     );
 
     if (buttonRef.current) {
@@ -55,18 +55,17 @@ export default function ContactPage() {
         )}
       >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
-          Get In Touch
+          {t('common.getInTouch')}
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
           FasTrack
         </h1>
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">Contact Us</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">{t('navigation.contactUs')}</h2>
         </div>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-12 items-stretch">
-        {/* Left Column: Informational Content */}
         <div 
           ref={lRef}
           className={cn(
@@ -76,15 +75,7 @@ export default function ContactPage() {
         >
           <section className="space-y-4">
             <p className="leading-relaxed text-muted-foreground">
-              We genuinely value user input and invite you to reach out with any questions, suggestions, or feedback about FasTrack. Whether you have a specific inquiry or just want to share your experience, we are here to listen and will respond as promptly as possible.
-            </p>
-          </section>
-
-          <Separator className="opacity-20" />
-
-          <section className="space-y-2">
-            <p className="text-sm font-medium text-foreground">
-              We typically respond to all messages within 24 to 48 hours.
+              We genuinely value user input and invite you to reach out with any questions, suggestions, or feedback about FasTrack.
             </p>
           </section>
 
@@ -109,10 +100,8 @@ export default function ContactPage() {
           </section>
         </div>
 
-        {/* Vertical Divider for Desktop */}
         <div className="hidden md:block w-px bg-border opacity-20" />
 
-        {/* Right Column: Premium Email Action */}
         <div className="flex items-center justify-center py-8 md:py-0">
           <a 
             ref={buttonRef}
@@ -129,9 +118,8 @@ export default function ContactPage() {
           >
             <div className="relative flex items-center justify-center gap-4">
               <span className="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter">
-                Send Us an Email
+                Send Email
               </span>
-              {/* Premium Arrow Icon */}
               <svg 
                 width="24" 
                 height="24" 
