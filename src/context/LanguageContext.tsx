@@ -5,66 +5,72 @@
  * Optimized with server-safe initialization and robust window guards.
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { translations } from '@/utils/translations';
 
-type LanguageContextType = {
+interface LanguageContextType {
   language: string;
   setLanguage: (lang: string) => void;
   t: (key: string) => string;
-};
+}
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // Always initialize with default 'en' for SSR stability
   const [language, setLanguageState] = useState('en');
 
   useEffect(() => {
-    // Only access browser APIs in useEffect
     if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('fastrack-language');
-        if (saved) setLanguageState(saved);
-      } catch (e) {
-        console.warn('Failed to read language from localStorage', e);
+      const saved = localStorage.getItem('fastrack-language');
+      if (saved && (translations as any)[saved]) {
+        setLanguageState(saved);
       }
     }
   }, []);
 
-  const setLanguage = (lang: string) => {
+  const setLanguage = useCallback((lang: string) => {
     if (typeof window === 'undefined') return;
-    
     setLanguageState(lang);
-    try {
-      localStorage.setItem('fastrack-language', lang);
-    } catch (e) {
-      console.warn('Failed to save language to localStorage', e);
-    }
-  };
+    localStorage.setItem('fastrack-language', lang);
+  }, []);
 
   const t = useCallback((key: string): string => {
     const keys = key.split('.');
-    let current: any = (translations as any)[language] || translations['en'];
     
-    for (const k of keys) {
-      if (current && current[k]) {
-        current = current[k];
-      } else {
-        // Fallback to English
-        let fallback: any = (translations as any)['en'];
-        for (const fk of keys) {
-           if (fallback && fallback[fk]) fallback = fallback[fk];
-           else return key; // Final fallback
+    const getVal = (obj: any, path: string[]) => {
+      let current = obj;
+      for (const k of path) {
+        if (current && typeof current === 'object' && k in current) {
+          current = current[k];
+        } else {
+          return null;
         }
-        return typeof fallback === 'string' ? fallback : key;
       }
+      return typeof current === 'string' ? current : null;
+    };
+
+    // 1. Try current language
+    const currentLangDict = (translations as any)[language];
+    let result = getVal(currentLangDict, keys);
+
+    // 2. Fallback to English
+    if (result === null && language !== 'en') {
+      const englishDict = (translations as any)['en'];
+      result = getVal(englishDict, keys);
     }
-    return typeof current === 'string' ? current : key;
+
+    // 3. Final fallback: return the key itself
+    return result !== null ? result : key;
   }, [language]);
 
+  const contextValue = useMemo(() => ({
+    language,
+    setLanguage,
+    t
+  }), [language, setLanguage, t]);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );
@@ -72,6 +78,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error('useLanguage must be used within LanguageProvider');
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
   return context;
 }

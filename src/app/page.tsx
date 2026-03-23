@@ -341,12 +341,12 @@ export default function TimerPage() {
             <div className="flex items-start justify-between gap-6">
               <div className="space-y-2">
                 <h3 className="text-2xl font-bold tracking-tight text-white font-outfit">
-                  {notificationType === 'fasting' ? 'Fasting Complete' : 'Eating Period Complete'}
+                  {notificationType === 'fasting' ? t('timer.fastingComplete') : t('timer.eatingComplete')}
                 </h3>
                 <p className="text-sm font-medium text-white/70 leading-relaxed max-w-md">
                   {notificationType === 'fasting' 
-                    ? 'Your fasting period has ended. Your eating period is ready to begin.' 
-                    : 'Your eating period has ended. Ready to begin your fast?'}
+                    ? t('timer.fastingCompleteDesc') 
+                    : t('timer.eatingCompleteDesc')}
                 </p>
               </div>
               <button 
@@ -361,7 +361,7 @@ export default function TimerPage() {
                 onClick={handleNotificationAction}
                 className="flex-1 bg-white text-black hover:bg-white/90 font-bold uppercase tracking-widest text-[10px] h-14 rounded-none transition-all duration-300"
               >
-                {notificationType === 'fasting' ? 'Start Eating Period' : 'Start Fasting Period'} <ArrowDown className="w-4 h-4 ml-2" />
+                {notificationType === 'fasting' ? t('timer.startEating') : t('timer.startFasting')} <ArrowDown className="w-4 h-4 ml-2" />
               </Button>
               <Button 
                 variant="outline"
@@ -534,7 +534,7 @@ export default function TimerPage() {
             "absolute top-4 px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] bg-white/10 group-hover:bg-black/10 transition-colors",
             activeMode === 'fasting' ? "text-primary" : "text-amber-400"
           )}>
-            {t('timer.currentlyActive', { mode: activeMode === 'fasting' ? t('nav.timer') : t('nav.log') }).replace('{mode}', activeMode === 'fasting' ? t('nav.timer') : t('nav.log'))}
+            {t('timer.currentlyActive').replace('{mode}', activeMode === 'fasting' ? t('nav.timer') : t('nav.log'))}
           </div>
 
           <div className="flex items-center justify-center gap-4 mt-2">

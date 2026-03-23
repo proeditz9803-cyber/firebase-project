@@ -1,9 +1,11 @@
-"use client";
+"use client"
 
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function GuidePage() {
+  const { t } = useLanguage();
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
   const [pRef, pVis] = useScrollReveal({ delay: 150 });
   const [mRef, mVis] = useScrollReveal({ delay: 300 });
@@ -31,7 +33,7 @@ export default function GuidePage() {
         ref={hRef}
         className={cn("space-y-4 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
-        <h1 className="text-4xl font-bold tracking-tight text-primary">Intermittent Fasting Guide</h1>
+        <h1 className="text-4xl font-bold tracking-tight text-primary">{t('nav.guide')}</h1>
         <p className="text-muted-foreground leading-relaxed">
           Intermittent fasting is an eating pattern that cycles between periods of fasting and eating. 
           Unlike traditional diets, it doesn’t specify which foods you should eat, but rather when 
