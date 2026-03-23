@@ -4,10 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { MoreVertical, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function KebabMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -49,35 +51,35 @@ export default function KebabMenu() {
           className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Settings className="w-4 h-4" />
-          Settings
+          {t('nav.settings')}
         </Link>
         <Link
           href="/about"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          About Us
+          {t('nav.about')}
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          Privacy Policy
+          {t('nav.privacy')}
         </Link>
         <Link
           href="/terms-and-conditions"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          Terms and Conditions
+          {t('nav.terms')}
         </Link>
         <Link
           href="/contact"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          Contact Us
+          {t('nav.contact')}
         </Link>
       </div>
     </div>

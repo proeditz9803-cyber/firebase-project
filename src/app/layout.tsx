@@ -7,6 +7,7 @@ import { Navigation } from '@/components/navigation';
 import KebabMenu from '@/components/KebabMenu';
 import { SwipeNavigator } from '@/components/SwipeNavigator';
 import { usePathname } from 'next/navigation';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -19,9 +20,6 @@ const outfit = Outfit({
   weight: ['600', '700', '800'],
   variable: '--font-clash-display',
 });
-
-// Since we added "use client", we can't export metadata here directly if it was a server component before.
-// But for standard NextJS, layout can be a client component for swipe nav logic.
 
 export default function RootLayout({
   children,
@@ -39,17 +37,19 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen flex flex-col overflow-x-hidden">
-        <KebabMenu />
-        <Navigation />
-        <main className="flex-1 flex flex-col">
-          {isMainPage ? (
-            <SwipeNavigator />
-          ) : (
-            <div className="container mx-auto px-4 py-8">
-              {children}
-            </div>
-          )}
-        </main>
+        <LanguageProvider>
+          <KebabMenu />
+          <Navigation />
+          <main className="flex-1 flex flex-col">
+            {isMainPage ? (
+              <SwipeNavigator />
+            ) : (
+              <div className="container mx-auto px-4 py-8">
+                {children}
+              </div>
+            )}
+          </main>
+        </LanguageProvider>
       </body>
     </html>
   );

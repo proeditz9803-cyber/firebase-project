@@ -5,21 +5,22 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Timer, ClipboardList, BookOpen } from 'lucide-react';
 import { LogoToggle } from './LogoToggle';
+import { useLanguage } from '@/context/LanguageContext';
 
 export function Navigation() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const navLinks = [
-    { href: '/', label: 'Timer', icon: Timer },
-    { href: '/log', label: 'Log', icon: ClipboardList },
-    { href: '/guide', label: 'Guide', icon: BookOpen },
+    { href: '/', label: t('nav.timer'), icon: Timer },
+    { href: '/log', label: t('nav.log'), icon: ClipboardList },
+    { href: '/guide', label: t('nav.guide'), icon: BookOpen },
   ];
 
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center">
-          {/* Replaced static Link with interactive LogoToggle component */}
           <LogoToggle />
         </div>
         <nav className="flex items-center gap-4 sm:gap-8 md:pr-32 lg:pr-48">
