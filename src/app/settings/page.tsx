@@ -49,7 +49,7 @@ export default function SettingsPage() {
 
   const handlePushToggle = async (checked: boolean) => {
     if (checked) {
-      if (!('Notification' in window)) {
+      if (typeof window === 'undefined' || !('Notification' in window)) {
         setPushError('Push notifications are not supported in this browser.');
         return;
       }
@@ -68,7 +68,8 @@ export default function SettingsPage() {
     }
   };
 
-  if (!isLoaded) return null;
+  // Note: We no longer return null here to ensure useScrollReveal refs can attach to DOM elements on mount.
+  // We handle the client-side hydration by rendering a stable shell.
 
   return (
     <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">

@@ -2,7 +2,7 @@
 /**
  * @fileOverview Global Language Context for FasTrack.
  * Provides current language state and translation functions to the entire app.
- * Optimized with server-safe initialization.
+ * Optimized with server-safe initialization and robust window guards.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
@@ -17,20 +17,29 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  // Always initialize with default 'en' for SSR stability
   const [language, setLanguageState] = useState('en');
 
   useEffect(() => {
-    // Only access localStorage on the client after mount
+    // Only access browser APIs in useEffect
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('fastrack-language');
-      if (saved) setLanguageState(saved);
+      try {
+        const saved = localStorage.getItem('fastrack-language');
+        if (saved) setLanguageState(saved);
+      } catch (e) {
+        console.warn('Failed to read language from localStorage', e);
+      }
     }
   }, []);
 
   const setLanguage = (lang: string) => {
+    if (typeof window === 'undefined') return;
+    
     setLanguageState(lang);
-    if (typeof window !== 'undefined') {
+    try {
       localStorage.setItem('fastrack-language', lang);
+    } catch (e) {
+      console.warn('Failed to save language to localStorage', e);
     }
   };
 
