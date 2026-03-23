@@ -1,5 +1,6 @@
 /**
  * @fileOverview Settings page for FasTrack notification and language preferences.
+ * Includes sections for language selection and notification alerts.
  */
 
 'use client';

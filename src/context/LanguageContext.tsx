@@ -2,6 +2,7 @@
 /**
  * @fileOverview Global Language Context for FasTrack.
  * Provides current language state and translation functions to the entire app.
+ * Optimized with server-safe initialization.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
@@ -19,13 +20,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState('en');
 
   useEffect(() => {
-    const saved = localStorage.getItem('fastrack-language');
-    if (saved) setLanguageState(saved);
+    // Only access localStorage on the client after mount
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('fastrack-language');
+      if (saved) setLanguageState(saved);
+    }
   }, []);
 
   const setLanguage = (lang: string) => {
     setLanguageState(lang);
-    localStorage.setItem('fastrack-language', lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('fastrack-language', lang);
+    }
   };
 
   const t = useCallback((key: string): string => {
@@ -37,7 +43,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         current = current[k];
       } else {
         // Fallback to English
-        let fallback: any = translations['en'];
+        let fallback: any = (translations as any)['en'];
         for (const fk of keys) {
            if (fallback && fallback[fk]) fallback = fallback[fk];
            else return key; // Final fallback
