@@ -34,7 +34,7 @@ export const languageCodes: Record<string, { english: string; native: string }> 
   gu: { english: "Gujarati", native: "ગુજરાતી" },
   ta: { english: "Tamil", native: "தமிழ்" },
   te: { english: "Telugu", native: "తెలుగు" },
-  kn: { english: "Kannada", native: "ಕನ್ನಡ" },
+  kn: { english: "Kannada", native: "ਕನ್ನಡ" },
   ml: { english: "Malayalam", native: "മലയാളം" },
   si: { english: "Sinhala", native: "සිංහල" },
   ne: { english: "Nepali", native: "नेपाली" },
