@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { ToggleSwitch } from '@/components/ToggleSwitch';
 import { RINGTONES, playRingtone, RingtoneName } from '@/utils/ringtones';
-import { Play, Bell, Volume2, Smartphone, Monitor, Globe, Search, X, Check } from 'lucide-react';
+import { Play, Bell, Volume2, Smartphone, Monitor, Globe, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -26,6 +26,25 @@ import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
 import { LANGUAGES } from '@/utils/translations';
+
+/**
+ * Custom Tick Icon SVG
+ */
+const TickIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-transform duration-200"
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
 
 export default function SettingsPage() {
   const { settings, updateSetting, isLoaded } = useNotificationSettings();
@@ -67,9 +86,6 @@ export default function SettingsPage() {
       setPushError(null);
     }
   };
-
-  // Note: We no longer return null here to ensure useScrollReveal refs can attach to DOM elements on mount.
-  // We handle the client-side hydration by rendering a stable shell.
 
   return (
     <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">
@@ -139,28 +155,54 @@ export default function SettingsPage() {
             <ScrollArea className="h-[400px]">
               {filteredLanguages.length > 0 ? (
                 <div className="divide-y divide-border/10">
-                  {filteredLanguages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => setLanguage(lang.code)}
-                      className={cn(
-                        "w-full flex items-center justify-between px-6 py-4 hover:bg-primary/5 transition-all text-left group",
-                        language === lang.code && "bg-primary/5 border-l-4 border-primary"
-                      )}
-                    >
-                      <div className="flex flex-col">
-                        <span className={cn("font-medium", language === lang.code && "text-primary")}>
-                          {lang.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {lang.native}
-                        </span>
+                  {filteredLanguages.map((lang) => {
+                    const isSelected = language === lang.code;
+                    return (
+                      <div
+                        key={lang.code}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setLanguage(lang.code)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setLanguage(lang.code);
+                          }
+                        }}
+                        className={cn(
+                          "w-full flex items-center justify-between px-6 py-4 hover:bg-primary/5 transition-all text-left group cursor-pointer",
+                          isSelected && "bg-primary/5 border-l-4 border-primary"
+                        )}
+                      >
+                        <div className="flex flex-col flex-1">
+                          <span className={cn("font-medium transition-colors", isSelected && "text-primary")}>
+                            {lang.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {lang.native}
+                          </span>
+                        </div>
+                        
+                        {/* Dedicated Selection Tick Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLanguage(lang.code);
+                          }}
+                          aria-label={`Select ${lang.name}`}
+                          aria-pressed={isSelected}
+                          className={cn(
+                            "relative flex items-center justify-center w-9 h-9 rounded-[10px] border transition-all duration-200 will-change-transform active:scale-[0.92]",
+                            isSelected 
+                              ? "bg-primary border-primary text-background shadow-[0_2px_8px_rgba(0,0,0,0.15)]" 
+                              : "bg-transparent border-border/40 text-foreground/30 hover:bg-primary/15 hover:border-primary/60 hover:text-primary/70"
+                          )}
+                        >
+                          <TickIcon />
+                        </button>
                       </div>
-                      {language === lang.code && (
-                        <Check className="w-4 h-4 text-primary" />
-                      )}
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
