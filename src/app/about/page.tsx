@@ -5,8 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Timer, Brain, Zap, Heart, Star, ShieldCheck } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AboutPage() {
+  const { t } = useLanguage();
   const [headerRef, headerVisible] = useScrollReveal({ delay: 0 });
   const [missionRef, missionVisible] = useScrollReveal({ delay: 150 });
   const [coverRef, coverVisible] = useScrollReveal({ delay: 300 });
@@ -14,11 +16,11 @@ export default function AboutPage() {
   const [closingRef, closingVisible] = useScrollReveal({ delay: 600 });
 
   const coverageItems = [
-    { icon: Timer, label: 'fasting based guide and tips' },
-    { icon: Brain, label: 'mental clarity and discipline' },
-    { icon: Zap, label: 'productive and healthy lifestyle' },
-    { icon: Heart, label: 'Mental wellness and mindful content' },
-    { icon: Star, label: 'Motivation and lifestyle inspiration' },
+    { icon: Timer, label: t('about_covers_item1') },
+    { icon: Brain, label: t('about_covers_item2') },
+    { icon: Zap, label: t('about_covers_item3') },
+    { icon: Heart, label: t('about_covers_item4') },
+    { icon: Star, label: t('about_covers_item5') },
   ];
 
   return (
@@ -32,13 +34,13 @@ export default function AboutPage() {
         )}
       >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
-          About Us
+          {t('nav_about')}
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
           FasTrack
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
-          Welcome to FasTrack — your trusted destination for fitness knowledge, wellness guidance, and a healthier lifestyle.
+          {t('about_intro')}
         </p>
       </section>
 
@@ -54,10 +56,10 @@ export default function AboutPage() {
         <div className="relative z-10 p-12 text-center space-y-4">
           <h2 className="text-3xl font-bold flex items-center justify-center gap-3">
             <Heart className="text-primary w-8 h-8" />
-            Our Mission
+            {t('about_mission_heading')}
           </h2>
           <p className="text-lg md:text-xl text-foreground/90 max-w-3xl mx-auto leading-relaxed">
-            Our mission is to make fitness and wellbeing accessible to everyone, regardless of age, experience, or fitness level. We believe that a healthier life begins with the right information and the right mindset.
+            {t('about_mission_body')}
           </p>
         </div>
       </section>
@@ -71,7 +73,7 @@ export default function AboutPage() {
         )}
       >
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">What We Cover</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t('about_covers_heading')}</h2>
           <p className="text-muted-foreground">At FasTrack we provide specialized guidance in key wellness areas:</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -102,9 +104,9 @@ export default function AboutPage() {
           </div>
         </div>
         <div className="space-y-2">
-          <h3 className="text-2xl font-bold">Why Trust Us</h3>
+          <h3 className="text-2xl font-bold">{t('about_trust_heading')}</h3>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Every piece of content on our platform is thoroughly researched and crafted to ensure accuracy, reliability, and real value to our readers.
+            {t('about_trust_body')}
           </p>
         </div>
       </section>
@@ -118,7 +120,7 @@ export default function AboutPage() {
         )}
       >
         <p className="text-2xl font-bold tracking-tight mb-8">
-          Whether you're just starting your fitness journey or looking to level up, <span className="text-primary">FasTrack</span> is here to guide you every step of the way.
+          {t('about_closing')}
         </p>
         <div className="flex justify-center gap-4">
           <div className="h-1 w-12 bg-primary rounded-full" />
