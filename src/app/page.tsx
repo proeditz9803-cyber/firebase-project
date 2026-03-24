@@ -296,7 +296,7 @@ export default function TimerPage() {
               <div className="flex gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">{t('timer_pause')}</Button></AlertDialogTrigger>
-                  <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>End Fast</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+                  <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{t('timer_dismiss')}</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>{t('timer_reset')}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                 </AlertDialog>
                 <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>
                   {t('timer_reset')}

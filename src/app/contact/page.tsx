@@ -13,7 +13,6 @@ export default function ContactPage() {
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // New Global Reveal Hooks
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
   const [lRef, lVis] = useScrollReveal({ delay: 150 });
 
@@ -46,7 +45,6 @@ export default function ContactPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 py-12 px-6">
-      {/* Brand Header */}
       <section 
         ref={hRef}
         className={cn(
@@ -120,24 +118,7 @@ export default function ContactPage() {
               <span className="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter">
                 {t('contact_email_button')}
               </span>
-              <svg 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="square" 
-                strokeLinejoin="miter" 
-                className="transition-transform duration-300 ease-in-out group-hover:translate-x-1.5"
-              >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
             </div>
-            <span className="text-sm font-medium mt-2 opacity-70 group-hover:opacity-70 transition-opacity">
-              {t('contact_email_address')}
-            </span>
           </a>
         </div>
       </div>

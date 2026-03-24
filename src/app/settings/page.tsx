@@ -54,7 +54,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">
+    <div className="max-w-3xl auto space-y-12 py-12 px-6">
       <section ref={hRef} className={cn("text-center space-y-6 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
           {t('nav_settings')}
@@ -101,11 +101,10 @@ export default function SettingsPage() {
                     
                     <button
                       onClick={(e) => {
-                        console.log('Tick button clicked, calling setLanguage with:', code);
                         e.stopPropagation();
                         setLanguage(code);
                       }}
-                      aria-label={`Select ${info.english}`}
+                      aria-label={`${t('settings_select_button')} ${info.english}`}
                       aria-pressed={language === code}
                       className={cn(
                         "relative w-9 h-9 flex items-center justify-center rounded-[10px] border transition-all duration-200 active:scale-[0.92] will-change-transform",

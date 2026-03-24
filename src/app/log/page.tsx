@@ -86,8 +86,8 @@ export default function LogPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={clearHistory}>Clear All</AlertDialogAction>
+                <AlertDialogCancel>{t('timer_dismiss')}</AlertDialogCancel>
+                <AlertDialogAction onClick={clearHistory}>{t('timer_reset')}</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -182,7 +182,7 @@ export default function LogPage() {
                       )}
                       variant="outline"
                     >
-                      {record.completed ? t('log_completed') : 'Ended Early'}
+                      {record.completed ? t('log_completed') : t('timer_dismiss')}
                     </Badge>
                   </div>
                 </div>

@@ -8,7 +8,6 @@ import { useLanguage } from '@/context/LanguageContext';
 
 export default function PrivacyPolicyPage() {
   const { t } = useLanguage();
-  const effectiveDate = "October 27, 2023";
 
   // Use hook for sections
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
@@ -49,7 +48,7 @@ export default function PrivacyPolicyPage() {
 
       {/* 1. Introduction */}
       <section ref={s1Ref} className={cn("space-y-4 transition-all", s1Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
-        <h2 className="text-2xl font-bold text-primary">1. Introduction</h2>
+        <h2 className="text-2xl font-bold text-primary">1. {t('nav_about')}</h2>
         <p className="leading-relaxed text-muted-foreground">
           {t('privacy_intro')}
         </p>
@@ -74,14 +73,12 @@ export default function PrivacyPolicyPage() {
         <Separator className="opacity-20" />
       </section>
 
-      {/* 4. Google AdSense and Third Party Advertising */}
+      {/* 4. Google AdSense */}
       <section ref={s4Ref} className={cn("space-y-4 transition-all", s4Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <h2 className="text-2xl font-bold text-primary">4. {t('privacy_adsense_heading')}</h2>
-        <div className="space-y-4 leading-relaxed text-muted-foreground">
-          <p>
-            {t('privacy_adsense_body')}
-          </p>
-        </div>
+        <p className="leading-relaxed text-muted-foreground">
+          {t('privacy_adsense_body')}
+        </p>
         <Separator className="opacity-20" />
       </section>
 
@@ -99,33 +96,6 @@ export default function PrivacyPolicyPage() {
         <h2 className="text-2xl font-bold text-primary">6. {t('privacy_storage_heading')}</h2>
         <p className="leading-relaxed text-muted-foreground">
           {t('privacy_storage_body')}
-        </p>
-        <Separator className="opacity-20" />
-      </section>
-
-      {/* 7. Third Party Links */}
-      <section ref={s7Ref} className={cn("space-y-4 transition-all", s7Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
-        <h2 className="text-2xl font-bold text-primary">7. {t('privacy_links_heading')}</h2>
-        <p className="leading-relaxed text-muted-foreground">
-          {t('privacy_links_body')}
-        </p>
-        <Separator className="opacity-20" />
-      </section>
-
-      {/* 8. Children's Privacy */}
-      <section ref={s8Ref} className={cn("space-y-4 transition-all", s8Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
-        <h2 className="text-2xl font-bold text-primary">8. {t('privacy_children_heading')}</h2>
-        <p className="leading-relaxed text-muted-foreground">
-          {t('privacy_children_body')}
-        </p>
-        <Separator className="opacity-20" />
-      </section>
-
-      {/* 9. Changes to This Policy */}
-      <section ref={s9Ref} className={cn("space-y-4 transition-all", s9Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
-        <h2 className="text-2xl font-bold text-primary">9. {t('privacy_changes_heading')}</h2>
-        <p className="leading-relaxed text-muted-foreground">
-          {t('privacy_changes_body')}
         </p>
         <Separator className="opacity-20" />
       </section>
