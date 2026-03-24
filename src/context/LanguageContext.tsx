@@ -34,6 +34,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setLanguage = (code: string) => {
+    console.log('setLanguage called with:', code)
+    console.log('translations available:', Object.keys(translations))
+    console.log('translation exists for code:', translations[code] !== undefined)
+    
     if (translations[code] !== undefined) {
       setLanguageState(code)
       try {
@@ -46,14 +50,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string): string => {
     const currentTranslations = translations[language]
+    let result = key
+
     if (currentTranslations !== undefined && currentTranslations[key] !== undefined) {
-      return currentTranslations[key]
+      result = currentTranslations[key]
+    } else {
+      const englishTranslations = translations['en']
+      if (englishTranslations !== undefined && englishTranslations[key] !== undefined) {
+        result = englishTranslations[key]
+      }
     }
-    const englishTranslations = translations['en']
-    if (englishTranslations !== undefined && englishTranslations[key] !== undefined) {
-      return englishTranslations[key]
-    }
-    return key
+
+    console.log('t called with key:', key, 'language:', language, 'result:', result)
+    return result
   }
 
   const value = useMemo(

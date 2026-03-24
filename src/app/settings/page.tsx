@@ -24,16 +24,14 @@ export default function SettingsPage() {
   const [langSectionRef, langSectionVis] = useScrollReveal({ delay: 150 });
   const [notifRef, notifVis] = useScrollReveal({ delay: 300 });
 
-  // Sorted and filtered language list
-  const filteredLanguages = useMemo(() => {
-    const list = Object.entries(languageCodes).sort((a, b) => 
-      a[1].english.localeCompare(b[1].english)
-    );
-    if (!searchQuery) return list;
-    return list.filter(([_, info]) => 
-      info.english.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      info.native.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const sortedLanguages = useMemo(() => {
+    return Object.entries(languageCodes)
+      .sort((a, b) => a[1].english.localeCompare(b[1].english))
+      .filter(([_, info]) => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return info.english.toLowerCase().includes(query) || info.native.toLowerCase().includes(query);
+      });
   }, [languageCodes, searchQuery]);
 
   const handlePushToggle = async (checked: boolean) => {
@@ -87,8 +85,8 @@ export default function SettingsPage() {
 
           <div className="bg-card/30 rounded-2xl border border-border/50 overflow-hidden">
             <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
-              {filteredLanguages.length > 0 ? (
-                filteredLanguages.map(([code, info]) => (
+              {sortedLanguages.length > 0 ? (
+                sortedLanguages.map(([code, info]) => (
                   <div
                     key={code}
                     className={cn(
@@ -96,13 +94,14 @@ export default function SettingsPage() {
                       language === code && "bg-primary/10"
                     )}
                   >
-                    <div className="flex flex-col items-start text-left">
+                    <div className="flex flex-col items-start text-left flex-1">
                       <span className="font-bold">{info.english}</span>
                       <span className="text-xs text-muted-foreground">{info.native}</span>
                     </div>
                     
                     <button
                       onClick={(e) => {
+                        console.log('Tick button clicked, calling setLanguage with:', code);
                         e.stopPropagation();
                         setLanguage(code);
                       }}
