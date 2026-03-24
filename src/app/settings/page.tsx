@@ -1,23 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { ToggleSwitch } from '@/components/ToggleSwitch';
 import { RINGTONES, playRingtone, RingtoneName } from '@/utils/ringtones';
-import { Play, Bell, Volume2, Smartphone, Monitor } from 'lucide-react';
+import { Play, Bell, Volume2, Smartphone, Monitor, Search, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function SettingsPage() {
+  const { language, setLanguage, t, languageCodes } = useLanguage();
   const { settings, updateSetting } = useNotificationSettings();
-  const [pushError, setPushError] = React.useState<string | null>(null);
+  const [pushError, setPushError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
-  const [notifRef, notifVis] = useScrollReveal({ delay: 150 });
+  const [langSectionRef, langSectionVis] = useScrollReveal({ delay: 150 });
+  const [notifRef, notifVis] = useScrollReveal({ delay: 300 });
+
+  // Sorted and filtered language list
+  const filteredLanguages = useMemo(() => {
+    const list = Object.entries(languageCodes).sort((a, b) => 
+      a[1].english.localeCompare(b[1].english)
+    );
+    if (!searchQuery) return list;
+    return list.filter(([_, info]) => 
+      info.english.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      info.native.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [languageCodes, searchQuery]);
 
   const handlePushToggle = async (checked: boolean) => {
     if (checked) {
@@ -42,7 +59,7 @@ export default function SettingsPage() {
     <div className="max-w-3xl mx-auto space-y-12 py-12 px-6">
       <section ref={hRef} className={cn("text-center space-y-6 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
-          Settings
+          {t('nav_settings')}
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
           FasTrack
@@ -51,7 +68,75 @@ export default function SettingsPage() {
 
       <Separator className="opacity-10" />
 
-      <section ref={notifRef} className={cn("space-y-8 transition-all", notifVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      {/* Language Section */}
+      <section ref={langSectionRef} className={cn("space-y-8 transition-all", langSectionVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <h3 className="text-2xl font-bold">{t('settings_language_heading')}</h3>
+          </div>
+          
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              placeholder={t('settings_search_placeholder')}
+              className="pl-10 bg-card/30 border-border/50 h-12"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="bg-card/30 rounded-2xl border border-border/50 overflow-hidden">
+            <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
+              {filteredLanguages.length > 0 ? (
+                filteredLanguages.map(([code, info]) => (
+                  <button
+                    key={code}
+                    onClick={() => setLanguage(code)}
+                    className={cn(
+                      "w-full flex items-center justify-between p-4 transition-all hover:bg-primary/5 group",
+                      language === code ? "bg-primary/10" : "hover:bg-accent/30"
+                    )}
+                  >
+                    <div className="flex flex-col items-start text-left">
+                      <span className="font-bold">{info.english}</span>
+                      <span className="text-xs text-muted-foreground">{info.native}</span>
+                    </div>
+                    
+                    <div className={cn(
+                      "w-9 h-9 flex items-center justify-center rounded-[10px] border transition-all duration-200",
+                      language === code 
+                        ? "bg-primary border-primary text-primary-foreground shadow-[0_2px_8px_rgba(0,0,0,0.15)]" 
+                        : "border-border/40 text-transparent"
+                    )}>
+                      <Check className="w-4 h-4" />
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <div className="p-8 text-center text-muted-foreground italic">
+                  {t('settings_no_results')}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => { setLanguage('en'); setSearchQuery(''); }}
+              className="text-xs font-bold uppercase tracking-widest"
+            >
+              {t('settings_restore_default')}
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="opacity-10" />
+
+      {/* Notifications Section */}
+      <section ref={notifRef} className={cn("space-y-8 transition-all pb-12", notifVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <Bell className="text-primary w-5 h-5" />
@@ -95,7 +180,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="space-y-6 pb-12">
+        <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <Monitor className="text-primary w-5 h-5" />
             <h3 className="text-xl font-bold">System Notifications</h3>

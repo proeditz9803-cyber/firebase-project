@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { MoreVertical, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function KebabMenu() {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -49,35 +51,28 @@ export default function KebabMenu() {
           className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Settings className="w-4 h-4" />
-          Settings
+          {t('nav_settings')}
         </Link>
         <Link
           href="/about"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          About Us
+          {t('nav_about')}
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          Privacy Policy
-        </Link>
-        <Link
-          href="/terms-and-conditions"
-          onClick={closeMenu}
-          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
-        >
-          Terms
+          {t('nav_privacy')}
         </Link>
         <Link
           href="/contact"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          Contact Us
+          {t('nav_contact')}
         </Link>
       </div>
     </div>

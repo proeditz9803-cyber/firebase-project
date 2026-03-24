@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { triggerCompletionNotifications } from '@/utils/notifications';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +33,7 @@ const PROTOCOLS: { label: string; value: ProtocolType; fasting: number; eating: 
 ];
 
 export default function TimerPage() {
+  const { t } = useLanguage();
   const { settings, isLoaded: settingsLoaded } = useNotificationSettings();
   
   const [activeMode, setActiveMode] = useState<TimerMode>('fasting');
@@ -219,16 +221,22 @@ export default function TimerPage() {
           <div className="bg-[#0a0f0a] border-l-4 border-primary p-6 container mx-auto max-w-xl shadow-2xl">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-xl font-bold">{notificationType === 'fasting' ? 'Fasting Complete' : 'Eating Complete'}</h3>
-                <p className="text-sm opacity-70">{notificationType === 'fasting' ? 'Your fasting period is complete. Time to eat.' : 'Your eating period has ended. Ready to begin your fast.'}</p>
+                <h3 className="text-xl font-bold">
+                  {notificationType === 'fasting' ? t('notification_fasting_complete_heading') : t('notification_eating_complete_heading')}
+                </h3>
+                <p className="text-sm opacity-70">
+                  {notificationType === 'fasting' ? t('notification_fasting_complete_body') : t('notification_eating_complete_body')}
+                </p>
               </div>
               <button onClick={() => setShowNotification(false)}><X className="w-5 h-5" /></button>
             </div>
             <div className="mt-4 flex gap-2">
               <Button className="flex-1" onClick={() => { setShowNotification(false); setActiveMode(notificationType === 'fasting' ? 'eating' : 'fasting'); startTimer(notificationType === 'fasting' ? 'eating' : 'fasting'); }}>
-                {notificationType === 'fasting' ? 'Start Eating' : 'Start Fasting'}
+                {notificationType === 'fasting' ? t('notification_start_eating_button') : t('notification_start_fasting_button')}
               </Button>
-              <Button variant="outline" onClick={() => setShowNotification(false)}>Dismiss</Button>
+              <Button variant="outline" onClick={() => setShowNotification(false)}>
+                {t('notification_dismiss_button')}
+              </Button>
             </div>
           </div>
         </div>
@@ -236,7 +244,9 @@ export default function TimerPage() {
 
       <Card ref={hRef} className={cn("border-none bg-card/40 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <CardContent className="pt-6 space-y-4">
-          <Label className="uppercase text-[10px] font-bold tracking-widest opacity-50">Select Protocol</Label>
+          <Label className="uppercase text-[10px] font-bold tracking-widest opacity-50">
+            {t('settings_language_heading')}
+          </Label>
           <div className="grid grid-cols-5 gap-2">
             {PROTOCOLS.map((p) => (
               <Button
@@ -256,12 +266,14 @@ export default function TimerPage() {
       <div ref={fastingSectionRef} className={cn("transition-all duration-700 p-6 sm:p-8 bg-card/20 border-l-4", isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", activeMode === 'fasting' ? "border-primary bg-primary/5" : "border-transparent opacity-50")}>
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-bold">Fasting Period</h2>
-            <Badge variant={activeMode === 'fasting' ? 'default' : 'secondary'}>{activeMode === 'fasting' ? 'ACTIVE' : 'INACTIVE'}</Badge>
+            <h2 className="text-2xl font-bold">{t('timer_fasting_period')}</h2>
+            <Badge variant={activeMode === 'fasting' ? 'default' : 'secondary'}>
+              {activeMode === 'fasting' ? t('timer_active') : t('timer_inactive')}
+            </Badge>
           </div>
           <div className="flex gap-4">
-            <div className="space-y-1"><Label className="text-[10px] uppercase">Hours</Label><Input type="number" value={customFastingHours} onChange={e => setCustomFastingHours(Number(e.target.value))} disabled={!!fastStart || activeMode !== 'fasting'} className="w-20" /></div>
-            <div className="space-y-1"><Label className="text-[10px] uppercase">Minutes</Label><Input type="number" value={customFastingMinutes} onChange={e => setCustomFastingMinutes(Number(e.target.value))} disabled={!!fastStart || activeMode !== 'fasting'} className="w-20" /></div>
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer_hours')}</Label><Input type="number" value={customFastingHours} onChange={e => setCustomFastingHours(Number(e.target.value))} disabled={!!fastStart || activeMode !== 'fasting'} className="w-20" /></div>
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer_minutes')}</Label><Input type="number" value={customFastingMinutes} onChange={e => setCustomFastingMinutes(Number(e.target.value))} disabled={!!fastStart || activeMode !== 'fasting'} className="w-20" /></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-8">
             <div className="relative w-32 aspect-square">
@@ -271,18 +283,24 @@ export default function TimerPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-sm font-bold">{formatTime(Math.max(0, getPlannedSeconds('fasting') - fastElapsedSeconds))}</span>
-                <span className="text-[8px] opacity-50">REMAINING</span>
+                <span className="text-[8px] opacity-50 uppercase tracking-widest">
+                  {t('timer_dismiss')}
+                </span>
               </div>
             </div>
             {!fastStart ? (
-              <Button className="w-full h-14 uppercase font-bold tracking-widest" onClick={() => startTimer('fasting')} disabled={activeMode !== 'fasting'}>Start Fasting</Button>
+              <Button className="w-full h-14 uppercase font-bold tracking-widest" onClick={() => startTimer('fasting')} disabled={activeMode !== 'fasting'}>
+                {t('timer_start')}
+              </Button>
             ) : (
               <div className="flex gap-2 w-full">
                 <AlertDialog>
-                  <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">End Early</Button></AlertDialogTrigger>
+                  <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">{t('timer_pause')}</Button></AlertDialogTrigger>
                   <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>End Fast</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                 </AlertDialog>
-                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>Reset</Button>
+                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>
+                  {t('timer_reset')}
+                </Button>
               </div>
             )}
           </div>
@@ -292,9 +310,11 @@ export default function TimerPage() {
       <div className="flex justify-center">
         <button ref={toggleButtonRef} onClick={() => setActiveMode(activeMode === 'fasting' ? 'eating' : 'fasting')} className={cn("group w-full p-8 border border-border rounded-xl transition-all duration-700", isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", "hover:bg-foreground hover:text-background")}>
           <div className="text-center space-y-2">
-            <span className="text-[10px] uppercase tracking-widest opacity-50">Currently Active: {activeMode === 'fasting' ? 'Fasting Period' : 'Eating Period'}</span>
+            <span className="text-[10px] uppercase tracking-widest opacity-50">
+              {t('timer_currently_active')} {activeMode === 'fasting' ? t('timer_fasting_period') : t('timer_eating_period')}
+            </span>
             <div className="text-xl font-bold flex items-center justify-center gap-2">
-              Switch to {activeMode === 'fasting' ? 'Eating Period' : 'Fasting Period'}
+              {activeMode === 'fasting' ? t('timer_switch_eating') : t('timer_switch_fasting')}
               <ArrowDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
             </div>
           </div>
@@ -304,12 +324,14 @@ export default function TimerPage() {
       <div ref={eatingSectionRef} className={cn("transition-all duration-700 p-6 sm:p-8 bg-card/20 border-l-4", isEatingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", activeMode === 'eating' ? "border-amber-500 bg-amber-500/5" : "border-transparent opacity-50")}>
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-bold">Eating Period</h2>
-            <Badge variant={activeMode === 'eating' ? 'default' : 'secondary'}>{activeMode === 'eating' ? 'ACTIVE' : 'INACTIVE'}</Badge>
+            <h2 className="text-2xl font-bold">{t('timer_eating_period')}</h2>
+            <Badge variant={activeMode === 'eating' ? 'default' : 'secondary'}>
+              {activeMode === 'eating' ? t('timer_active') : t('timer_inactive')}
+            </Badge>
           </div>
           <div className="flex gap-4">
-            <div className="space-y-1"><Label className="text-[10px] uppercase">Hours</Label><Input type="number" value={customEatingHours} onChange={e => setCustomEatingHours(Number(e.target.value))} disabled={!!eatingStart || activeMode !== 'eating'} className="w-20" /></div>
-            <div className="space-y-1"><Label className="text-[10px] uppercase">Minutes</Label><Input type="number" value={customEatingMinutes} onChange={e => setCustomEatingMinutes(Number(e.target.value))} disabled={!!eatingStart || activeMode !== 'eating'} className="w-20" /></div>
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer_hours')}</Label><Input type="number" value={customEatingHours} onChange={e => setCustomEatingHours(Number(e.target.value))} disabled={!!eatingStart || activeMode !== 'eating'} className="w-20" /></div>
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer_minutes')}</Label><Input type="number" value={customEatingMinutes} onChange={e => setCustomEatingMinutes(Number(e.target.value))} disabled={!!eatingStart || activeMode !== 'eating'} className="w-20" /></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-8">
             <div className="relative w-32 aspect-square">
@@ -319,15 +341,19 @@ export default function TimerPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-sm font-bold">{formatTime(Math.max(0, getPlannedSeconds('eating') - eatingElapsedSeconds))}</span>
-                <span className="text-[8px] opacity-50">REMAINING</span>
+                <span className="text-[8px] opacity-50 uppercase tracking-widest">
+                  {t('timer_dismiss')}
+                </span>
               </div>
             </div>
             {!eatingStart ? (
-              <Button className="w-full h-14 bg-amber-500 text-black hover:bg-amber-400 font-bold" onClick={() => startTimer('eating')} disabled={activeMode !== 'eating'}>Start Eating</Button>
+              <Button className="w-full h-14 bg-amber-500 text-black hover:bg-amber-400 font-bold" onClick={() => startTimer('eating')} disabled={activeMode !== 'eating'}>
+                {t('timer_start')}
+              </Button>
             ) : (
               <div className="flex gap-2 w-full">
-                <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>End Early</Button>
-                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>Reset</Button>
+                <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>{t('timer_pause')}</Button>
+                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>{t('timer_reset')}</Button>
               </div>
             )}
           </div>
