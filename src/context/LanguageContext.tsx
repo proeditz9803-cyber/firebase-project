@@ -1,7 +1,7 @@
 'use client';
 /**
- * @fileOverview Definitive Language Context implementation for FasTrack.
- * Handles site-wide translation state, persistence, and nested key traversal.
+ * @fileOverview Definitive Language Context implementation.
+ * Handles dot-notation translation keys and site-wide persistence.
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
@@ -18,18 +18,14 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState('en');
 
-  // Step 1: Initialize language from localStorage after mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('fastrack-language');
-      if (saved && (translations as any)[saved]) {
-        setLanguageState(saved);
-      }
+    const saved = localStorage.getItem('fastrack-language');
+    if (saved && translations[saved]) {
+      setLanguageState(saved);
     }
   }, []);
 
   const setLanguage = useCallback((newLang: string) => {
-    if (typeof window === 'undefined') return;
     setLanguageState(newLang);
     localStorage.setItem('fastrack-language', newLang);
   }, []);
@@ -49,18 +45,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       return typeof current === 'string' ? current : null;
     };
 
-    // 1. Try current language
-    const currentLangDict = (translations as any)[language];
-    let result = getVal(currentLangDict, keys);
+    // 1. Try active language
+    let result = getVal(translations[language], keys);
 
     // 2. Fallback to English
-    if (result === null && language !== 'en') {
-      const englishDict = (translations as any)['en'];
-      result = getVal(englishDict, keys);
+    if (!result && language !== 'en') {
+      result = getVal(translations['en'], keys);
     }
 
-    // 3. Final fallback: return the key itself
-    return result !== null ? result : key;
+    return result || key;
   }, [language]);
 
   const contextValue = useMemo(() => ({

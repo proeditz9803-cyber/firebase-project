@@ -18,7 +18,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -34,11 +33,9 @@ const PROTOCOLS: { label: string; value: ProtocolType; fasting: number; eating: 
 ];
 
 export default function TimerPage() {
-  const [isClient, setIsClient] = useState(false);
   const { settings, isLoaded: settingsLoaded } = useNotificationSettings();
   const { t } = useLanguage();
   
-  // Mode & Global State
   const [activeMode, setActiveMode] = useState<TimerMode>('fasting');
   const [protocol, setProtocol] = useState<ProtocolType>('16:8');
   const [history, setHistory] = useState<FastRecord[]>([]);
@@ -46,38 +43,27 @@ export default function TimerPage() {
   const [notificationType, setNotificationType] = useState<'fasting' | 'eating'>('fasting');
   const [isDismissing, setIsDismissing] = useState(false);
 
-  // Entrance Animation States
   const [isFastingSectionVisible, setIsFastingSectionVisible] = useState(false);
   const [isToggleButtonVisible, setIsToggleButtonVisible] = useState(false);
   const [isEatingSectionVisible, setIsEatingSectionVisible] = useState(false);
 
-  // Fasting Timer State
   const [fastStart, setFastStart] = useState<string | null>(null);
   const [fastElapsedSeconds, setFastElapsedSeconds] = useState(0);
   const [customFastingHours, setCustomFastingHours] = useState(16);
   const [customFastingMinutes, setCustomFastingMinutes] = useState(0);
 
-  // Eating Timer State
   const [eatingStart, setEatingStart] = useState<string | null>(null);
   const [eatingElapsedSeconds, setEatingElapsedSeconds] = useState(0);
   const [customEatingHours, setCustomEatingHours] = useState(8);
   const [customEatingMinutes, setCustomEatingMinutes] = useState(0);
 
-  // Refs for Scroll Animations
   const fastingSectionRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const eatingSectionRef = useRef<HTMLDivElement>(null);
 
-  const fastingObserverRef = useRef<IntersectionObserver | null>(null);
-  const toggleObserverRef = useRef<IntersectionObserver | null>(null);
-  const eatingObserverRef = useRef<IntersectionObserver | null>(null);
-
-  // New Global Reveal Hook for heading
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
 
-  // Persistence
   useEffect(() => {
-    setIsClient(true);
     const savedActiveMode = localStorage.getItem('fastrack-active-mode') as TimerMode;
     const savedFastStart = localStorage.getItem('fastStart');
     const savedEatingStart = localStorage.getItem('fastrack-eating-start');
@@ -87,8 +73,6 @@ export default function TimerPage() {
     const savedCustomEH = localStorage.getItem('fastrack-eating-hours');
     const savedCustomEM = localStorage.getItem('fastrack-eating-minutes');
     const savedHistory = localStorage.getItem('fastHistory');
-    const savedNotification = localStorage.getItem('fastrack-fasting-complete');
-    const savedNotifyType = localStorage.getItem('fastrack-notify-type') as 'fasting' | 'eating';
 
     if (savedActiveMode) setActiveMode(savedActiveMode);
     if (savedFastStart) setFastStart(savedFastStart);
@@ -99,62 +83,32 @@ export default function TimerPage() {
     if (savedCustomEH) setCustomEatingHours(parseInt(savedCustomEH));
     if (savedCustomEM) setCustomEatingMinutes(parseInt(savedCustomEM));
     if (savedHistory) setHistory(JSON.parse(savedHistory));
-    if (savedNotification === 'true') setShowNotification(true);
-    if (savedNotifyType) setNotificationType(savedNotifyType);
   }, []);
 
   useEffect(() => {
-    if (isClient) {
-      localStorage.setItem('fastrack-active-mode', activeMode);
-      localStorage.setItem('fastProtocol', protocol);
-      localStorage.setItem('customFastingHours', customFastingHours.toString());
-      localStorage.setItem('customFastingMinutes', customFastingMinutes.toString());
-      localStorage.setItem('fastrack-eating-hours', customEatingHours.toString());
-      localStorage.setItem('fastrack-eating-minutes', customEatingMinutes.toString());
-      localStorage.setItem('fastrack-fasting-complete', showNotification.toString());
-      localStorage.setItem('fastrack-notify-type', notificationType);
-    }
-  }, [activeMode, protocol, customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes, showNotification, notificationType, isClient]);
+    localStorage.setItem('fastrack-active-mode', activeMode);
+    localStorage.setItem('fastProtocol', protocol);
+    localStorage.setItem('customFastingHours', customFastingHours.toString());
+    localStorage.setItem('customFastingMinutes', customFastingMinutes.toString());
+    localStorage.setItem('fastrack-eating-hours', customEatingHours.toString());
+    localStorage.setItem('fastrack-eating-minutes', customEatingMinutes.toString());
+  }, [activeMode, protocol, customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes]);
 
-  // Entrance Animation Setup
   useEffect(() => {
-    if (!isClient) return;
-
-    const fastingObserver = new IntersectionObserver(([entry]) => {
+    const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        setIsFastingSectionVisible(true);
-        fastingObserver.disconnect();
+        if (entry.target === fastingSectionRef.current) setIsFastingSectionVisible(true);
+        if (entry.target === toggleButtonRef.current) setIsToggleButtonVisible(true);
+        if (entry.target === eatingSectionRef.current) setIsEatingSectionVisible(true);
       }
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
 
-    const toggleObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => setIsToggleButtonVisible(true), 150);
-        toggleObserver.disconnect();
-      }
-    }, { threshold: 0.15 });
+    if (fastingSectionRef.current) observer.observe(fastingSectionRef.current);
+    if (toggleButtonRef.current) observer.observe(toggleButtonRef.current);
+    if (eatingSectionRef.current) observer.observe(eatingSectionRef.current);
 
-    const eatingObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => setIsEatingSectionVisible(true), 300);
-        eatingObserver.disconnect();
-      }
-    }, { threshold: 0.15 });
-
-    if (fastingSectionRef.current) fastingObserver.observe(fastingSectionRef.current);
-    if (toggleButtonRef.current) toggleObserver.observe(toggleButtonRef.current);
-    if (eatingSectionRef.current) eatingObserver.observe(eatingSectionRef.current);
-
-    fastingObserverRef.current = fastingObserver;
-    toggleObserverRef.current = toggleObserver;
-    eatingObserverRef.current = eatingObserver;
-
-    return () => {
-      fastingObserverRef.current?.disconnect();
-      toggleObserverRef.current?.disconnect();
-      eatingObserverRef.current?.disconnect();
-    };
-  }, [isClient]);
+    return () => observer.disconnect();
+  }, []);
 
   const getPlannedSeconds = useCallback((mode: TimerMode) => {
     const h = mode === 'fasting' ? customFastingHours : customEatingHours;
@@ -162,20 +116,12 @@ export default function TimerPage() {
     return (h * 3600) + (m * 60);
   }, [customFastingHours, customFastingMinutes, customEatingHours, customEatingMinutes]);
 
-  const saveHistory = useCallback((newHistory: FastRecord[]) => {
-    setHistory(newHistory);
-    localStorage.setItem('fastHistory', JSON.stringify(newHistory));
-  }, []);
-
   const endFast = useCallback((early = false) => {
     if (!fastStart) return;
-
-    const totalSeconds = getPlannedSeconds('fasting');
-    const plannedHours = totalSeconds / 3600;
     const startTime = new Date(fastStart);
     const endTime = new Date();
-    const actualHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-    const completed = !early && actualHours >= (plannedHours - 0.001);
+    const actualHours = (endTime.getTime() - startTime.getTime()) / (1000 * 3600);
+    const plannedHours = getPlannedSeconds('fasting') / 3600;
 
     const newRecord: FastRecord = {
       id: crypto.randomUUID(),
@@ -184,26 +130,24 @@ export default function TimerPage() {
       plannedProtocol: protocol,
       plannedHours,
       actualHours,
-      completed
+      completed: !early && actualHours >= plannedHours
     };
 
-    saveHistory([newRecord, ...history]);
+    const newHistory = [newRecord, ...history];
+    setHistory(newHistory);
+    localStorage.setItem('fastHistory', JSON.stringify(newHistory));
     setFastStart(null);
     localStorage.removeItem('fastStart');
     setFastElapsedSeconds(0);
 
-    if (completed) {
+    if (newRecord.completed) {
       setNotificationType('fasting');
       setShowNotification(true);
-      setIsDismissing(false);
-      if (settingsLoaded) {
-        triggerCompletionNotifications('fasting', settings);
-      }
+      if (settingsLoaded) triggerCompletionNotifications('fasting', settings);
     }
-  }, [fastStart, protocol, getPlannedSeconds, history, saveHistory, settings, settingsLoaded]);
+  }, [fastStart, protocol, getPlannedSeconds, history, settings, settingsLoaded]);
 
   const startTimer = (mode: TimerMode) => {
-    if (getPlannedSeconds(mode) <= 0) return;
     const now = new Date().toISOString();
     if (mode === 'fasting') {
       setFastStart(now);
@@ -226,32 +170,13 @@ export default function TimerPage() {
     }
   };
 
-  const handleToggleMode = () => {
-    const nextMode = activeMode === 'fasting' ? 'eating' : 'fasting';
-    setActiveMode(nextMode);
-  };
-
-  const dismissNotification = () => {
-    setIsDismissing(true);
-    setTimeout(() => {
-      setShowNotification(false);
-      setIsDismissing(false);
-      localStorage.removeItem('fastrack-fasting-complete');
-    }, 350);
-  };
-
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (fastStart && activeMode === 'fasting') {
       interval = setInterval(() => {
-        const start = new Date(fastStart).getTime();
-        const now = Date.now();
-        const diff = Math.floor((now - start) / 1000);
+        const diff = Math.floor((Date.now() - new Date(fastStart).getTime()) / 1000);
         setFastElapsedSeconds(diff);
-
-        if (diff >= getPlannedSeconds('fasting')) {
-          endFast(false);
-        }
+        if (diff >= getPlannedSeconds('fasting')) endFast(false);
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -261,44 +186,20 @@ export default function TimerPage() {
     let interval: NodeJS.Timeout;
     if (eatingStart && activeMode === 'eating') {
       interval = setInterval(() => {
-        const start = new Date(eatingStart).getTime();
-        const now = Date.now();
-        const diff = Math.floor((now - start) / 1000);
+        const diff = Math.floor((Date.now() - new Date(eatingStart).getTime()) / 1000);
         setEatingElapsedSeconds(diff);
-
-        const planned = getPlannedSeconds('eating');
-        if (diff >= planned) {
+        if (diff >= getPlannedSeconds('eating')) {
           setEatingStart(null);
           localStorage.removeItem('fastrack-eating-start');
           setEatingElapsedSeconds(0);
-          
           setNotificationType('eating');
           setShowNotification(true);
-          setIsDismissing(false);
-          if (settingsLoaded) {
-            triggerCompletionNotifications('eating', settings);
-          }
+          if (settingsLoaded) triggerCompletionNotifications('eating', settings);
         }
       }, 1000);
     }
     return () => clearInterval(interval);
   }, [eatingStart, activeMode, getPlannedSeconds, settings, settingsLoaded]);
-
-  const handleMinutesChange = (val: string, type: 'fasting' | 'eating') => {
-    const rawValue = parseInt(val) || 0;
-    if (rawValue < 0) return;
-
-    const overflowHours = Math.floor(rawValue / 60);
-    const remainingMinutes = rawValue % 60;
-
-    if (type === 'fasting') {
-      if (overflowHours > 0) setCustomFastingHours(prev => prev + overflowHours);
-      setCustomFastingMinutes(remainingMinutes);
-    } else {
-      if (overflowHours > 0) setCustomEatingHours(prev => prev + overflowHours);
-      setCustomEatingMinutes(remainingMinutes);
-    }
-  };
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -307,104 +208,38 @@ export default function TimerPage() {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleNotificationAction = () => {
-    dismissNotification();
-    if (notificationType === 'fasting') {
-      setActiveMode('eating');
-      startTimer('eating');
-      setTimeout(() => {
-        eatingSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    } else {
-      setActiveMode('fasting');
-      startTimer('fasting');
-      setTimeout(() => {
-        fastingSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    }
-  };
-
-  if (!isClient) return null;
-
   return (
-    <div className="max-w-xl mx-auto space-y-12 relative pb-20">
-      {/* Notification Banner */}
+    <div className="max-w-xl mx-auto space-y-12 pb-20">
       {showNotification && (
-        <div 
-          className={cn(
-            "fixed top-[64px] left-0 right-0 z-[60] will-change-[transform,opacity]",
-            isDismissing ? "animate-notification-out" : "animate-notification-in"
-          )}
-          style={{ animationDelay: isDismissing ? '0ms' : '100ms' }}
-        >
-          <div className="bg-[#0a0f0a] border-l-4 border-primary p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] container mx-auto max-w-xl">
-            <div className="flex items-start justify-between gap-6">
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold tracking-tight text-white font-outfit">
-                  {notificationType === 'fasting' ? t('timer.fastingComplete') : t('timer.eatingComplete')}
-                </h3>
-                <p className="text-sm font-medium text-white/70 leading-relaxed max-w-md">
-                  {notificationType === 'fasting' 
-                    ? t('timer.fastingCompleteDesc') 
-                    : t('timer.eatingCompleteDesc')}
-                </p>
+        <div className={cn("fixed top-[64px] left-0 right-0 z-[60]", isDismissing ? "animate-notification-out" : "animate-notification-in")}>
+          <div className="bg-[#0a0f0a] border-l-4 border-primary p-6 container mx-auto max-w-xl shadow-2xl">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-xl font-bold">{notificationType === 'fasting' ? t('timer.fastingComplete') : t('timer.eatingComplete')}</h3>
+                <p className="text-sm opacity-70">{notificationType === 'fasting' ? t('timer.fastingCompleteDesc') : t('timer.eatingCompleteDesc')}</p>
               </div>
-              <button 
-                onClick={dismissNotification} 
-                className="p-1 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <button onClick={() => setShowNotification(false)}><X className="w-5 h-5" /></button>
             </div>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Button 
-                onClick={handleNotificationAction}
-                className="flex-1 bg-white text-black hover:bg-white/90 font-bold uppercase tracking-widest text-[10px] h-14 rounded-none transition-all duration-300"
-              >
-                {notificationType === 'fasting' ? t('timer.startEating') : t('timer.startFasting')} <ArrowDown className="w-4 h-4 ml-2" />
+            <div className="mt-4 flex gap-2">
+              <Button className="flex-1" onClick={() => { setShowNotification(false); setActiveMode(notificationType === 'fasting' ? 'eating' : 'fasting'); startTimer(notificationType === 'fasting' ? 'eating' : 'fasting'); }}>
+                {notificationType === 'fasting' ? t('timer.startEating') : t('timer.startFasting')}
               </Button>
-              <Button 
-                variant="outline"
-                onClick={dismissNotification}
-                className="flex-1 border-white/20 bg-transparent text-white hover:bg-white/10 font-bold uppercase tracking-widest text-[10px] h-14 rounded-none transition-all duration-300"
-              >
-                {t('common.dismiss')}
-              </Button>
+              <Button variant="outline" onClick={() => setShowNotification(false)}>{t('common.dismiss')}</Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Protocol Selector */}
-      <Card 
-        ref={hRef}
-        className={cn(
-          "border-none shadow-xl bg-card/40 transition-all",
-          hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
-        )}
-      >
+      <Card ref={hRef} className={cn("border-none bg-card/40 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <CardContent className="pt-6 space-y-4">
-          <Label className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">{t('timer.protocolLabel')}</Label>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+          <Label className="uppercase text-[10px] font-bold tracking-widest opacity-50">{t('timer.protocolLabel')}</Label>
+          <div className="grid grid-cols-5 gap-2">
             {PROTOCOLS.map((p) => (
               <Button
                 key={p.value}
                 variant={protocol === p.value ? 'default' : 'secondary'}
-                className={cn(
-                  "h-12 text-xs font-bold transition-all duration-300",
-                  protocol === p.value 
-                    ? "bg-primary text-background shadow-lg shadow-primary/20 scale-[1.02]" 
-                    : "bg-secondary/50 text-foreground hover:bg-secondary"
-                )}
-                onClick={() => {
-                  setProtocol(p.value);
-                  if (p.value !== 'Custom') {
-                    setCustomFastingHours(p.fasting);
-                    setCustomFastingMinutes(0);
-                    setCustomEatingHours(p.eating);
-                    setCustomEatingMinutes(0);
-                  }
-                }}
+                className="h-10 text-xs font-bold"
+                onClick={() => { setProtocol(p.value); if (p.value !== 'Custom') { setCustomFastingHours(p.fasting); setCustomEatingHours(p.eating); setCustomFastingMinutes(0); setCustomEatingMinutes(0); } }}
                 disabled={!!fastStart || !!eatingStart}
               >
                 {p.label}
@@ -414,231 +249,83 @@ export default function TimerPage() {
         </CardContent>
       </Card>
 
-      {/* Fasting Timer Section */}
-      <div 
-        ref={fastingSectionRef}
-        className={cn(
-          "transition-all duration-900 ease-reveal border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
-          isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]",
-          activeMode === 'fasting' 
-            ? "border-primary bg-primary/5" 
-            : "border-border/20 opacity-50 grayscale-[0.3]"
-        )}
-      >
-        <div className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h2 className="text-3xl font-bold tracking-tight font-outfit">{t('timer.fastingPeriod')}</h2>
-              <Badge 
-                className={cn(
-                  "transition-all duration-400 font-bold tracking-widest text-[10px] px-3 py-1 rounded-full",
-                  activeMode === 'fasting' 
-                    ? "bg-primary text-background animate-pulse" 
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {activeMode === 'fasting' ? t('timer.active') : t('timer.inactive')}
-              </Badge>
-            </div>
+      <div ref={fastingSectionRef} className={cn("transition-all duration-700 p-6 sm:p-8 bg-card/20 border-l-4", isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", activeMode === 'fasting' ? "border-primary bg-primary/5" : "border-transparent opacity-50")}>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-bold">{t('timer.fastingPeriod')}</h2>
+            <Badge variant={activeMode === 'fasting' ? 'default' : 'secondary'}>{activeMode === 'fasting' ? t('timer.active') : t('timer.inactive')}</Badge>
           </div>
-
-          <div className="grid grid-cols-2 gap-6 max-w-[300px]">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">{t('timer.hours')}</Label>
-              <Input
-                type="number"
-                value={customFastingHours}
-                onChange={(e) => setCustomFastingHours(parseInt(e.target.value) || 0)}
-                disabled={!!fastStart || activeMode !== 'fasting'}
-                className="h-14 font-bold text-lg bg-background/50 border-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">{t('timer.minutes')}</Label>
-              <Input
-                type="number"
-                value={customFastingMinutes}
-                onChange={(e) => handleMinutesChange(e.target.value, 'fasting')}
-                disabled={!!fastStart || activeMode !== 'fasting'}
-                className="h-14 font-bold text-lg bg-background/50 border-none"
-              />
-            </div>
+          <div className="flex gap-4">
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer.hours')}</Label><Input type="number" value={customFastingHours} onChange={e => setCustomFastingHours(Number(e.target.value))} disabled={!!fastStart || activeMode !== 'fasting'} className="w-20" /></div>
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer.minutes')}</Label><Input type="number" value={customFastingMinutes} onChange={e => setCustomFastingMinutes(Number(e.target.value))} disabled={!!fastStart || activeMode !== 'fasting'} className="w-20" /></div>
           </div>
-
-          <div className="flex flex-col items-center sm:flex-row gap-8">
-            <div className="relative w-40 aspect-square">
-              <svg className="w-full h-full circular-timer-svg" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="hsl(var(--secondary))" strokeWidth="3" className="opacity-20" />
-                <circle
-                  cx="50" cy="50" r="45" fill="none" stroke="hsl(var(--primary))" strokeWidth="3"
-                  strokeDasharray="282.7"
-                  strokeDashoffset={282.7 - (282.7 * Math.min(100, (fastElapsedSeconds / Math.max(1, getPlannedSeconds('fasting'))) * 100)) / 100}
-                  strokeLinecap="round" className="timer-progress-arc"
-                />
+          <div className="flex flex-col sm:flex-row items-center gap-8">
+            <div className="relative w-32 aspect-square">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-10" />
+                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="283" strokeDashoffset={283 - (283 * Math.min(1, fastElapsedSeconds / (getPlannedSeconds('fasting') || 1)))} className="text-primary transition-all duration-300" />
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold tracking-tighter tabular-nums font-outfit">
-                  {formatTime(Math.max(0, getPlannedSeconds('fasting') - fastElapsedSeconds))}
-                </span>
-                <span className="text-[8px] font-bold text-muted-foreground mt-0.5 tracking-widest uppercase">{t('timer.remaining')}</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-sm font-bold">{formatTime(Math.max(0, getPlannedSeconds('fasting') - fastElapsedSeconds))}</span>
+                <span className="text-[8px] opacity-50">{t('timer.remaining')}</span>
               </div>
             </div>
-            
-            <div className="flex flex-col w-full gap-2">
-              {!fastStart ? (
-                <Button 
-                  className="w-full h-16 font-bold uppercase text-xs tracking-widest rounded-none shadow-2xl" 
-                  onClick={() => startTimer('fasting')}
-                  disabled={activeMode !== 'fasting' || getPlannedSeconds('fasting') <= 0}
-                >
-                  <Play className="w-4 h-4 mr-2" /> {t('timer.startFasting')}
-                </Button>
-              ) : (
-                <div className="flex gap-2">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="secondary" className="flex-1 h-16 font-bold uppercase text-xs tracking-widest rounded-none" disabled={activeMode !== 'fasting'}>
-                        <Square className="w-4 h-4 mr-2" /> {t('timer.endEarly')}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="rounded-none border-primary/20">
-                      <AlertDialogHeader><AlertDialogTitle className="font-outfit uppercase">{t('timer.confirmEndTitle')}</AlertDialogTitle></AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="rounded-none">{t('timer.confirmEndCancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => endFast(true)} className="rounded-none bg-primary text-background">{t('timer.confirmEndAction')}</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                  <Button variant="outline" className="flex-1 h-16 font-bold uppercase text-xs tracking-widest rounded-none" onClick={() => resetTimer('fasting')} disabled={activeMode !== 'fasting'}>
-                    <RotateCcw className="w-4 h-4 mr-2" /> {t('timer.reset')}
-                  </Button>
-                </div>
-              )}
-            </div>
+            {!fastStart ? (
+              <Button className="w-full h-14 uppercase font-bold tracking-widest" onClick={() => startTimer('fasting')} disabled={activeMode !== 'fasting'}>{t('timer.startFasting')}</Button>
+            ) : (
+              <div className="flex gap-2 w-full">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">{t('timer.endEarly')}</Button></AlertDialogTrigger>
+                  <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{t('timer.confirmEndTitle')}</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{t('timer.confirmEndCancel')}</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>{t('timer.confirmEndAction')}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+                </AlertDialog>
+                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>{t('timer.reset')}</Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mode Toggle Button */}
-      <div className="flex justify-center px-4 sm:px-0">
-        <button
-          ref={toggleButtonRef}
-          onClick={handleToggleMode}
-          className={cn(
-            "group relative w-full flex flex-col items-center justify-center p-8 bg-background text-foreground border border-border transition-all duration-900 ease-reveal delay-150 will-change-[transform,opacity] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-            isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]",
-            "hover:bg-foreground hover:text-background hover:scale-[1.015] active:scale-[0.985] hover:duration-300"
-          )}
-        >
-          <div className={cn(
-            "absolute top-4 px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] bg-white/10 group-hover:bg-black/10 transition-colors",
-            activeMode === 'fasting' ? "text-primary" : "text-amber-400"
-          )}>
-            {t('timer.currentlyActive').replace('{mode}', activeMode === 'fasting' ? t('nav.timer') : t('nav.log'))}
+      <div className="flex justify-center">
+        <button ref={toggleButtonRef} onClick={() => setActiveMode(activeMode === 'fasting' ? 'eating' : 'fasting')} className={cn("group w-full p-8 border border-border rounded-xl transition-all duration-700", isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", "hover:bg-foreground hover:text-background")}>
+          <div className="text-center space-y-2">
+            <span className="text-[10px] uppercase tracking-widest opacity-50">{t('timer.currentlyActive').replace('{mode}', activeMode === 'fasting' ? t('timer.fastingPeriod') : t('timer.eatingPeriod'))}</span>
+            <div className="text-xl font-bold flex items-center justify-center gap-2">
+              {t('timer.switchMode').replace('{mode}', activeMode === 'fasting' ? t('timer.eatingPeriod') : t('timer.fastingPeriod'))}
+              <ArrowDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
+            </div>
           </div>
-
-          <div className="flex items-center justify-center gap-4 mt-2">
-            <span className="text-xl md:text-2xl font-bold uppercase tracking-tighter font-outfit">
-              {activeMode === 'fasting' ? t('timer.switchMode').replace('{mode}', t('timer.eatingPeriod')) : t('timer.switchMode').replace('{mode}', t('timer.fastingPeriod'))}
-            </span>
-            <ArrowDown className="w-6 h-6 transition-transform duration-500 group-hover:translate-y-1.5" />
-          </div>
-          <span className="text-[10px] font-medium mt-2 opacity-60 tracking-wider">
-            {t('timer.tapToSwitch')}
-          </span>
         </button>
       </div>
 
-      {/* Eating Timer Section */}
-      <div 
-        ref={eatingSectionRef}
-        className={cn(
-          "transition-all duration-900 ease-reveal delay-300 border-l-4 p-6 sm:p-8 bg-card/20 group will-change-[transform,opacity]",
-          isEatingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]",
-          activeMode === 'eating' 
-            ? "border-amber-500 bg-amber-500/5" 
-            : "border-border/20 opacity-50 grayscale-[0.3]"
-        )}
-      >
-        <div className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h2 className="text-3xl font-bold tracking-tight font-outfit">{t('timer.eatingPeriod')}</h2>
-              <Badge 
-                className={cn(
-                  "transition-all duration-400 font-bold tracking-widest text-[10px] px-3 py-1 rounded-full",
-                  activeMode === 'eating' 
-                    ? "bg-amber-500 text-background animate-pulse" 
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {activeMode === 'eating' ? t('timer.active') : t('timer.inactive')}
-              </Badge>
-            </div>
+      <div ref={eatingSectionRef} className={cn("transition-all duration-700 p-6 sm:p-8 bg-card/20 border-l-4", isEatingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", activeMode === 'eating' ? "border-amber-500 bg-amber-500/5" : "border-transparent opacity-50")}>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-bold">{t('timer.eatingPeriod')}</h2>
+            <Badge variant={activeMode === 'eating' ? 'default' : 'secondary'}>{activeMode === 'eating' ? t('timer.active') : t('timer.inactive')}</Badge>
           </div>
-
-          <div className="grid grid-cols-2 gap-6 max-w-[300px]">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">{t('timer.hours')}</Label>
-              <Input
-                type="number"
-                value={customEatingHours}
-                onChange={(e) => setCustomEatingHours(parseInt(e.target.value) || 0)}
-                disabled={!!eatingStart || activeMode !== 'eating'}
-                className="h-14 font-bold text-lg bg-background/50 border-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">{t('timer.minutes')}</Label>
-              <Input
-                type="number"
-                value={customEatingMinutes}
-                onChange={(e) => handleMinutesChange(e.target.value, 'eating')}
-                disabled={!!eatingStart || activeMode !== 'eating'}
-                className="h-14 font-bold text-lg bg-background/50 border-none"
-              />
-            </div>
+          <div className="flex gap-4">
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer.hours')}</Label><Input type="number" value={customEatingHours} onChange={e => setCustomEatingHours(Number(e.target.value))} disabled={!!eatingStart || activeMode !== 'eating'} className="w-20" /></div>
+            <div className="space-y-1"><Label className="text-[10px] uppercase">{t('timer.minutes')}</Label><Input type="number" value={customEatingMinutes} onChange={e => setCustomEatingMinutes(Number(e.target.value))} disabled={!!eatingStart || activeMode !== 'eating'} className="w-20" /></div>
           </div>
-
-          <div className="flex flex-col items-center sm:flex-row gap-8">
-            <div className="relative w-40 aspect-square">
-              <svg className="w-full h-full circular-timer-svg" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="hsl(var(--secondary))" strokeWidth="3" className="opacity-20" />
-                <circle
-                  cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" strokeWidth="3"
-                  strokeDasharray="282.7"
-                  strokeDashoffset={282.7 - (282.7 * Math.min(100, (eatingElapsedSeconds / Math.max(1, getPlannedSeconds('eating'))) * 100)) / 100}
-                  strokeLinecap="round" className="timer-progress-arc"
-                />
+          <div className="flex flex-col sm:flex-row items-center gap-8">
+            <div className="relative w-32 aspect-square">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-10" />
+                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="283" strokeDashoffset={283 - (283 * Math.min(1, eatingElapsedSeconds / (getPlannedSeconds('eating') || 1)))} className="text-amber-500 transition-all duration-300" />
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-bold tracking-tighter tabular-nums font-outfit">
-                  {formatTime(Math.max(0, getPlannedSeconds('eating') - eatingElapsedSeconds))}
-                </span>
-                <span className="text-[8px] font-bold text-muted-foreground mt-0.5 tracking-widest uppercase">{t('timer.remaining')}</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-sm font-bold">{formatTime(Math.max(0, getPlannedSeconds('eating') - eatingElapsedSeconds))}</span>
+                <span className="text-[8px] opacity-50">{t('timer.remaining')}</span>
               </div>
             </div>
-            
-            <div className="flex flex-col w-full gap-2">
-              {!eatingStart ? (
-                <Button 
-                  className="w-full h-16 font-bold uppercase text-xs tracking-widest rounded-none shadow-2xl bg-amber-500 text-black hover:bg-amber-400" 
-                  onClick={() => startTimer('eating')}
-                  disabled={activeMode !== 'eating' || getPlannedSeconds('eating') <= 0}
-                >
-                  <Play className="w-4 h-4 mr-2" /> {t('timer.startEating')}
-                </Button>
-              ) : (
-                <div className="flex gap-2">
-                  <Button variant="secondary" className="flex-1 h-16 font-bold uppercase text-xs tracking-widest rounded-none" onClick={() => resetTimer('eating')} disabled={activeMode !== 'eating'}>
-                    <Square className="w-4 h-4 mr-2" /> {t('timer.endEarly')}
-                  </Button>
-                  <Button variant="outline" className="flex-1 h-16 font-bold uppercase text-xs tracking-widest rounded-none" onClick={() => resetTimer('eating')} disabled={activeMode !== 'eating'}>
-                    <RotateCcw className="w-4 h-4 mr-2" /> {t('timer.reset')}
-                  </Button>
-                </div>
-              )}
-            </div>
+            {!eatingStart ? (
+              <Button className="w-full h-14 bg-amber-500 text-black hover:bg-amber-400 font-bold" onClick={() => startTimer('eating')} disabled={activeMode !== 'eating'}>{t('timer.startEating')}</Button>
+            ) : (
+              <div className="flex gap-2 w-full">
+                <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>{t('timer.endEarly')}</Button>
+                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>{t('timer.reset')}</Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
