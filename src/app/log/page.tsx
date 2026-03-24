@@ -19,10 +19,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2, History, Award, Clock } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
-import { useLanguage } from '@/context/LanguageContext';
 
 export default function LogPage() {
-  const { t } = useLanguage();
   const [headerRef, isHeaderVisible] = useScrollReveal({ delay: 0 });
   const [statsRef, isStatsVisible] = useScrollReveal({ delay: 150 });
   const [listRef, isListVisible] = useScrollReveal({ delay: 300 });
@@ -70,24 +68,24 @@ export default function LogPage() {
           isHeaderVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden'
         )}
       >
-        <h1 className="text-3xl font-bold tracking-tight">{t('log.title')}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Fasting History</h1>
         {isClient && totalFasts > 0 && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                <Trash2 className="w-4 h-4 mr-2" /> {t('log.clearHistory')}
+                <Trash2 className="w-4 h-4 mr-2" /> Clear History
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{t('log.confirmClearTitle')}</AlertDialogTitle>
+                <AlertDialogTitle>Clear All History?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {t('log.confirmClearDesc')}
+                  This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>{t('log.confirmClearCancel')}</AlertDialogCancel>
-                <AlertDialogAction onClick={clearHistory}>{t('log.confirmClearAction')}</AlertDialogAction>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearHistory}>Clear All</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -104,7 +102,7 @@ export default function LogPage() {
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <Award className="w-4 h-4 mr-2 text-primary" /> {t('log.totalFasts')}
+              <Award className="w-4 h-4 mr-2 text-primary" /> Total Fasts
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -114,7 +112,7 @@ export default function LogPage() {
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <Clock className="w-4 h-4 mr-2 text-primary" /> {t('log.totalHours')}
+              <Clock className="w-4 h-4 mr-2 text-primary" /> Total Hours
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -124,7 +122,7 @@ export default function LogPage() {
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <History className="w-4 h-4 mr-2 text-primary" /> {t('log.avgDuration')}
+              <History className="w-4 h-4 mr-2 text-primary" /> Avg. Duration
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -144,7 +142,7 @@ export default function LogPage() {
           history.length === 0 ? (
             <div className="text-center py-20 bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
               <History className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
-              <p className="mt-4 text-muted-foreground">{t('log.noHistory')}</p>
+              <p className="mt-4 text-muted-foreground">No history yet. Start your first fast!</p>
             </div>
           ) : (
             history.map((record) => (
@@ -170,7 +168,7 @@ export default function LogPage() {
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-6">
                     <div className="text-right">
-                      <div className="text-sm font-medium text-muted-foreground">{t('log.duration')}</div>
+                      <div className="text-sm font-medium text-muted-foreground">Duration</div>
                       <div className="text-lg font-bold text-primary">{formatDuration(record.actualHours)}</div>
                     </div>
                     <Badge 
@@ -182,7 +180,7 @@ export default function LogPage() {
                       )}
                       variant="outline"
                     >
-                      {record.completed ? t('log.completed') : t('log.endedEarly')}
+                      {record.completed ? 'Completed' : 'Ended Early'}
                     </Badge>
                   </div>
                 </div>

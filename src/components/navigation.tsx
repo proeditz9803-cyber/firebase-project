@@ -5,16 +5,14 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Timer, ClipboardList, BookOpen } from 'lucide-react';
 import { LogoToggle } from './LogoToggle';
-import { useLanguage } from '@/context/LanguageContext';
 
 export function Navigation() {
   const pathname = usePathname();
-  const { t } = useLanguage();
 
   const navLinks = [
-    { href: '/', label: t('navigation.timer'), icon: Timer },
-    { href: '/log', label: t('navigation.log'), icon: ClipboardList },
-    { href: '/guide', label: t('navigation.guide'), icon: BookOpen },
+    { href: '/', label: 'Timer', icon: Timer },
+    { href: '/log', label: 'Log', icon: ClipboardList },
+    { href: '/guide', label: 'Guide', icon: BookOpen },
   ];
 
   return (

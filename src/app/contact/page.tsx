@@ -5,10 +5,8 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import useScrollReveal from '@/hooks/useScrollReveal';
-import { useLanguage } from '@/context/LanguageContext';
 
 export default function ContactPage() {
-  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -55,13 +53,13 @@ export default function ContactPage() {
         )}
       >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
-          {t('common.getInTouch')}
+          Get In Touch
         </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
           FasTrack
         </h1>
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">{t('navigation.contactUs')}</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">Contact Us</h2>
         </div>
       </section>
 
