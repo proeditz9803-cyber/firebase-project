@@ -1,81 +1,82 @@
-"use client";
-/**
- * @fileOverview Flat-key Language Context implementation.
- * Ensures site-wide language persistence and instant UI updates.
- */
+'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import translations, { languageCodes } from '@/utils/translations';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  ReactNode
+} from 'react'
+import translations, { languageCodes } from '@/utils/translations'
 
-interface LanguageContextType {
-  language: string;
-  setLanguage: (lang: string) => void;
-  t: (key: string) => string;
-  languageCodes: typeof languageCodes;
+type LanguageContextType = {
+  language: string
+  setLanguage: (code: string) => void
+  t: (key: string) => string
+  languageCodes: typeof languageCodes
 }
 
-const LanguageContext = createContext<LanguageContextType | null>(null);
+const LanguageContext = createContext<LanguageContextType | null>(null)
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState('en');
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<string>('en')
 
-  // Load saved language after mount to avoid SSR mismatch
   useEffect(() => {
-    const saved = localStorage.getItem('fastrack-language');
-    if (saved && languageCodes[saved]) {
-      setLanguageState(saved);
+    try {
+      const saved = localStorage.getItem('fastrack-language')
+      if (saved && translations[saved] !== undefined) {
+        setLanguageState(saved)
+      }
+    } catch (e) {
+      console.error('Failed to read language from storage', e)
     }
-  }, []);
+  }, [])
 
-  const setLanguage = useCallback((newLang: string) => {
-    if (languageCodes[newLang]) {
-      setLanguageState(newLang);
-      localStorage.setItem('fastrack-language', newLang);
-    }
-  }, []);
-
-  /**
-   * Flat-key translation function.
-   * Traverses the translations object for the current language.
-   * Falls back to English if key is missing.
-   */
-  const t = useCallback((key: string): string => {
-    // 1. Try active language
-    const currentLangSet = translations[language];
-    if (currentLangSet && currentLangSet[key]) {
-      return currentLangSet[key];
-    }
-
-    // 2. Fallback to English
-    if (language !== 'en') {
-      const englishSet = translations['en'];
-      if (englishSet && englishSet[key]) {
-        return englishSet[key];
+  const setLanguage = (code: string) => {
+    if (translations[code] !== undefined) {
+      setLanguageState(code)
+      try {
+        localStorage.setItem('fastrack-language', code)
+      } catch (e) {
+        console.error('Failed to save language to storage', e)
       }
     }
+  }
 
-    // 3. Last resort fallback to key itself
-    return key;
-  }, [language]);
+  const t = (key: string): string => {
+    const currentTranslations = translations[language]
+    if (currentTranslations !== undefined && currentTranslations[key] !== undefined) {
+      return currentTranslations[key]
+    }
+    const englishTranslations = translations['en']
+    if (englishTranslations !== undefined && englishTranslations[key] !== undefined) {
+      return englishTranslations[key]
+    }
+    return key
+  }
 
-  const contextValue = useMemo(() => ({
-    language,
-    setLanguage,
-    t,
-    languageCodes
-  }), [language, setLanguage, t]);
+  const value = useMemo(
+    () => ({
+      language,
+      setLanguage,
+      t,
+      languageCodes
+    }),
+    [language]
+  )
 
   return (
-    <LanguageContext.Provider value={contextValue}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
-  );
+  )
 }
 
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+export function useLanguage(): LanguageContextType {
+  const context = useContext(LanguageContext)
+  if (context === null) {
+    throw new Error('useLanguage must be used within a LanguageProvider')
   }
-  return context;
+  return context
 }

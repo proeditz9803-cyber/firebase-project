@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
 import { ToggleSwitch } from '@/components/ToggleSwitch';
 import { RINGTONES, playRingtone, RingtoneName } from '@/utils/ringtones';
-import { Play, Bell, Volume2, Smartphone, Monitor, Search, Check } from 'lucide-react';
+import { Play, Bell, Volume2, Smartphone, Monitor, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -89,12 +89,11 @@ export default function SettingsPage() {
             <div className="max-h-[320px] overflow-y-auto custom-scrollbar">
               {filteredLanguages.length > 0 ? (
                 filteredLanguages.map(([code, info]) => (
-                  <button
+                  <div
                     key={code}
-                    onClick={() => setLanguage(code)}
                     className={cn(
-                      "w-full flex items-center justify-between p-4 transition-all hover:bg-primary/5 group",
-                      language === code ? "bg-primary/10" : "hover:bg-accent/30"
+                      "w-full flex items-center justify-between p-4 transition-all hover:bg-primary/5 group border-b border-border/10 last:border-0",
+                      language === code && "bg-primary/10"
                     )}
                   >
                     <div className="flex flex-col items-start text-left">
@@ -102,15 +101,34 @@ export default function SettingsPage() {
                       <span className="text-xs text-muted-foreground">{info.native}</span>
                     </div>
                     
-                    <div className={cn(
-                      "w-9 h-9 flex items-center justify-center rounded-[10px] border transition-all duration-200",
-                      language === code 
-                        ? "bg-primary border-primary text-primary-foreground shadow-[0_2px_8px_rgba(0,0,0,0.15)]" 
-                        : "border-border/40 text-transparent"
-                    )}>
-                      <Check className="w-4 h-4" />
-                    </div>
-                  </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLanguage(code);
+                      }}
+                      aria-label={`Select ${info.english}`}
+                      aria-pressed={language === code}
+                      className={cn(
+                        "relative w-9 h-9 flex items-center justify-center rounded-[10px] border transition-all duration-200 active:scale-[0.92] will-change-transform",
+                        language === code 
+                          ? "bg-primary border-primary text-white shadow-[0_2px_8px_rgba(0,0,0,0.15)]" 
+                          : "bg-transparent border-border/40 text-foreground/30 hover:bg-primary/15 hover:border-primary/60 hover:text-primary/70"
+                      )}
+                    >
+                      <svg 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 16 16" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="3 8 7 12 13 4" />
+                      </svg>
+                    </button>
+                  </div>
                 ))
               ) : (
                 <div className="p-8 text-center text-muted-foreground italic">
