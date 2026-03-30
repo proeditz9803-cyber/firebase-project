@@ -4,10 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { MoreVertical, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/context/LanguageContext';
 
 export default function KebabMenu() {
-  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -51,28 +49,28 @@ export default function KebabMenu() {
           className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
         >
           <Settings className="w-4 h-4" />
-          {t('nav_settings')}
+          Settings
         </Link>
         <Link
           href="/about"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav_about')}
+          About Us
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav_privacy')}
+          Privacy Policy
         </Link>
         <Link
           href="/contact"
           onClick={closeMenu}
           className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
         >
-          {t('nav_contact')}
+          Contact Us
         </Link>
       </div>
     </div>

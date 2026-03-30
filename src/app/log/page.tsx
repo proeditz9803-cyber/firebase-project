@@ -19,10 +19,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2, History, Award, Clock } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
-import { useLanguage } from '@/context/LanguageContext';
 
 export default function LogPage() {
-  const { t } = useLanguage();
   const [headerRef, isHeaderVisible] = useScrollReveal({ delay: 0 });
   const [statsRef, isStatsVisible] = useScrollReveal({ delay: 150 });
   const [listRef, isListVisible] = useScrollReveal({ delay: 300 });
@@ -58,7 +56,7 @@ export default function LogPage() {
   const formatDuration = (hours: number) => {
     const h = Math.floor(hours);
     const m = Math.round((hours - h) * 60);
-    return `${h}${t('log_hours')} ${m}${t('log_minutes')}`;
+    return `${h}h ${m}m`;
   };
 
   return (
@@ -70,24 +68,24 @@ export default function LogPage() {
           isHeaderVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden'
         )}
       >
-        <h1 className="text-3xl font-bold tracking-tight">{t('log_heading')}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Fasting Log</h1>
         {isClient && totalFasts > 0 && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                <Trash2 className="w-4 h-4 mr-2" /> {t('timer_reset')}
+                <Trash2 className="w-4 h-4 mr-2" /> Reset Log
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{t('timer_reset')}?</AlertDialogTitle>
+                <AlertDialogTitle>Reset Log?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone.
+                  This action cannot be undone. All your fasting history will be cleared.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>{t('timer_dismiss')}</AlertDialogCancel>
-                <AlertDialogAction onClick={clearHistory}>{t('timer_reset')}</AlertDialogAction>
+                <AlertDialogCancel>Dismiss</AlertDialogCancel>
+                <AlertDialogAction onClick={clearHistory}>Reset</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -104,7 +102,7 @@ export default function LogPage() {
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <Award className="w-4 h-4 mr-2 text-primary" /> {t('log_completed')}
+              <Award className="w-4 h-4 mr-2 text-primary" /> Completed
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -114,7 +112,7 @@ export default function LogPage() {
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <Clock className="w-4 h-4 mr-2 text-primary" /> {t('timer_hours')}
+              <Clock className="w-4 h-4 mr-2 text-primary" /> Total Hours
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -124,7 +122,7 @@ export default function LogPage() {
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <History className="w-4 h-4 mr-2 text-primary" /> {t('nav_log')}
+              <History className="w-4 h-4 mr-2 text-primary" /> Avg. Duration
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -144,7 +142,7 @@ export default function LogPage() {
           history.length === 0 ? (
             <div className="text-center py-20 bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
               <History className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
-              <p className="mt-4 text-muted-foreground">{t('log_empty')}</p>
+              <p className="mt-4 text-muted-foreground">No fasting history yet. Start your first fast to see it here.</p>
             </div>
           ) : (
             history.map((record) => (
@@ -170,7 +168,7 @@ export default function LogPage() {
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-6">
                     <div className="text-right">
-                      <div className="text-sm font-medium text-muted-foreground">{t('timer_hours')}</div>
+                      <div className="text-sm font-medium text-muted-foreground">Duration</div>
                       <div className="text-lg font-bold text-primary">{formatDuration(record.actualHours)}</div>
                     </div>
                     <Badge 
@@ -182,7 +180,7 @@ export default function LogPage() {
                       )}
                       variant="outline"
                     >
-                      {record.completed ? t('log_completed') : t('timer_dismiss')}
+                      {record.completed ? 'Completed' : 'Ended Early'}
                     </Badge>
                   </div>
                 </div>
