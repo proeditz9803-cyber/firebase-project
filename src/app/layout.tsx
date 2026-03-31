@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Outfit } from 'next/font/google';
 import './globals.css';
 import ConditionalLayout from '@/components/ConditionalLayout';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -32,6 +33,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen flex flex-col overflow-x-hidden">
         <ConditionalLayout>{children}</ConditionalLayout>
+        <SpeedInsights />
       </body>
     </html>
   );
