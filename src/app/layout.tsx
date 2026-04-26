@@ -30,7 +30,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6752713314867783"
-     crossorigin="anonymous"></script>
+     crossOrigin="anonymous"></script>
       </head>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen flex flex-col overflow-x-hidden">
         <ConditionalLayout>{children}</ConditionalLayout>
