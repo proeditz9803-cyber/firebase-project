@@ -13,6 +13,9 @@ export default function PrivacyPolicyPage() {
   const [s4Ref, s4Vis] = useScrollReveal({ delay: 400 });
   const [s5Ref, s5Vis] = useScrollReveal({ delay: 500 });
   const [s6Ref, s6Vis] = useScrollReveal({ delay: 600 });
+  const [s7Ref, s7Vis] = useScrollReveal({ delay: 700 });
+  const [s8Ref, s8Vis] = useScrollReveal({ delay: 800 });
+  const [s9Ref, s9Vis] = useScrollReveal({ delay: 900 });
   const [s10Ref, s10Vis] = useScrollReveal({ delay: 1000 });
 
   return (
@@ -39,7 +42,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* 1. Introduction */}
+      {/* 1. About Us */}
       <section ref={s1Ref} className={cn("space-y-4 transition-all", s1Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
         <h2 className="text-2xl font-bold text-primary">1. About Us</h2>
         <p className="leading-relaxed text-muted-foreground">
@@ -89,6 +92,33 @@ export default function PrivacyPolicyPage() {
         <h2 className="text-2xl font-bold text-primary">6. Local Storage</h2>
         <p className="leading-relaxed text-muted-foreground">
           FasTrack uses browser local storage solely to save your fasting data.
+        </p>
+        <Separator className="opacity-20" />
+      </section>
+
+      {/* 7. Third Party Links */}
+      <section ref={s7Ref} className={cn("space-y-4 transition-all", s7Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <h2 className="text-2xl font-bold text-primary">7. Third Party Links</h2>
+        <p className="leading-relaxed text-muted-foreground">
+          FasTrack may contain links to third-party websites.
+        </p>
+        <Separator className="opacity-20" />
+      </section>
+
+      {/* 8. Security */}
+      <section ref={s8Ref} className={cn("space-y-4 transition-all", s8Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <h2 className="text-2xl font-bold text-primary">8. Security</h2>
+        <p className="leading-relaxed text-muted-foreground">
+          Your data remains strictly under your control.
+        </p>
+        <Separator className="opacity-20" />
+      </section>
+
+      {/* 9. Children's Privacy */}
+      <section ref={s9Ref} className={cn("space-y-4 transition-all", s9Vis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <h2 className="text-2xl font-bold text-primary">9. Children's Privacy</h2>
+        <p className="leading-relaxed text-muted-foreground">
+          FasTrack is not directed at children under the age of 13.
         </p>
         <Separator className="opacity-20" />
       </section>
