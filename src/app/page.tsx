@@ -302,9 +302,7 @@ export default function TimerPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-sm font-bold">{formatTime(Math.max(0, getPlannedSeconds('fasting') - fastElapsedSeconds))}</span>
-                <span className="text-[8px] opacity-50 uppercase tracking-widest">
-                  Remaining
-                </span>
+                <span className="text-[8px] opacity-50 uppercase tracking-widest">Remaining</span>
               </div>
             </div>
             {!fastStart ? (
@@ -315,7 +313,7 @@ export default function TimerPage() {
               <div className="flex gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">End Fast</Button></AlertDialogTrigger>
-                  <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Dismiss</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>Reset</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+                  <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Dismiss</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>End Fast</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                 </AlertDialog>
                 <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>
                   Reset
@@ -360,9 +358,7 @@ export default function TimerPage() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-sm font-bold">{formatTime(Math.max(0, getPlannedSeconds('eating') - eatingElapsedSeconds))}</span>
-                <span className="text-[8px] opacity-50 uppercase tracking-widest">
-                  Remaining
-                </span>
+                <span className="text-[8px] opacity-50 uppercase tracking-widest">Remaining</span>
               </div>
             </div>
             {!eatingStart ? (
