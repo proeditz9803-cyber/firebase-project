@@ -58,6 +58,7 @@ export default function TimerPage() {
   const fastingSectionRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const eatingSectionRef = useRef<HTMLDivElement>(null);
+  const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
 
@@ -112,6 +113,21 @@ export default function TimerPage() {
     if (eatingSectionRef.current) observer.observe(eatingSectionRef.current);
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
+    };
+  }, []);
+
+  const dismissNotification = useCallback((callback?: () => void) => {
+    setIsDismissing(true);
+    dismissTimeoutRef.current = setTimeout(() => {
+      setShowNotification(false);
+      setIsDismissing(false);
+      if (callback) callback();
+    }, 350);
   }, []);
 
   const getPlannedSeconds = useCallback((mode: TimerMode) => {
@@ -228,13 +244,16 @@ export default function TimerPage() {
                     : 'Your eating period has ended. Ready to begin your fast.'}
                 </p>
               </div>
-              <button onClick={() => setShowNotification(false)}><X className="w-5 h-5" /></button>
+              <button onClick={() => dismissNotification()}><X className="w-5 h-5" /></button>
             </div>
             <div className="mt-4 flex gap-2">
-              <Button className="flex-1" onClick={() => { setShowNotification(false); setActiveMode(notificationType === 'fasting' ? 'eating' : 'fasting'); startTimer(notificationType === 'fasting' ? 'eating' : 'fasting'); }}>
+              <Button className="flex-1" onClick={() => dismissNotification(() => {
+                setActiveMode(notificationType === 'fasting' ? 'eating' : 'fasting');
+                startTimer(notificationType === 'fasting' ? 'eating' : 'fasting');
+              })}>
                 {notificationType === 'fasting' ? 'Start Eating Period' : 'Start Fasting'}
               </Button>
-              <Button variant="outline" onClick={() => setShowNotification(false)}>
+              <Button variant="outline" onClick={() => dismissNotification()}>
                 Dismiss
               </Button>
             </div>
