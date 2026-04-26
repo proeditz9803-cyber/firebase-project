@@ -376,4 +376,4 @@ export default function TimerPage() {
       </div>
     </div>
   );
-}
+} 
