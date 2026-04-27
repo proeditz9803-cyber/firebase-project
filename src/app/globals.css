@@ -39,13 +39,13 @@
 /* Global Scroll Reveal System */
 .scroll-reveal-hidden {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(24px) scale(0.98);
   will-change: transform, opacity;
 }
 
 .scroll-reveal-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1), transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -54,38 +54,38 @@
 }
 
 .timer-progress-arc {
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke-dashoffset 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Dual Timer Redesign Keyframes */
 @keyframes notificationSlideDown {
   0% {
-    transform: translateY(-100%);
+    transform: translateY(-100%) scale(0.96);
     opacity: 0;
   }
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
 
 @keyframes notificationSlideUp {
   0% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
   100% {
-    transform: translateY(-100%);
+    transform: translateY(-100%) scale(0.96);
     opacity: 0;
   }
 }
 
 .animate-notification-in {
-  animation: notificationSlideDown 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: notificationSlideDown 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-notification-out {
-  animation: notificationSlideUp 350ms ease-in forwards;
+  animation: notificationSlideUp 350ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
 }
 
 /* LogoToggle Letter Pop Reveal Keyframes */
@@ -95,14 +95,14 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(30px);
+    transform: translateY(16px);
     opacity: 0;
   }
 }
 
 @keyframes letterPopIn {
   0% {
-    transform: translateY(30px);
+    transform: translateY(16px);
     opacity: 0;
   }
   100% {
@@ -116,7 +116,7 @@
 }
 
 .animate-letter-in {
-  animation: letterPopIn 450ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation: letterPopIn 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-letter-in-snap {
