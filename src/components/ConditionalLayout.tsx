@@ -4,9 +4,16 @@ import { usePathname } from 'next/navigation';
 import { SwipeNavigator } from '@/components/SwipeNavigator';
 import { Navigation } from '@/components/navigation';
 import KebabMenu from '@/components/KebabMenu';
+import TimerPage from '@/app/page';
+import LogPage from '@/app/log/page';
+import GuidePage from '@/app/guide/page';
 
 /**
  * @fileOverview A client-side wrapper that handles conditional rendering of the SwipeNavigator.
+ * For main routes, Next.js children are intentionally not rendered here because SwipeNavigator
+ * pre-renders all three pages simultaneously to enable the swipe card animation system.
+ * The page components are passed as React nodes so SwipeNavigator remains decoupled from
+ * specific page implementations.
  */
 
 export default function ConditionalLayout({
@@ -15,8 +22,7 @@ export default function ConditionalLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  
-  // Define the main routes that should use the SwipeNavigator system
+
   const mainRoutes = ['/', '/log', '/guide'];
   const isMainPage = mainRoutes.includes(pathname);
 
@@ -26,7 +32,7 @@ export default function ConditionalLayout({
       <Navigation />
       <main className="flex-1 flex flex-col">
         {isMainPage ? (
-          <SwipeNavigator />
+          <SwipeNavigator pageNodes={[<TimerPage />, <LogPage />, <GuidePage />]} />
         ) : (
           <div className="container mx-auto px-4 py-8">
             {children}
