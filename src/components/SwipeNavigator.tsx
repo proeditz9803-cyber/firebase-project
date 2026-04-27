@@ -6,24 +6,18 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import useScrollReveal from '@/hooks/useScrollReveal';
 
-// Import Page Components
-import TimerPage from '@/app/page';
-import LogPage from '@/app/log/page';
-import GuidePage from '@/app/guide/page';
+interface SwipeNavigatorProps {
+  pageNodes: React.ReactNode[];
+}
 
-/**
- * SwipeNavigator Component
- * Implements a premium "Card Swipe" navigation system.
- * Navigation buttons are now positioned exactly at the viewport edges, vertically centered.
- */
-export function SwipeNavigator() {
+export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   const pages = useMemo(() => [
-    { path: '/', component: TimerPage, label: 'Page one' },
-    { path: '/log', component: LogPage, label: 'Page two' },
-    { path: '/guide', component: GuidePage, label: 'Page three' },
+    { path: '/', label: 'Page one' },
+    { path: '/log', label: 'Page two' },
+    { path: '/guide', label: 'Page three' },
   ], []);
 
   const getPageIndex = useCallback((path: string) => {
@@ -31,17 +25,14 @@ export function SwipeNavigator() {
     return index === -1 ? 0 : index;
   }, [pages]);
 
-  // Persistent States
   const [currentPage, setCurrentPage] = useState(() => getPageIndex(pathname));
   const [liveDelta, setLiveDelta] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward' | 'none'>('none');
   const [screenWidth, setScreenWidth] = useState(0);
-  
-  // Entrance reveal hooks for controls
+
   const [controlsRef, controlsVisible] = useScrollReveal({ delay: 300 });
 
-  // Gesture tracking refs
   const startX = useRef(0);
   const startY = useRef(0);
   const currentDelta = useRef(0);
@@ -58,7 +49,6 @@ export function SwipeNavigator() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Synchronize state for external navigation (Top Nav clicks)
   useEffect(() => {
     if (navigationSource.current === 'internal') {
       navigationSource.current = '';
@@ -70,21 +60,17 @@ export function SwipeNavigator() {
     }
   }, [pathname, getPageIndex, currentPage]);
 
-  /**
-   * Unified transition trigger for all navigation methods.
-   */
   const commitPageTransition = useCallback((targetIndex: number) => {
     if (isTransitioning || targetIndex === currentPage || targetIndex < 0 || targetIndex >= pages.length) return;
-    
+
     navigationSource.current = 'internal';
     const direction = targetIndex > currentPage ? 'forward' : 'backward';
-    
+
     setTransitionDirection(direction);
     setIsTransitioning(true);
     setCurrentPage(targetIndex);
     setLiveDelta(0);
 
-    // Sync URL
     const targetPath = pages[targetIndex].path;
     router.replace(targetPath);
   }, [currentPage, isTransitioning, pages, router]);
@@ -125,18 +111,16 @@ export function SwipeNavigator() {
     if ((currentPage === 0 && deltaX > 0) || (currentPage === pages.length - 1 && deltaX < 0)) {
       adjustedDelta = deltaX * 0.3;
     }
-    
+
     currentDelta.current = adjustedDelta;
     setLiveDelta(adjustedDelta);
-  }, [currentPage, pages.length, isTransitioning]);
-
-  const handleEnd = useCallback(() => {
+  }, [currentPage, pages.length, isTransitioning]); const handleEnd = useCallback(() => {
     if (!isGestureActive.current) return;
 
     if (directionLocked.current === 'horizontal') {
       const threshold = 80;
       const delta = currentDelta.current;
-      
+
       if (delta < -threshold && currentPage < pages.length - 1) {
         commitPageTransition(currentPage + 1);
       } else if (delta > threshold && currentPage > 0) {
@@ -175,7 +159,7 @@ export function SwipeNavigator() {
     container.addEventListener('touchmove', onTouchMove, { passive: false });
     container.addEventListener('touchend', onTouchEnd, { passive: true });
     container.addEventListener('mousedown', onMouseDown, { passive: true });
-    
+
     document.addEventListener('mousemove', onMouseMove, { passive: true });
     document.addEventListener('mouseup', onMouseUp, { passive: true });
 
@@ -184,14 +168,14 @@ export function SwipeNavigator() {
       container.removeEventListener('touchmove', onTouchMove);
       container.removeEventListener('touchend', onTouchEnd);
       container.removeEventListener('mousedown', onMouseDown);
-      
+
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
   }, [handleMove, handleEnd]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="relative w-full h-[calc(100vh-64px)] overflow-hidden touch-none"
     >
@@ -199,21 +183,21 @@ export function SwipeNavigator() {
         const isActive = i === currentPage;
         const isForward = transitionDirection === 'forward';
         const isBackward = transitionDirection === 'backward';
-        
+
         const isOutgoing = (isForward && i === currentPage - 1) || (isBackward && i === currentPage + 1);
-        
+
         let zIndex = 0;
         let transform = i < currentPage ? 'translateX(-100vw)' : 'translateX(100vw)';
         let shadow = 'none';
         let pointerEvents: 'auto' | 'none' = 'none';
-        
+
         const isSwiping = liveDelta !== 0;
         const transitionStyle = isSwiping ? 'none' : 'transform 700ms cubic-bezier(0.16, 1, 0.3, 1)';
 
         if (isActive) {
           zIndex = 2;
           pointerEvents = 'auto';
-          
+
           if (isSwiping) {
             transform = `translateX(${liveDelta}px) scale(1)`;
           } else if (isTransitioning) {
@@ -225,7 +209,7 @@ export function SwipeNavigator() {
         } else if (isOutgoing) {
           zIndex = 1;
           if (isSwiping) {
-            const scale = 1 - (Math.abs(liveDelta) / screenWidth * 0.05); 
+            const scale = 1 - (Math.abs(liveDelta) / screenWidth * 0.05);
             transform = `translateX(${liveDelta}px) scale(${Math.max(0.95, scale)})`;
           } else if (isTransitioning) {
             const offset = isForward ? '-100vw' : '100vw';
@@ -235,26 +219,24 @@ export function SwipeNavigator() {
             transform = `translateX(${offset}) scale(0.95)`;
           }
         } else {
-            // Incoming card logic for gesture visualization
-            if (isSwiping) {
-                const incomingTarget = liveDelta < 0 ? currentPage + 1 : currentPage - 1;
-                if (i === incomingTarget) {
-                    zIndex = 2;
-                    const basePos = liveDelta < 0 ? screenWidth : -screenWidth;
-                    transform = `translateX(${basePos + liveDelta}px) scale(0.97)`;
-                    shadow = '0 8px 32px rgba(0,0,0,0.18)';
-                }
+          if (isSwiping) {
+            const incomingTarget = liveDelta < 0 ? currentPage + 1 : currentPage - 1;
+            if (i === incomingTarget) {
+              zIndex = 2;
+              const basePos = liveDelta < 0 ? screenWidth : -screenWidth;
+              transform = `translateX(${basePos + liveDelta}px) scale(0.97)`;
+              shadow = '0 8px 32px rgba(0,0,0,0.18)';
             }
+          }
         }
-
-        return (
-          <div 
+return (
+          <div
             key={page.path}
             className="absolute top-0 left-0 w-full h-full overflow-y-auto bg-background"
-            style={{ 
-              transform, 
-              zIndex, 
-              boxShadow: shadow, 
+            style={{
+              transform,
+              zIndex,
+              boxShadow: shadow,
               pointerEvents,
               transition: transitionStyle,
               willChange: 'transform'
@@ -262,13 +244,12 @@ export function SwipeNavigator() {
             onTransitionEnd={isOutgoing ? handleTransitionEnd : undefined}
           >
             <div className="container mx-auto px-4 py-8">
-              <page.component />
+              {pageNodes[i]}
             </div>
           </div>
         );
       })}
 
-      {/* Repositioned Navigation Buttons: Center Vertically at Edges */}
       <div className="pointer-events-none fixed inset-0 z-[50]">
         <button
           onClick={() => commitPageTransition(currentPage - 1)}
@@ -299,8 +280,7 @@ export function SwipeNavigator() {
         </button>
       </div>
 
-      {/* Page Indicator Dots (Remains at bottom) */}
-      <div 
+      <div
         ref={controlsRef}
         className={cn(
           "fixed bottom-5 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center gap-2.5 transition-all pointer-events-none",
@@ -314,8 +294,8 @@ export function SwipeNavigator() {
               aria-label={p.label}
               className={cn(
                 "h-1.5 rounded-full transition-all duration-300",
-                currentPage === idx 
-                  ? "w-5 bg-white opacity-100" 
+                currentPage === idx
+                  ? "w-5 bg-white opacity-100"
                   : "w-1.5 bg-white opacity-25"
               )}
             />
