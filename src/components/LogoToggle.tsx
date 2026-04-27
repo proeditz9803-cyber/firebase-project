@@ -51,7 +51,7 @@ export function LogoToggle() {
       isAnimatingRef.current = false;
     }, totalDuration + 20);
 
-  }, [isToggled, totalDuration]);
+  }, [totalDuration]);
 
   /**
    * Renders a layer of letters for a specific brand style.
@@ -103,7 +103,7 @@ export function LogoToggle() {
     );
   };
 
-  return (
+return (
     <div
       role="button"
       tabIndex={0}
