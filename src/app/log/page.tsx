@@ -50,6 +50,7 @@ export default function LogPage() {
   };
 
   const totalFasts = history.length;
+  const completedFasts = history.filter(r => r.completed).length;
   const totalHours = history.reduce((acc, curr) => acc + curr.actualHours, 0);
   const averageHours = totalFasts > 0 ? totalHours / totalFasts : 0;
 
@@ -61,7 +62,7 @@ export default function LogPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div 
+      <div
         ref={headerRef}
         className={cn(
           "flex items-center justify-between transition-all",
@@ -92,7 +93,7 @@ export default function LogPage() {
         )}
       </div>
 
-      <div 
+      <div
         ref={statsRef}
         className={cn(
           "grid grid-cols-1 md:grid-cols-3 gap-4 transition-all",
@@ -106,10 +107,10 @@ export default function LogPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isClient ? totalFasts : 0}</div>
+            <div className="text-2xl font-bold">{isClient ? completedFasts : 0}</div>
           </CardContent>
         </Card>
-        <Card className="bg-card border-none shadow-lg">
+<Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
               <Clock className="w-4 h-4 mr-2 text-primary" /> Total Hours
@@ -131,7 +132,7 @@ export default function LogPage() {
         </Card>
       </div>
 
-      <div 
+      <div
         ref={listRef}
         className={cn(
           "space-y-4 transition-all min-h-[100px]",
@@ -161,7 +162,7 @@ export default function LogPage() {
                       <span className="text-lg font-bold">{record.plannedProtocol}</span>
                       <span className="text-muted-foreground">•</span>
                       <span className="text-muted-foreground text-sm">
-                        {new Date(record.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                        {new Date(record.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
                         {new Date(record.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -171,11 +172,11 @@ export default function LogPage() {
                       <div className="text-sm font-medium text-muted-foreground">Duration</div>
                       <div className="text-lg font-bold text-primary">{formatDuration(record.actualHours)}</div>
                     </div>
-                    <Badge 
+                    <Badge
                       className={cn(
                         "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                        record.completed 
-                          ? "bg-primary/20 text-primary border-primary/20" 
+                        record.completed
+                          ? "bg-primary/20 text-primary border-primary/20"
                           : "bg-amber-500/20 text-amber-500 border-amber-500/20"
                       )}
                       variant="outline"
