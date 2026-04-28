@@ -3,9 +3,18 @@ export type TimerMode = 'fasting' | 'eating';
 
 export interface FastRecord {
   id: string;
-  startTime: string; // ISO string
-  endTime: string; // ISO string
+  startTime: string;
+  endTime: string;
   plannedProtocol: ProtocolType;
+  plannedHours: number;
+  actualHours: number;
+  completed: boolean;
+}
+
+export interface EatingRecord {
+  id: string;
+  startTime: string;
+  endTime: string;
   plannedHours: number;
   actualHours: number;
   completed: boolean;
