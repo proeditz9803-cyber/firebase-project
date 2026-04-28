@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FastRecord } from '@/lib/fasting-types';
+import { FastRecord, EatingRecord } from '@/lib/fasting-types';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2, History, Award, Clock } from 'lucide-react';
+import { Trash2, History, Award, Clock, Utensils, AlertCircle } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
 
 export default function LogPage() {
@@ -26,18 +26,19 @@ export default function LogPage() {
   const [listRef, isListVisible] = useScrollReveal({ delay: 300 });
 
   const [history, setHistory] = useState<FastRecord[]>([]);
+  const [eatingHistory, setEatingHistory] = useState<EatingRecord[]>([]);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
     if (typeof window !== 'undefined') {
       const savedHistory = localStorage.getItem('fastHistory');
+      const savedEatingHistory = localStorage.getItem('eatingHistory');
       if (savedHistory) {
-        try {
-          setHistory(JSON.parse(savedHistory));
-        } catch (e) {
-          console.error("Failed to parse fasting history", e);
-        }
+        try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error("Failed to parse fasting history", e); }
+      }
+      if (savedEatingHistory) {
+        try { setEatingHistory(JSON.parse(savedEatingHistory)); } catch (e) { console.error("Failed to parse eating history", e); }
       }
     }
   }, []);
@@ -45,12 +46,16 @@ export default function LogPage() {
   const clearHistory = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('fastHistory');
+      localStorage.removeItem('eatingHistory');
       setHistory([]);
+      setEatingHistory([]);
     }
   };
 
   const totalFasts = history.length;
   const completedFasts = history.filter(r => r.completed).length;
+  const earlyEndedFasts = history.filter(r => !r.completed).length;
+  const completedEatingPeriods = eatingHistory.length;
   const totalHours = history.reduce((acc, curr) => acc + curr.actualHours, 0);
   const averageHours = totalFasts > 0 ? totalHours / totalFasts : 0;
 
@@ -60,17 +65,13 @@ export default function LogPage() {
     return `${h}h ${m}m`;
   };
 
+  const hasAnyHistory = totalFasts > 0 || completedEatingPeriods > 0;
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div
-        ref={headerRef}
-        className={cn(
-          "flex items-center justify-between transition-all",
-          isHeaderVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden'
-        )}
-      >
+      <div ref={headerRef} className={cn("flex items-center justify-between transition-all", isHeaderVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
         <h1 className="text-3xl font-bold tracking-tight">Fasting Log</h1>
-        {isClient && totalFasts > 0 && (
+        {isClient && hasAnyHistory && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
@@ -80,9 +81,7 @@ export default function LogPage() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Reset Log?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. All your fasting history will be cleared.
-                </AlertDialogDescription>
+                <AlertDialogDescription>This action cannot be undone. All your fasting and eating history will be cleared.</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Dismiss</AlertDialogCancel>
@@ -93,32 +92,38 @@ export default function LogPage() {
         )}
       </div>
 
-      <div
-        ref={statsRef}
-        className={cn(
-          "grid grid-cols-1 md:grid-cols-3 gap-4 transition-all",
-          isStatsVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden'
-        )}
-      >
+      <div ref={statsRef} className={cn("grid grid-cols-1 md:grid-cols-3 gap-4 transition-all", isStatsVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-              <Award className="w-4 h-4 mr-2 text-primary" /> Completed
+              <Award className="w-4 h-4 mr-2 text-primary" /> Completed fasts
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{isClient ? completedFasts : 0}</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{isClient ? completedFasts : 0}</div></CardContent>
         </Card>
-<Card className="bg-card border-none shadow-lg">
+        <Card className="bg-card border-none shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+              <Utensils className="w-4 h-4 mr-2 text-amber-500" /> Completed eating periods
+            </CardTitle>
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{isClient ? completedEatingPeriods : 0}</div></CardContent>
+        </Card>
+        <Card className="bg-card border-none shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+              <AlertCircle className="w-4 h-4 mr-2 text-destructive" /> Early ended fasts
+            </CardTitle>
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold">{isClient ? earlyEndedFasts : 0}</div></CardContent>
+        </Card>
+        <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
               <Clock className="w-4 h-4 mr-2 text-primary" /> Total Hours
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{isClient ? totalHours.toFixed(1) : '0.0'}h</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{isClient ? totalHours.toFixed(1) : '0.0'}h</div></CardContent>
         </Card>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
@@ -126,19 +131,11 @@ export default function LogPage() {
               <History className="w-4 h-4 mr-2 text-primary" /> Avg. Duration
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{isClient ? averageHours.toFixed(1) : '0.0'}h</div>
-          </CardContent>
+          <CardContent><div className="text-2xl font-bold">{isClient ? averageHours.toFixed(1) : '0.0'}h</div></CardContent>
         </Card>
       </div>
-
-      <div
-        ref={listRef}
-        className={cn(
-          "space-y-4 transition-all min-h-[100px]",
-          isListVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden'
-        )}
-      >
+     
+     <div ref={listRef} className={cn("space-y-4 transition-all min-h-[100px]", isListVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
         {isClient ? (
           history.length === 0 ? (
             <div className="text-center py-20 bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
@@ -152,10 +149,7 @@ export default function LogPage() {
                   <div className="space-y-1">
                     <div className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
                       {new Date(record.startTime).toLocaleDateString(undefined, {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                       })}
                     </div>
                     <div className="flex items-center gap-2">
