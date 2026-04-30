@@ -30,6 +30,8 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward' | 'none'>('none');
   const [screenWidth, setScreenWidth] = useState(0);
+  const [leftPressed, setLeftPressed] = useState(false);
+  const [rightPressed, setRightPressed] = useState(false);
 
   const [controlsRef, controlsVisible] = useScrollReveal({ delay: 300 });
 
@@ -93,8 +95,8 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     currentDelta.current = adjustedDelta;
     setLiveDelta(adjustedDelta);
   }, [currentPage, pages.length, isTransitioning]);
-       
-            const handleEnd = useCallback(() => {
+
+ const handleEnd = useCallback(() => {
     if (!isGestureActive.current) return;
     if (directionLocked.current === 'horizontal') {
       const threshold = 80;
@@ -183,33 +185,55 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
         );
       })}
 
-       <div className="pointer-events-none fixed inset-0 z-[50]">
+  <div className="pointer-events-none fixed inset-0 z-[50]">
         <button
-          onClick={() => commitPageTransition(currentPage - 1)}
+          onPointerDown={() => setLeftPressed(true)}
+          onPointerUp={() => { setLeftPressed(false); commitPageTransition(currentPage - 1); }}
+          onPointerLeave={() => setLeftPressed(false)}
           disabled={currentPage === 0 || isTransitioning}
           aria-label="Navigate to previous page"
           className={cn(
-            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/20 bg-white/10 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-white/20 hover:border-white/40 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
-            currentPage === 0 ? "opacity-20 cursor-not-allowed" : "opacity-100",
-            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2",
+            "w-10 h-10 flex items-center justify-center rounded-[10px]",
+            "border border-white/20 bg-transparent",
+            "transition-all duration-200 will-change-transform overflow-hidden",
+            "disabled:opacity-20 disabled:cursor-not-allowed",
+            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden",
+            leftPressed && !isTransitioning && currentPage !== 0
+              ? "bg-white/20 border-white/40 scale-[0.88]"
+              : "scale-100"
           )}
-          style={{ WebkitBackdropFilter: 'blur(12px)', transitionProperty: 'transform, opacity, background-color, border-color, box-shadow' }}
+          style={{ WebkitBackdropFilter: 'none', backdropFilter: 'none' }}
         >
-          <ChevronLeft className="w-4 h-4 text-white stroke-[1.5] transition-transform duration-250 group-hover:-translate-x-0.5" />
+          <ChevronLeft className={cn(
+            "w-4 h-4 text-white stroke-[1.5] transition-transform duration-200",
+            leftPressed && currentPage !== 0 ? "-translate-x-0.5 opacity-100" : "opacity-70"
+          )} />
         </button>
 
         <button
-          onClick={() => commitPageTransition(currentPage + 1)}
+          onPointerDown={() => setRightPressed(true)}
+          onPointerUp={() => { setRightPressed(false); commitPageTransition(currentPage + 1); }}
+          onPointerLeave={() => setRightPressed(false)}
           disabled={currentPage === pages.length - 1 || isTransitioning}
           aria-label="Navigate to next page"
           className={cn(
-            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-[10px] border border-white/20 bg-white/10 backdrop-blur-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] group transition-all duration-250 hover:bg-white/20 hover:border-white/40 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)] active:scale-[0.92] will-change-transform",
-            currentPage === pages.length - 1 ? "opacity-20 cursor-not-allowed" : "opacity-100",
-            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2",
+            "w-10 h-10 flex items-center justify-center rounded-[10px]",
+            "border border-white/20 bg-transparent",
+            "transition-all duration-200 will-change-transform overflow-hidden",
+            "disabled:opacity-20 disabled:cursor-not-allowed",
+            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden",
+            rightPressed && !isTransitioning && currentPage !== pages.length - 1
+              ? "bg-white/20 border-white/40 scale-[0.88]"
+              : "scale-100"
           )}
-          style={{ WebkitBackdropFilter: 'blur(12px)', transitionProperty: 'transform, opacity, background-color, border-color, box-shadow' }}
+          style={{ WebkitBackdropFilter: 'none', backdropFilter: 'none' }}
         >
-          <ChevronRight className="w-4 h-4 text-white stroke-[1.5] transition-transform duration-250 group-hover:translate-x-0.5" />
+          <ChevronRight className={cn(
+            "w-4 h-4 text-white stroke-[1.5] transition-transform duration-200",
+            rightPressed && currentPage !== pages.length - 1 ? "translate-x-0.5 opacity-100" : "opacity-70"
+          )} />
         </button>
       </div>
 
