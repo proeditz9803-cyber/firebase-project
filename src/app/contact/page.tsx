@@ -33,34 +33,28 @@ export default function ContactPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 py-12 px-6">
-      <section
-        ref={hRef}
-        className={cn("text-center space-y-6 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
-      >
-        <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
+      <section ref={hRef} className={cn("text-center space-y-6 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold select-none">
           Contact Us
         </Badge>
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 select-none">
           FasTrack
         </h1>
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">Contact Us</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground select-none">Contact Us</h2>
         </div>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-12 items-stretch">
-        <div
-          ref={lRef}
-          className={cn("space-y-8 flex flex-col justify-center transition-all", lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
-        >
+        <div ref={lRef} className={cn("space-y-8 flex flex-col justify-center transition-all", lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
           <section className="space-y-4">
-            <p className="leading-relaxed text-muted-foreground">
+            <p className="leading-relaxed text-muted-foreground select-none">
               We genuinely value user input and invite you to reach out.
             </p>
           </section>
           <Separator className="opacity-20" />
           <section className="space-y-4">
-            <h3 className="text-xl font-bold text-primary">How we can help:</h3>
+            <h3 className="text-xl font-bold text-primary select-none">How we can help:</h3>
             <ul className="space-y-3">
               {[
                 "General questions about FasTrack",
@@ -69,7 +63,7 @@ export default function ContactPage() {
                 "Privacy or data related concerns",
                 "Advertising and partnership enquiries"
               ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-muted-foreground leading-tight">
+                <li key={i} className="flex items-start gap-3 text-muted-foreground leading-tight select-none">
                   <span className="text-primary font-bold">•</span>
                   {item}
                 </li>
@@ -86,7 +80,7 @@ export default function ContactPage() {
             href="mailto:proeditz9803@gmail.com"
             className={cn(
               "group relative w-full max-w-sm flex flex-col items-center justify-center p-8 md:p-12",
-              "bg-transparent text-foreground border border-border rounded-full",
+              "bg-transparent text-foreground border border-border rounded-full select-none",
               "transition-[transform,opacity,background-color,border-color] duration-150",
               "active:scale-[0.97] active:bg-foreground/10 active:border-foreground/30 active:duration-75",
               "will-change-[transform,opacity] cursor-pointer no-underline overflow-hidden",
@@ -95,7 +89,7 @@ export default function ContactPage() {
             style={{ transitionProperty: 'transform, opacity, background-color, border-color' }}
           >
             <div className="relative flex items-center justify-center gap-4">
-              <span className="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter">
+              <span className="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter select-none">
                 Send Us an Email
               </span>
             </div>
