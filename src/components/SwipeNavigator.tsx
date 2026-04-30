@@ -96,7 +96,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     setLiveDelta(adjustedDelta);
   }, [currentPage, pages.length, isTransitioning]);
 
- const handleEnd = useCallback(() => {
+   const handleEnd = useCallback(() => {
     if (!isGestureActive.current) return;
     if (directionLocked.current === 'horizontal') {
       const threshold = 80;
@@ -184,8 +184,8 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
           </div>
         );
       })}
-
-  <div className="pointer-events-none fixed inset-0 z-[50]">
+   
+     <div className="pointer-events-none fixed inset-0 z-[50]">
         <button
           onPointerDown={() => setLeftPressed(true)}
           onPointerUp={() => { setLeftPressed(false); commitPageTransition(currentPage - 1); }}
@@ -193,7 +193,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
           disabled={currentPage === 0 || isTransitioning}
           aria-label="Navigate to previous page"
           className={cn(
-            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2",
+            "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 select-none",
             "w-10 h-10 flex items-center justify-center rounded-[10px]",
             "border border-white/20 bg-transparent",
             "transition-all duration-200 will-change-transform overflow-hidden",
@@ -218,7 +218,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
           disabled={currentPage === pages.length - 1 || isTransitioning}
           aria-label="Navigate to next page"
           className={cn(
-            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2",
+            "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 select-none",
             "w-10 h-10 flex items-center justify-center rounded-[10px]",
             "border border-white/20 bg-transparent",
             "transition-all duration-200 will-change-transform overflow-hidden",
@@ -238,14 +238,8 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
       </div>
 
       <div className="fixed bottom-5 left-0 right-0 z-[50] flex justify-center pointer-events-none">
-        <div
-          ref={controlsRef}
-          className={cn(
-            "flex flex-col items-center gap-2.5 transition-all",
-            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden"
-          )}
-        >
-          <div className="flex items-center gap-1.5" aria-label="Page indicator">
+        <div ref={controlsRef} className={cn("flex flex-col items-center gap-2.5 transition-all", controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+          <div className="flex items-center gap-1.5 select-none" aria-label="Page indicator">
             {pages.map((p, idx) => (
               <div
                 key={p.path}
