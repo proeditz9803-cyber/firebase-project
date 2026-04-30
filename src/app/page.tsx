@@ -97,8 +97,9 @@ export default function TimerPage() {
     if (savedHistory) {
       try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error("Failed to parse history", e); }
     }
-  }, []); 
- useEffect(() => {
+  }, []);
+
+     useEffect(() => {
     localStorage.setItem('fastrack-active-mode', activeMode);
     localStorage.setItem('fastProtocol', protocol);
     localStorage.setItem('customFastingHours', customFastingHours.toString());
@@ -147,26 +148,20 @@ export default function TimerPage() {
     const actualHours = (endTime.getTime() - startTime.getTime()) / (1000 * 3600);
     const plannedHours = getPlannedSeconds('fasting') / 3600;
     const newRecord: FastRecord = {
-      id: crypto.randomUUID(),
-      startTime: fastStart,
-      endTime: endTime.toISOString(),
-      plannedProtocol: protocol,
-      plannedHours,
-      actualHours,
+      id: crypto.randomUUID(), startTime: fastStart,
+      endTime: endTime.toISOString(), plannedProtocol: protocol,
+      plannedHours, actualHours,
       completed: !early && actualHours >= plannedHours
     };
     const newHistory = [newRecord, ...history];
     setHistory(newHistory);
     localStorage.setItem('fastHistory', JSON.stringify(newHistory));
-    setFastStart(null);
-    localStorage.removeItem('fastStart');
-    setFastElapsedSeconds(0);
-    setFastingPaused(false);
+    setFastStart(null); localStorage.removeItem('fastStart');
+    setFastElapsedSeconds(0); setFastingPaused(false);
     localStorage.removeItem('fastrack-fasting-paused');
     localStorage.removeItem('fastrack-fasting-elapsed');
     if (newRecord.completed) {
-      setNotificationType('fasting');
-      setShowNotification(true);
+      setNotificationType('fasting'); setShowNotification(true);
       if (settingsLoaded) triggerCompletionNotifications('fasting', settings);
     }
   }, [fastStart, protocol, getPlannedSeconds, history, settings, settingsLoaded]);
@@ -178,8 +173,7 @@ export default function TimerPage() {
   };
 
   const pauseFasting = () => {
-    setFastingPaused(true);
-    setFastStart(null);
+    setFastingPaused(true); setFastStart(null);
     localStorage.removeItem('fastStart');
     localStorage.setItem('fastrack-fasting-paused', 'true');
     localStorage.setItem('fastrack-fasting-elapsed', fastElapsedSeconds.toString());
@@ -187,16 +181,14 @@ export default function TimerPage() {
 
   const resumeFasting = () => {
     const resumeStart = new Date(Date.now() - fastElapsedSeconds * 1000).toISOString();
-    setFastStart(resumeStart);
-    localStorage.setItem('fastStart', resumeStart);
+    setFastStart(resumeStart); localStorage.setItem('fastStart', resumeStart);
     setFastingPaused(false);
     localStorage.removeItem('fastrack-fasting-paused');
     localStorage.removeItem('fastrack-fasting-elapsed');
   };
 
   const pauseEating = () => {
-    setEatingPaused(true);
-    setEatingStart(null);
+    setEatingPaused(true); setEatingStart(null);
     localStorage.removeItem('fastrack-eating-start');
     localStorage.setItem('fastrack-eating-paused', 'true');
     localStorage.setItem('fastrack-eating-elapsed', eatingElapsedSeconds.toString());
@@ -204,8 +196,7 @@ export default function TimerPage() {
 
   const resumeEating = () => {
     const resumeStart = new Date(Date.now() - eatingElapsedSeconds * 1000).toISOString();
-    setEatingStart(resumeStart);
-    localStorage.setItem('fastrack-eating-start', resumeStart);
+    setEatingStart(resumeStart); localStorage.setItem('fastrack-eating-start', resumeStart);
     setEatingPaused(false);
     localStorage.removeItem('fastrack-eating-paused');
     localStorage.removeItem('fastrack-eating-elapsed');
@@ -272,7 +263,7 @@ export default function TimerPage() {
     const s = seconds % 60;
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
-  
+
  return (
     <div className="max-w-xl mx-auto space-y-12 pb-20">
       {showNotification && (
@@ -345,33 +336,47 @@ export default function TimerPage() {
             ) : fastingPaused ? (
               <div className="flex gap-2 w-full">
                 <AlertDialog>
-                  <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">End Fast</Button></AlertDialogTrigger>
+                  <AlertDialogTrigger asChild><Button variant="outline" className="flex-1 h-14 font-bold">End Fast</Button></AlertDialogTrigger>
                   <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Dismiss</AlertDialogCancel><AlertDialogAction onClick={() => { resumeFasting(); setTimeout(() => endFast(true), 50); }}>End Fast</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                 </AlertDialog>
-                <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={resumeFasting}>Resume</Button>
+                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={resumeFasting}>Resume</Button>
                 <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>Reset</Button>
               </div>
             ) : (
               <div className="flex gap-2 w-full">
                 <AlertDialog>
-                  <AlertDialogTrigger asChild><Button variant="secondary" className="flex-1 h-14 font-bold">End Fast</Button></AlertDialogTrigger>
+                  <AlertDialogTrigger asChild><Button variant="outline" className="flex-1 h-14 font-bold">End Fast</Button></AlertDialogTrigger>
                   <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>End Fast Early?</AlertDialogTitle></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Dismiss</AlertDialogCancel><AlertDialogAction onClick={() => endFast(true)}>End Fast</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
                 </AlertDialog>
-                <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={pauseFasting}>Pause</Button>
+                <Button variant="outline" className="flex-1 h-14 font-bold" onClick={pauseFasting}>Pause</Button>
                 <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('fasting')}>Reset</Button>
               </div>
             )}
           </div>
         </div>
       </div>
-       
+
      <div className="flex justify-center">
-        <button ref={toggleButtonRef} onClick={() => setActiveMode(activeMode === 'fasting' ? 'eating' : 'fasting')} className={cn("group w-full p-8 border border-border rounded-xl transition-all duration-700", isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", "hover:bg-foreground hover:text-background")}>
+        <button
+          ref={toggleButtonRef}
+          onClick={() => setActiveMode(activeMode === 'fasting' ? 'eating' : 'fasting')}
+          className={cn(
+            "group w-full p-8 border border-border rounded-full transition-all duration-700",
+            isToggleButtonVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+            "active:scale-[0.97] active:bg-foreground/10 active:border-foreground/30",
+            "transition-[transform,background-color,border-color] duration-150 active:duration-75"
+          )}
+        >
           <div className="text-center space-y-2">
-            <span className="text-[10px] uppercase tracking-widest opacity-50">Currently Active: {activeMode === 'fasting' ? 'Fasting Period' : 'Eating Period'}</span>
+            <span className="text-[10px] uppercase tracking-widest opacity-50">
+              Currently Active: {activeMode === 'fasting' ? 'Fasting Period' : 'Eating Period'}
+            </span>
             <div className="text-xl font-bold flex items-center justify-center gap-2">
               {activeMode === 'fasting' ? 'Switch to Eating Period' : 'Switch to Fasting Period'}
-              <ArrowDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
+              <ArrowDown className={cn(
+                "w-5 h-5 transition-transform duration-500",
+                activeMode === 'eating' ? "rotate-180" : "rotate-0"
+              )} />
             </div>
           </div>
         </button>
@@ -403,9 +408,9 @@ export default function TimerPage() {
             ) : (
               <div className="flex gap-2 w-full">
                 {eatingPaused ? (
-                  <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={resumeEating}>Resume</Button>
+                  <Button variant="outline" className="flex-1 h-14 font-bold" onClick={resumeEating}>Resume</Button>
                 ) : (
-                  <Button variant="secondary" className="flex-1 h-14 font-bold" onClick={pauseEating}>Pause</Button>
+                  <Button variant="outline" className="flex-1 h-14 font-bold" onClick={pauseEating}>Pause</Button>
                 )}
                 <Button variant="outline" className="flex-1 h-14 font-bold" onClick={() => resetTimer('eating')}>Reset</Button>
               </div>
