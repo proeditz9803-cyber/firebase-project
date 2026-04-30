@@ -30,7 +30,7 @@ export function Navigation() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
+                  "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary select-none",
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
