@@ -7,15 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { FastRecord, EatingRecord } from '@/lib/fasting-types';
 import { cn } from '@/lib/utils';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2, History, Award, Clock, Utensils, AlertCircle } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
@@ -47,8 +41,7 @@ export default function LogPage() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('fastHistory');
       localStorage.removeItem('eatingHistory');
-      setHistory([]);
-      setEatingHistory([]);
+      setHistory([]); setEatingHistory([]);
     }
   };
 
@@ -58,6 +51,7 @@ export default function LogPage() {
   const completedEatingPeriods = eatingHistory.length;
   const totalHours = history.reduce((acc, curr) => acc + curr.actualHours, 0);
   const averageHours = totalFasts > 0 ? totalHours / totalFasts : 0;
+  const hasAnyHistory = totalFasts > 0 || completedEatingPeriods > 0;
 
   const formatDuration = (hours: number) => {
     const h = Math.floor(hours);
@@ -65,27 +59,25 @@ export default function LogPage() {
     return `${h}h ${m}m`;
   };
 
-  const hasAnyHistory = totalFasts > 0 || completedEatingPeriods > 0;
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div ref={headerRef} className={cn("flex items-center justify-between transition-all", isHeaderVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
-        <h1 className="text-3xl font-bold tracking-tight">Fasting Log</h1>
+        <h1 className="text-3xl font-bold tracking-tight select-none">Fasting Log</h1>
         {isClient && hasAnyHistory && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 select-none">
                 <Trash2 className="w-4 h-4 mr-2" /> Reset Log
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Reset Log?</AlertDialogTitle>
-                <AlertDialogDescription>This action cannot be undone. All your fasting and eating history will be cleared.</AlertDialogDescription>
+                <AlertDialogTitle className="select-none">Reset Log?</AlertDialogTitle>
+                <AlertDialogDescription className="select-none">This action cannot be undone. All your fasting and eating history will be cleared.</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Dismiss</AlertDialogCancel>
-                <AlertDialogAction onClick={clearHistory}>Reset</AlertDialogAction>
+                <AlertDialogCancel className="select-none">Dismiss</AlertDialogCancel>
+                <AlertDialogAction className="select-none" onClick={clearHistory}>Reset</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -95,67 +87,67 @@ export default function LogPage() {
       <div ref={statsRef} className={cn("grid grid-cols-1 md:grid-cols-3 gap-4 transition-all", isStatsVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center select-none">
               <Award className="w-4 h-4 mr-2 text-primary" /> Completed fasts
             </CardTitle>
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{isClient ? completedFasts : 0}</div></CardContent>
+          <CardContent><div className="text-2xl font-bold select-none">{isClient ? completedFasts : 0}</div></CardContent>
         </Card>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center select-none">
               <Utensils className="w-4 h-4 mr-2 text-amber-500" /> Completed eating periods
             </CardTitle>
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{isClient ? completedEatingPeriods : 0}</div></CardContent>
+          <CardContent><div className="text-2xl font-bold select-none">{isClient ? completedEatingPeriods : 0}</div></CardContent>
         </Card>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center select-none">
               <AlertCircle className="w-4 h-4 mr-2 text-destructive" /> Early ended fasts
             </CardTitle>
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{isClient ? earlyEndedFasts : 0}</div></CardContent>
+          <CardContent><div className="text-2xl font-bold select-none">{isClient ? earlyEndedFasts : 0}</div></CardContent>
         </Card>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center select-none">
               <Clock className="w-4 h-4 mr-2 text-primary" /> Total Hours
             </CardTitle>
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{isClient ? totalHours.toFixed(1) : '0.0'}h</div></CardContent>
+          <CardContent><div className="text-2xl font-bold select-none">{isClient ? totalHours.toFixed(1) : '0.0'}h</div></CardContent>
         </Card>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center select-none">
               <History className="w-4 h-4 mr-2 text-primary" /> Avg. Duration
             </CardTitle>
           </CardHeader>
-          <CardContent><div className="text-2xl font-bold">{isClient ? averageHours.toFixed(1) : '0.0'}h</div></CardContent>
+          <CardContent><div className="text-2xl font-bold select-none">{isClient ? averageHours.toFixed(1) : '0.0'}h</div></CardContent>
         </Card>
       </div>
-     
-     <div ref={listRef} className={cn("space-y-4 transition-all min-h-[100px]", isListVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
+
+    <div ref={listRef} className={cn("space-y-4 transition-all min-h-[100px]", isListVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
         {isClient ? (
           history.length === 0 ? (
             <div className="text-center py-20 bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
               <History className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
-              <p className="mt-4 text-muted-foreground">No fasting history yet. Start your first fast to see it here.</p>
+              <p className="mt-4 text-muted-foreground select-none">No fasting history yet. Start your first fast to see it here.</p>
             </div>
           ) : (
             history.map((record) => (
               <Card key={record.id} className="bg-card border-none shadow-md overflow-hidden">
                 <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
-                    <div className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                    <div className="text-sm font-bold text-muted-foreground uppercase tracking-widest select-none">
                       {new Date(record.startTime).toLocaleDateString(undefined, {
                         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                       })}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold">{record.plannedProtocol}</span>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-muted-foreground text-sm">
+                      <span className="text-lg font-bold select-none">{record.plannedProtocol}</span>
+                      <span className="text-muted-foreground select-none">•</span>
+                      <span className="text-muted-foreground text-sm select-none">
                         {new Date(record.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
                         {new Date(record.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
@@ -163,12 +155,12 @@ export default function LogPage() {
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-6">
                     <div className="text-right">
-                      <div className="text-sm font-medium text-muted-foreground">Duration</div>
-                      <div className="text-lg font-bold text-primary">{formatDuration(record.actualHours)}</div>
+                      <div className="text-sm font-medium text-muted-foreground select-none">Duration</div>
+                      <div className="text-lg font-bold text-primary select-none">{formatDuration(record.actualHours)}</div>
                     </div>
                     <Badge
                       className={cn(
-                        "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                        "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none",
                         record.completed
                           ? "bg-primary/20 text-primary border-primary/20"
                           : "bg-amber-500/20 text-amber-500 border-amber-500/20"
@@ -184,7 +176,7 @@ export default function LogPage() {
           )
         ) : (
           <div className="flex items-center justify-center py-20">
-            <div className="animate-pulse text-muted-foreground">Loading history...</div>
+            <div className="animate-pulse text-muted-foreground select-none">Loading history...</div>
           </div>
         )}
       </div>
