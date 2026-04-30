@@ -18,37 +18,24 @@ export default function ContactPage() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => {
-            setIsVisible(true);
-          }, 150);
-          if (observerRef.current) {
-            observerRef.current.disconnect();
-          }
+          setTimeout(() => { setIsVisible(true); }, 150);
+          if (observerRef.current) observerRef.current.disconnect();
         }
       },
       { threshold: 0.15 }
     );
-
     if (buttonRef.current) {
       observer.observe(buttonRef.current);
       observerRef.current = observer;
     }
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
+    return () => { if (observerRef.current) observerRef.current.disconnect(); };
   }, []);
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 py-12 px-6">
-      <section 
+      <section
         ref={hRef}
-        className={cn(
-          "text-center space-y-6 transition-all",
-          hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
-        )}
+        className={cn("text-center space-y-6 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold">
           Contact Us
@@ -62,21 +49,16 @@ export default function ContactPage() {
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-12 items-stretch">
-        <div 
+        <div
           ref={lRef}
-          className={cn(
-            "space-y-8 flex flex-col justify-center transition-all",
-            lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
-          )}
+          className={cn("space-y-8 flex flex-col justify-center transition-all", lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
         >
           <section className="space-y-4">
             <p className="leading-relaxed text-muted-foreground">
               We genuinely value user input and invite you to reach out.
             </p>
           </section>
-
           <Separator className="opacity-20" />
-
           <section className="space-y-4">
             <h3 className="text-xl font-bold text-primary">How we can help:</h3>
             <ul className="space-y-3">
@@ -99,18 +81,18 @@ export default function ContactPage() {
         <div className="hidden md:block w-px bg-border opacity-20" />
 
         <div className="flex items-center justify-center py-8 md:py-0">
-          <a 
+          <a
             ref={buttonRef}
-            href={`mailto:proeditz9803@gmail.com`}
+            href="mailto:proeditz9803@gmail.com"
             className={cn(
               "group relative w-full max-w-sm flex flex-col items-center justify-center p-8 md:p-12",
-              "bg-background text-foreground border border-border rounded-xl",
-              "transition-all duration-900 ease-reveal delay-150",
-              "hover:bg-foreground hover:text-background hover:scale-[1.02] active:scale-[0.98] active:duration-100",
+              "bg-transparent text-foreground border border-border rounded-full",
+              "transition-[transform,opacity,background-color,border-color] duration-150",
+              "active:scale-[0.97] active:bg-foreground/10 active:border-foreground/30 active:duration-75",
               "will-change-[transform,opacity] cursor-pointer no-underline overflow-hidden",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[30px]"
             )}
-            style={{ transitionProperty: 'transform, opacity, background-color, color, border-color' }}
+            style={{ transitionProperty: 'transform, opacity, background-color, border-color' }}
           >
             <div className="relative flex items-center justify-center gap-4">
               <span className="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter">
