@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import useScrollReveal from '@/hooks/useScrollReveal';
 
 interface SwipeNavigatorProps {
   pageNodes: React.ReactNode[];
@@ -32,8 +31,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
   const [screenWidth, setScreenWidth] = useState(0);
   const [leftPressed, setLeftPressed] = useState(false);
   const [rightPressed, setRightPressed] = useState(false);
-
-  const [controlsRef, controlsVisible] = useScrollReveal({ delay: 300 });
+  const [controlsVisible, setControlsVisible] = useState(false);
 
   const startX = useRef(0);
   const startY = useRef(0);
@@ -42,6 +40,11 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
   const directionLocked = useRef<'horizontal' | 'vertical' | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigationSource = useRef<'internal' | 'external' | ''>('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setControlsVisible(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -96,7 +99,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     setLiveDelta(adjustedDelta);
   }, [currentPage, pages.length, isTransitioning]);
 
-   const handleEnd = useCallback(() => {
+          const handleEnd = useCallback(() => {
     if (!isGestureActive.current) return;
     if (directionLocked.current === 'horizontal') {
       const threshold = 80;
@@ -184,8 +187,8 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
           </div>
         );
       })}
-   
-     <div className="pointer-events-none fixed inset-0 z-[50]">
+
+    <div className="pointer-events-none fixed inset-0 z-[50]">
         <button
           onPointerDown={() => setLeftPressed(true)}
           onPointerUp={() => { setLeftPressed(false); commitPageTransition(currentPage - 1); }}
@@ -196,14 +199,13 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
             "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 select-none",
             "w-10 h-10 flex items-center justify-center rounded-[10px]",
             "border border-white/20 bg-transparent",
-            "transition-all duration-200 will-change-transform overflow-hidden",
+            "transition-all duration-200 will-change-transform",
             "disabled:opacity-20 disabled:cursor-not-allowed",
-            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden",
+            controlsVisible ? "opacity-100" : "opacity-0",
             leftPressed && !isTransitioning && currentPage !== 0
               ? "bg-white/20 border-white/40 scale-[0.88]"
               : "scale-100"
           )}
-          style={{ WebkitBackdropFilter: 'none', backdropFilter: 'none' }}
         >
           <ChevronLeft className={cn(
             "w-4 h-4 text-white stroke-[1.5] transition-transform duration-200",
@@ -221,14 +223,13 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
             "pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 select-none",
             "w-10 h-10 flex items-center justify-center rounded-[10px]",
             "border border-white/20 bg-transparent",
-            "transition-all duration-200 will-change-transform overflow-hidden",
+            "transition-all duration-200 will-change-transform",
             "disabled:opacity-20 disabled:cursor-not-allowed",
-            controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden",
+            controlsVisible ? "opacity-100" : "opacity-0",
             rightPressed && !isTransitioning && currentPage !== pages.length - 1
               ? "bg-white/20 border-white/40 scale-[0.88]"
               : "scale-100"
           )}
-          style={{ WebkitBackdropFilter: 'none', backdropFilter: 'none' }}
         >
           <ChevronRight className={cn(
             "w-4 h-4 text-white stroke-[1.5] transition-transform duration-200",
@@ -238,7 +239,10 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
       </div>
 
       <div className="fixed bottom-5 left-0 right-0 z-[50] flex justify-center pointer-events-none">
-        <div ref={controlsRef} className={cn("flex flex-col items-center gap-2.5 transition-all", controlsVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <div className={cn(
+          "flex flex-col items-center gap-2.5 transition-opacity duration-500",
+          controlsVisible ? "opacity-100" : "opacity-0"
+        )}>
           <div className="flex items-center gap-1.5 select-none" aria-label="Page indicator">
             {pages.map((p, idx) => (
               <div
@@ -256,3 +260,4 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     </div>
   );
 }
+    
