@@ -96,7 +96,7 @@ export default function TimerPage() {
     }
   }, []);
 
-   useEffect(() => {
+     useEffect(() => {
     localStorage.setItem('fastrack-active-mode', activeMode);
     localStorage.setItem('fastProtocol', protocol);
     localStorage.setItem('customFastingHours', customFastingHours.toString());
@@ -147,11 +147,12 @@ export default function TimerPage() {
       id: crypto.randomUUID(), startTime: fastStart,
       endTime: endTime.toISOString(), plannedProtocol: protocol,
       plannedHours, actualHours,
-      completed: !early && actualHours >= plannedHours
+      completed: !early && actualHours >= plannedHours,
     };
     const newHistory = [newRecord, ...history];
     setHistory(newHistory);
     localStorage.setItem('fastHistory', JSON.stringify(newHistory));
+    window.dispatchEvent(new CustomEvent('fastrack-history-updated'));
     setFastStart(null); localStorage.removeItem('fastStart');
     setFastElapsedSeconds(0); setFastingPaused(false);
     localStorage.removeItem('fastrack-fasting-paused');
@@ -161,6 +162,27 @@ export default function TimerPage() {
       if (settingsLoaded) triggerCompletionNotifications('fasting', settings);
     }
   }, [fastStart, protocol, getPlannedSeconds, history, settings, settingsLoaded]);
+
+  const endEatingPeriod = useCallback((early = false) => {
+    if (!eatingStart) return;
+    const endTime = new Date();
+    const actualHours = (endTime.getTime() - new Date(eatingStart).getTime()) / (1000 * 3600);
+    const plannedHours = getPlannedSeconds('eating') / 3600;
+    const newRecord: EatingRecord = {
+      id: crypto.randomUUID(), startTime: eatingStart,
+      endTime: endTime.toISOString(),
+      plannedHours, actualHours,
+      completed: !early,
+    };
+    const existing: EatingRecord[] = JSON.parse(localStorage.getItem('eatingHistory') || '[]');
+    const newEatingHistory = [newRecord, ...existing];
+    localStorage.setItem('eatingHistory', JSON.stringify(newEatingHistory));
+    window.dispatchEvent(new CustomEvent('fastrack-history-updated'));
+    setEatingStart(null); localStorage.removeItem('fastrack-eating-start');
+    setEatingElapsedSeconds(0); setEatingPaused(false);
+    localStorage.removeItem('fastrack-eating-paused');
+    localStorage.removeItem('fastrack-eating-elapsed');
+  }, [eatingStart, getPlannedSeconds]);
 
   const startTimer = (mode: TimerMode) => {
     const now = new Date().toISOString();
@@ -208,7 +230,7 @@ export default function TimerPage() {
     }
   };
 
- useEffect(() => {
+    useEffect(() => {
     let interval: NodeJS.Timeout;
     if (fastStart && activeMode === 'fasting') {
       const immediateDiff = Math.floor((Date.now() - new Date(fastStart).getTime()) / 1000);
@@ -241,6 +263,7 @@ export default function TimerPage() {
           };
           const existing: EatingRecord[] = JSON.parse(localStorage.getItem('eatingHistory') || '[]');
           localStorage.setItem('eatingHistory', JSON.stringify([newEatingRecord, ...existing]));
+          window.dispatchEvent(new CustomEvent('fastrack-history-updated'));
           setEatingStart(null); localStorage.removeItem('fastrack-eating-start');
           setEatingElapsedSeconds(0); setEatingPaused(false);
           localStorage.removeItem('fastrack-eating-paused'); localStorage.removeItem('fastrack-eating-elapsed');
@@ -305,7 +328,7 @@ export default function TimerPage() {
         </CardContent>
       </Card>
 
-     <div ref={fastingSectionRef} className={cn("transition-all duration-700 p-6 sm:p-8 bg-card/20 border-l-4", isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", activeMode === 'fasting' ? "border-primary bg-primary/5" : "border-transparent opacity-50")}>
+      <div ref={fastingSectionRef} className={cn("transition-all duration-700 p-6 sm:p-8 bg-card/20 border-l-4", isFastingSectionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8", activeMode === 'fasting' ? "border-primary bg-primary/5" : "border-transparent opacity-50")}>
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-bold select-none">Fasting Period</h2>
@@ -365,7 +388,7 @@ export default function TimerPage() {
         </div>
       </div>
 
-      <div className="flex justify-center">
+    <div className="flex justify-center">
         <button
           ref={toggleButtonRef}
           onClick={() => setActiveMode(activeMode === 'fasting' ? 'eating' : 'fasting')}
@@ -378,11 +401,11 @@ export default function TimerPage() {
           )}
         >
           <div className="text-center space-y-2">
-            <span className="text-[10px] uppercase tracking-widest opacity-50">
+            <span className="text-[10px] uppercase tracking-widest opacity-50 select-none">
               Currently Active: {activeMode === 'fasting' ? 'Fasting Period' : 'Eating Period'}
             </span>
             <div className={cn(
-              "font-bold flex items-center justify-center gap-2 transition-all duration-300 whitespace-nowrap",
+              "font-bold flex items-center justify-center gap-2 transition-all duration-300 whitespace-nowrap select-none",
               activeMode === 'fasting' ? "text-xl" : "text-lg"
             )}>
               {activeMode === 'fasting' ? 'Switch to Eating Period' : 'Switch to Fasting Period'}
@@ -423,13 +446,28 @@ export default function TimerPage() {
                 disabled={activeMode !== 'eating'}>
                 Start Eating Period
               </Button>
+            ) : eatingPaused ? (
+              <div className="flex gap-2 w-full">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild><Button variant="outline" className="flex-1 h-14 font-bold select-none">End Interval</Button></AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle className="select-none">End Eating Period Early?</AlertDialogTitle></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel className="select-none">Dismiss</AlertDialogCancel><AlertDialogAction className="select-none" onClick={() => { resumeEating(); setTimeout(() => endEatingPeriod(true), 50); }}>End Interval</AlertDialogAction></AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Button variant="outline" className="flex-1 h-14 font-bold select-none" onClick={resumeEating}>Resume</Button>
+                <Button variant="outline" className="flex-1 h-14 font-bold select-none" onClick={() => resetTimer('eating')}>Reset</Button>
+              </div>
             ) : (
               <div className="flex gap-2 w-full">
-                {eatingPaused ? (
-                  <Button variant="outline" className="flex-1 h-14 font-bold select-none" onClick={resumeEating}>Resume</Button>
-                ) : (
-                  <Button variant="outline" className="flex-1 h-14 font-bold select-none" onClick={pauseEating}>Pause</Button>
-                )}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild><Button variant="outline" className="flex-1 h-14 font-bold select-none">End Interval</Button></AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle className="select-none">End Eating Period Early?</AlertDialogTitle></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel className="select-none">Dismiss</AlertDialogCancel><AlertDialogAction className="select-none" onClick={() => endEatingPeriod(true)}>End Interval</AlertDialogAction></AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Button variant="outline" className="flex-1 h-14 font-bold select-none" onClick={pauseEating}>Pause</Button>
                 <Button variant="outline" className="flex-1 h-14 font-bold select-none" onClick={() => resetTimer('eating')}>Reset</Button>
               </div>
             )}
