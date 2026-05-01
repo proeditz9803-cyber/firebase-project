@@ -63,6 +63,7 @@ export default function LogPage() {
   const completedFasts = history.filter(r => r.completed).length;
   const earlyEndedFasts = history.filter(r => !r.completed).length;
   const completedEatingPeriods = eatingHistory.filter(r => r.completed).length;
+  const earlyEndedEatingPeriods = eatingHistory.filter(r => !r.completed).length;
   const totalHours = history.reduce((acc, curr) => acc + curr.actualHours, 0);
   const averageHours = totalFasts > 0 ? totalHours / totalFasts : 0;
   const hasAnyHistory = totalFasts > 0 || eatingHistory.length > 0;
@@ -127,6 +128,14 @@ export default function LogPage() {
             </CardTitle>
           </CardHeader>
           <CardContent><div className="text-2xl font-bold select-none">{isClient ? earlyEndedFasts : 0}</div></CardContent>
+        </Card>
+        <Card className="bg-card border-none shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center select-none">
+              <AlertCircle className="w-4 h-4 mr-2 text-destructive" /> Early ended eating periods
+            </CardTitle>
+          </CardHeader>
+          <CardContent><div className="text-2xl font-bold select-none">{isClient ? earlyEndedEatingPeriods : 0}</div></CardContent>
         </Card>
         <Card className="bg-card border-none shadow-lg">
           <CardHeader className="pb-2">
