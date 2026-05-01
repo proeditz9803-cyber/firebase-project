@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,10 @@ import {
 import { Trash2, History, Award, Clock, Utensils, AlertCircle } from 'lucide-react';
 import useScrollReveal from '@/hooks/useScrollReveal';
 
+type UnifiedRecord =
+  | { recordType: 'fasting'; data: FastRecord }
+  | { recordType: 'eating'; data: EatingRecord };
+
 export default function LogPage() {
   const [headerRef, isHeaderVisible] = useScrollReveal({ delay: 0 });
   const [statsRef, isStatsVisible] = useScrollReveal({ delay: 150 });
@@ -23,19 +27,29 @@ export default function LogPage() {
   const [eatingHistory, setEatingHistory] = useState<EatingRecord[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
+  const loadHistory = useCallback(() => {
     if (typeof window !== 'undefined') {
       const savedHistory = localStorage.getItem('fastHistory');
       const savedEatingHistory = localStorage.getItem('eatingHistory');
       if (savedHistory) {
         try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error("Failed to parse fasting history", e); }
-      }
+      } else { setHistory([]); }
       if (savedEatingHistory) {
         try { setEatingHistory(JSON.parse(savedEatingHistory)); } catch (e) { console.error("Failed to parse eating history", e); }
-      }
+      } else { setEatingHistory([]); }
     }
   }, []);
+
+  useEffect(() => {
+    setIsClient(true);
+    loadHistory();
+  }, [loadHistory]);
+
+  useEffect(() => {
+    const handleHistoryUpdate = () => loadHistory();
+    window.addEventListener('fastrack-history-updated', handleHistoryUpdate);
+    return () => window.removeEventListener('fastrack-history-updated', handleHistoryUpdate);
+  }, [loadHistory]);
 
   const clearHistory = () => {
     if (typeof window !== 'undefined') {
@@ -48,10 +62,15 @@ export default function LogPage() {
   const totalFasts = history.length;
   const completedFasts = history.filter(r => r.completed).length;
   const earlyEndedFasts = history.filter(r => !r.completed).length;
-  const completedEatingPeriods = eatingHistory.length;
+  const completedEatingPeriods = eatingHistory.filter(r => r.completed).length;
   const totalHours = history.reduce((acc, curr) => acc + curr.actualHours, 0);
   const averageHours = totalFasts > 0 ? totalHours / totalFasts : 0;
-  const hasAnyHistory = totalFasts > 0 || completedEatingPeriods > 0;
+  const hasAnyHistory = totalFasts > 0 || eatingHistory.length > 0;
+
+  const unifiedRecords: UnifiedRecord[] = [
+    ...history.map(r => ({ recordType: 'fasting' as const, data: r })),
+    ...eatingHistory.map(r => ({ recordType: 'eating' as const, data: r })),
+  ].sort((a, b) => new Date(b.data.startTime).getTime() - new Date(a.data.startTime).getTime());
 
   const formatDuration = (hours: number) => {
     const h = Math.floor(hours);
@@ -129,50 +148,63 @@ export default function LogPage() {
 
     <div ref={listRef} className={cn("space-y-4 transition-all min-h-[100px]", isListVisible ? 'scroll-reveal-visible' : 'scroll-reveal-hidden')}>
         {isClient ? (
-          history.length === 0 ? (
+          unifiedRecords.length === 0 ? (
             <div className="text-center py-20 bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
               <History className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
-              <p className="mt-4 text-muted-foreground select-none">No fasting history yet. Start your first fast to see it here.</p>
+              <p className="mt-4 text-muted-foreground select-none">No history yet. Start your first fast to see it here.</p>
             </div>
           ) : (
-            history.map((record) => (
-              <Card key={record.id} className="bg-card border-none shadow-md overflow-hidden">
-                <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="text-sm font-bold text-muted-foreground uppercase tracking-widest select-none">
-                      {new Date(record.startTime).toLocaleDateString(undefined, {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-                      })}
+            unifiedRecords.map((record) => {
+              const isFasting = record.recordType === 'fasting';
+              const data = record.data;
+              const isCompleted = data.completed;
+              const protocol = isFasting ? (data as FastRecord).plannedProtocol : null;
+              const badgeClass = isFasting
+                ? isCompleted
+                  ? "bg-primary/20 text-primary border-primary/20"
+                  : "bg-amber-500/20 text-amber-500 border-amber-500/20"
+                : isCompleted
+                  ? "bg-amber-500/20 text-amber-500 border-amber-500/20"
+                  : "bg-destructive/20 text-destructive border-destructive/20";
+              const badgeLabel = isCompleted ? 'Completed' : 'Ended Early';
+              return (
+                <Card key={data.id} className="bg-card border-none shadow-md overflow-hidden">
+                  <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={cn("text-[10px] font-bold uppercase tracking-widest select-none px-2 py-0.5 rounded-full", isFasting ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-500")}>
+                          {isFasting ? 'Fasting' : 'Eating Period'}
+                        </span>
+                      </div>
+                      <div className="text-sm font-bold text-muted-foreground uppercase tracking-widest select-none">
+                        {new Date(data.startTime).toLocaleDateString(undefined, {
+                          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                        })}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {protocol && <span className="text-lg font-bold select-none">{protocol}</span>}
+                        {protocol && <span className="text-muted-foreground select-none">•</span>}
+                        <span className="text-muted-foreground text-sm select-none">
+                          {new Date(data.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
+                          {new Date(data.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold select-none">{record.plannedProtocol}</span>
-                      <span className="text-muted-foreground select-none">•</span>
-                      <span className="text-muted-foreground text-sm select-none">
-                        {new Date(record.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
-                        {new Date(record.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                    <div className="flex items-center justify-between sm:justify-end gap-6">
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-muted-foreground select-none">Duration</div>
+                        <div className={cn("text-lg font-bold select-none", isFasting ? "text-primary" : "text-amber-500")}>
+                          {formatDuration(data.actualHours)}
+                        </div>
+                      </div>
+                      <Badge className={cn("px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none", badgeClass)} variant="outline">
+                        {badgeLabel}
+                      </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-6">
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-muted-foreground select-none">Duration</div>
-                      <div className="text-lg font-bold text-primary select-none">{formatDuration(record.actualHours)}</div>
-                    </div>
-                    <Badge
-                      className={cn(
-                        "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider select-none",
-                        record.completed
-                          ? "bg-primary/20 text-primary border-primary/20"
-                          : "bg-amber-500/20 text-amber-500 border-amber-500/20"
-                      )}
-                      variant="outline"
-                    >
-                      {record.completed ? 'Completed' : 'Ended Early'}
-                    </Badge>
-                  </div>
-                </div>
-              </Card>
-            ))
+                </Card>
+              );
+            })
           )
         ) : (
           <div className="flex items-center justify-center py-20">
