@@ -53,12 +53,10 @@ export default function TimerPage() {
 
   const [startFastingPressed, setStartFastingPressed] = useState(false);
   const [startEatingPressed, setStartEatingPressed] = useState(false);
-
   const [endFastPressed, setEndFastPressed] = useState(false);
   const [pauseFastingPressed, setPauseFastingPressed] = useState(false);
   const [resumeFastingPressed, setResumeFastingPressed] = useState(false);
   const [resetFastingPressed, setResetFastingPressed] = useState(false);
-
   const [endIntervalPressed, setEndIntervalPressed] = useState(false);
   const [pauseEatingPressed, setPauseEatingPressed] = useState(false);
   const [resumeEatingPressed, setResumeEatingPressed] = useState(false);
@@ -70,6 +68,22 @@ export default function TimerPage() {
   const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
+
+  const fBtn = (pressed: boolean) => cn(
+    "flex-1 h-14 font-bold select-none rounded-md border text-sm",
+    "transition-transform duration-150",
+    pressed
+      ? "scale-[0.97] bg-primary/20 border-primary/30 text-primary"
+      : "scale-100 bg-transparent border-border text-foreground"
+  );
+
+  const eBtn = (pressed: boolean) => cn(
+    "flex-1 h-14 font-bold select-none rounded-md border text-sm",
+    "transition-transform duration-150",
+    pressed
+      ? "scale-[0.97] bg-amber-500/20 border-amber-500/30 text-amber-500"
+      : "scale-100 bg-transparent border-border text-foreground"
+  );
 
   useEffect(() => {
     const savedActiveMode = localStorage.getItem('fastrack-active-mode') as TimerMode;
@@ -106,7 +120,7 @@ export default function TimerPage() {
     }
   }, []);
 
-    useEffect(() => {
+   useEffect(() => {
     localStorage.setItem('fastrack-active-mode', activeMode);
     localStorage.setItem('fastProtocol', protocol);
     localStorage.setItem('customFastingHours', customFastingHours.toString());
@@ -290,17 +304,7 @@ export default function TimerPage() {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const fBtnClass = (pressed: boolean) => cn(
-    "flex-1 h-14 font-bold select-none transition-all duration-150 active:duration-75",
-    pressed ? "scale-[0.97] bg-primary/20 border-primary/40 text-primary" : "scale-100"
-  );
-
-  const eBtnClass = (pressed: boolean) => cn(
-    "flex-1 h-14 font-bold select-none transition-all duration-150 active:duration-75",
-    pressed ? "scale-[0.97] bg-amber-500/20 border-amber-500/40 text-amber-500" : "scale-100"
-  );
-
-     return (
+    return (
     <div className="max-w-xl mx-auto space-y-12 pb-20">
       {showNotification && (
         <div className={cn("fixed top-[64px] left-0 right-0 z-[60]", isDismissing ? "animate-notification-out" : "animate-notification-in")}>
@@ -369,7 +373,7 @@ export default function TimerPage() {
             </div>
             {!fastStart && !fastingPaused ? (
               <Button
-                className={cn("w-full h-14 uppercase font-bold tracking-widest select-none transition-transform duration-150 active:duration-75", startFastingPressed ? "scale-[0.97]" : "scale-100")}
+                className={cn("w-full h-14 uppercase font-bold tracking-widest select-none transition-transform duration-150", startFastingPressed ? "scale-[0.97]" : "scale-100")}
                 onClick={() => startTimer('fasting')}
                 onPointerDown={() => setStartFastingPressed(true)}
                 onPointerUp={() => setStartFastingPressed(false)}
@@ -381,12 +385,12 @@ export default function TimerPage() {
               <div className="flex gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" className={fBtnClass(endFastPressed)}
+                    <button className={fBtn(endFastPressed)}
                       onPointerDown={() => setEndFastPressed(true)}
                       onPointerUp={() => setEndFastPressed(false)}
                       onPointerLeave={() => setEndFastPressed(false)}>
                       End Fast
-                    </Button>
+                    </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle className="select-none">End Fast Early?</AlertDialogTitle></AlertDialogHeader>
@@ -396,27 +400,27 @@ export default function TimerPage() {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button variant="outline" className={fBtnClass(resumeFastingPressed)}
+                <button className={fBtn(resumeFastingPressed)}
                   onPointerDown={() => setResumeFastingPressed(true)}
                   onPointerUp={() => setResumeFastingPressed(false)}
                   onPointerLeave={() => setResumeFastingPressed(false)}
-                  onClick={resumeFasting}>Resume</Button>
-                <Button variant="outline" className={fBtnClass(resetFastingPressed)}
+                  onClick={resumeFasting}>Resume</button>
+                <button className={fBtn(resetFastingPressed)}
                   onPointerDown={() => setResetFastingPressed(true)}
                   onPointerUp={() => setResetFastingPressed(false)}
                   onPointerLeave={() => setResetFastingPressed(false)}
-                  onClick={() => resetTimer('fasting')}>Reset</Button>
+                  onClick={() => resetTimer('fasting')}>Reset</button>
               </div>
             ) : (
               <div className="flex gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" className={fBtnClass(endFastPressed)}
+                    <button className={fBtn(endFastPressed)}
                       onPointerDown={() => setEndFastPressed(true)}
                       onPointerUp={() => setEndFastPressed(false)}
                       onPointerLeave={() => setEndFastPressed(false)}>
                       End Fast
-                    </Button>
+                    </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle className="select-none">End Fast Early?</AlertDialogTitle></AlertDialogHeader>
@@ -426,23 +430,22 @@ export default function TimerPage() {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button variant="outline" className={fBtnClass(pauseFastingPressed)}
+                <button className={fBtn(pauseFastingPressed)}
                   onPointerDown={() => setPauseFastingPressed(true)}
                   onPointerUp={() => setPauseFastingPressed(false)}
                   onPointerLeave={() => setPauseFastingPressed(false)}
-                  onClick={pauseFasting}>Pause</Button>
-                <Button variant="outline" className={fBtnClass(resetFastingPressed)}
+                  onClick={pauseFasting}>Pause</button>
+                <button className={fBtn(resetFastingPressed)}
                   onPointerDown={() => setResetFastingPressed(true)}
                   onPointerUp={() => setResetFastingPressed(false)}
                   onPointerLeave={() => setResetFastingPressed(false)}
-                  onClick={() => resetTimer('fasting')}>Reset</Button>
+                  onClick={() => resetTimer('fasting')}>Reset</button>
               </div>
             )}
           </div>
         </div>
       </div>
-
-   <div className="flex justify-center">
+     <div className="flex justify-center">
         <button
           ref={toggleButtonRef}
           onClick={() => setActiveMode(activeMode === 'fasting' ? 'eating' : 'fasting')}
@@ -492,7 +495,7 @@ export default function TimerPage() {
             </div>
             {!eatingStart && !eatingPaused ? (
               <Button
-                className={cn("w-full h-14 bg-amber-500 text-black hover:bg-amber-400 font-bold select-none transition-transform duration-150 active:duration-75", startEatingPressed ? "scale-[0.97]" : "scale-100")}
+                className={cn("w-full h-14 bg-amber-500 text-black hover:bg-amber-400 font-bold select-none transition-transform duration-150", startEatingPressed ? "scale-[0.97]" : "scale-100")}
                 onClick={() => startTimer('eating')}
                 onPointerDown={() => setStartEatingPressed(true)}
                 onPointerUp={() => setStartEatingPressed(false)}
@@ -504,12 +507,12 @@ export default function TimerPage() {
               <div className="flex gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" className={eBtnClass(endIntervalPressed)}
+                    <button className={eBtn(endIntervalPressed)}
                       onPointerDown={() => setEndIntervalPressed(true)}
                       onPointerUp={() => setEndIntervalPressed(false)}
                       onPointerLeave={() => setEndIntervalPressed(false)}>
                       End Interval
-                    </Button>
+                    </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle className="select-none">End Eating Period Early?</AlertDialogTitle></AlertDialogHeader>
@@ -519,27 +522,27 @@ export default function TimerPage() {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button variant="outline" className={eBtnClass(resumeEatingPressed)}
+                <button className={eBtn(resumeEatingPressed)}
                   onPointerDown={() => setResumeEatingPressed(true)}
                   onPointerUp={() => setResumeEatingPressed(false)}
                   onPointerLeave={() => setResumeEatingPressed(false)}
-                  onClick={resumeEating}>Resume</Button>
-                <Button variant="outline" className={eBtnClass(resetEatingPressed)}
+                  onClick={resumeEating}>Resume</button>
+                <button className={eBtn(resetEatingPressed)}
                   onPointerDown={() => setResetEatingPressed(true)}
                   onPointerUp={() => setResetEatingPressed(false)}
                   onPointerLeave={() => setResetEatingPressed(false)}
-                  onClick={() => resetTimer('eating')}>Reset</Button>
+                  onClick={() => resetTimer('eating')}>Reset</button>
               </div>
             ) : (
               <div className="flex gap-2 w-full">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" className={eBtnClass(endIntervalPressed)}
+                    <button className={eBtn(endIntervalPressed)}
                       onPointerDown={() => setEndIntervalPressed(true)}
                       onPointerUp={() => setEndIntervalPressed(false)}
                       onPointerLeave={() => setEndIntervalPressed(false)}>
                       End Interval
-                    </Button>
+                    </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle className="select-none">End Eating Period Early?</AlertDialogTitle></AlertDialogHeader>
@@ -549,16 +552,16 @@ export default function TimerPage() {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <Button variant="outline" className={eBtnClass(pauseEatingPressed)}
+                <button className={eBtn(pauseEatingPressed)}
                   onPointerDown={() => setPauseEatingPressed(true)}
                   onPointerUp={() => setPauseEatingPressed(false)}
                   onPointerLeave={() => setPauseEatingPressed(false)}
-                  onClick={pauseEating}>Pause</Button>
-                <Button variant="outline" className={eBtnClass(resetEatingPressed)}
+                  onClick={pauseEating}>Pause</button>
+                <button className={eBtn(resetEatingPressed)}
                   onPointerDown={() => setResetEatingPressed(true)}
                   onPointerUp={() => setResetEatingPressed(false)}
                   onPointerLeave={() => setResetEatingPressed(false)}
-                  onClick={() => resetTimer('eating')}>Reset</Button>
+                  onClick={() => resetTimer('eating')}>Reset</button>
               </div>
             )}
           </div>
