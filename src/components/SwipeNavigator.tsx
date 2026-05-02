@@ -99,7 +99,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     setLiveDelta(adjustedDelta);
   }, [currentPage, pages.length, isTransitioning]);
 
-          const handleEnd = useCallback(() => {
+  const handleEnd = useCallback(() => {
     if (!isGestureActive.current) return;
     if (directionLocked.current === 'horizontal') {
       const threshold = 80;
@@ -113,13 +113,24 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
         setLiveDelta(0);
         setTransitionDirection('none');
       }
+    } else {
+      setLiveDelta(0);
     }
     isGestureActive.current = false;
     directionLocked.current = null;
     currentDelta.current = 0;
   }, [currentPage, pages.length, commitPageTransition]);
 
-  const handleTransitionEnd = () => {
+  const handleCancel = useCallback(() => {
+    if (!isGestureActive.current) return;
+    isGestureActive.current = false;
+    directionLocked.current = null;
+    currentDelta.current = 0;
+    setLiveDelta(0);
+    setIsTransitioning(false);
+  }, []);
+
+    const handleTransitionEnd = () => {
     setIsTransitioning(false);
     setTransitionDirection('none');
     setLiveDelta(0);
@@ -131,24 +142,32 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     const onTouchStart = (e: TouchEvent) => handleStart(e.touches[0].clientX, e.touches[0].clientY);
     const onTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX, e.touches[0].clientY, e);
     const onTouchEnd = () => handleEnd();
+    const onTouchCancel = () => handleCancel();
     const onMouseDown = (e: MouseEvent) => handleStart(e.clientX, e.clientY);
     const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY, e);
     const onMouseUp = () => handleEnd();
+    const onPointerCancel = () => handleCancel();
+
     container.addEventListener('touchstart', onTouchStart, { passive: true });
     container.addEventListener('touchmove', onTouchMove, { passive: false });
     container.addEventListener('touchend', onTouchEnd, { passive: true });
+    container.addEventListener('touchcancel', onTouchCancel, { passive: true });
     container.addEventListener('mousedown', onMouseDown, { passive: true });
+    container.addEventListener('pointercancel', onPointerCancel, { passive: true });
     document.addEventListener('mousemove', onMouseMove, { passive: true });
     document.addEventListener('mouseup', onMouseUp, { passive: true });
+
     return () => {
       container.removeEventListener('touchstart', onTouchStart);
       container.removeEventListener('touchmove', onTouchMove);
       container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('touchcancel', onTouchCancel);
       container.removeEventListener('mousedown', onMouseDown);
+      container.removeEventListener('pointercancel', onPointerCancel);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
-  }, [handleMove, handleEnd]);
+  }, [handleMove, handleEnd, handleCancel]);
 
   return (
     <div ref={containerRef} className="relative w-full h-[calc(100vh-64px)] overflow-hidden touch-none">
@@ -188,7 +207,7 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
         );
       })}
 
-    <div className="pointer-events-none fixed inset-0 z-[50]">
+  <div className="pointer-events-none fixed inset-0 z-[50]">
         <button
           onPointerDown={() => setLeftPressed(true)}
           onPointerUp={() => { setLeftPressed(false); commitPageTransition(currentPage - 1); }}
@@ -260,4 +279,3 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
     </div>
   );
 }
-    
