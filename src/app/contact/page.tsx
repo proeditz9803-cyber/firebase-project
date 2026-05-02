@@ -31,9 +31,38 @@ export default function ContactPage() {
     return () => { if (observerRef.current) observerRef.current.disconnect(); };
   }, []);
 
+  const contactItems = [
+    {
+      label: "General questions about FasTrack",
+      description: "Curious about how the app works, which protocol to start with, or anything else? Just ask."
+    },
+    {
+      label: "Bug reports or technical issues",
+      description: "If something is not working the way it should, let me know and I will look into it as quickly as I can."
+    },
+    {
+      label: "Feature requests and suggestions",
+      description: "Have an idea that would make FasTrack better? I genuinely want to hear it."
+    },
+    {
+      label: "Privacy or data related concerns",
+      description: "Your privacy matters. If you have any concerns about how the app handles your data, reach out directly."
+    },
+    {
+      label: "Advertising and partnership enquiries",
+      description: "For any advertising or collaboration related conversations, email is the best way to get in touch."
+    },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto space-y-12 py-12 px-6">
-      <section ref={hRef} className={cn("text-center space-y-6 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+      <section
+        ref={hRef}
+        className={cn(
+          "text-center space-y-6 transition-all",
+          hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+        )}
+      >
         <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 uppercase tracking-tighter font-bold select-none">
           Contact Us
         </Badge>
@@ -46,26 +75,34 @@ export default function ContactPage() {
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-8 md:gap-12 items-stretch">
-        <div ref={lRef} className={cn("space-y-8 flex flex-col justify-center transition-all", lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}>
+        <div
+          ref={lRef}
+          className={cn(
+            "space-y-8 flex flex-col justify-center transition-all",
+            lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+          )}
+        >
           <section className="space-y-4">
             <p className="leading-relaxed text-muted-foreground select-none">
-              We genuinely value user input and invite you to reach out.
+              FasTrack is built and maintained by one person, so when you send a message it goes straight to me. I read every single one and do my best to get back to you within a day or two. Whether you have a question, a problem, or just want to share your thoughts, I genuinely welcome it.
+            </p>
+            <p className="leading-relaxed text-muted-foreground select-none">
+              There is no support ticket system or automated response here. Just a real person on the other end who cares about making FasTrack as good as it can be.
             </p>
           </section>
+
           <Separator className="opacity-20" />
+
           <section className="space-y-4">
-            <h3 className="text-xl font-bold text-primary select-none">How we can help:</h3>
-            <ul className="space-y-3">
-              {[
-                "General questions about FasTrack",
-                "Bug reports or technical issues",
-                "Feature requests and suggestions",
-                "Privacy or data related concerns",
-                "Advertising and partnership enquiries"
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-muted-foreground leading-tight select-none">
-                  <span className="text-primary font-bold">•</span>
-                  {item}
+            <h3 className="text-xl font-bold text-primary select-none">How I can help:</h3>
+            <ul className="space-y-5">
+              {contactItems.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="text-primary font-bold mt-0.5 select-none">•</span>
+                  <div className="space-y-0.5">
+                    <p className="text-foreground font-medium leading-tight select-none">{item.label}</p>
+                    <p className="text-muted-foreground text-sm leading-relaxed select-none">{item.description}</p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -74,7 +111,7 @@ export default function ContactPage() {
 
         <div className="hidden md:block w-px bg-border opacity-20" />
 
-        <div className="flex items-center justify-center py-8 md:py-0">
+                         <div className="flex items-center justify-center py-8 md:py-0">
           <a
             ref={buttonRef}
             href="mailto:proeditz9803@gmail.com"
@@ -88,14 +125,26 @@ export default function ContactPage() {
             )}
             style={{ transitionProperty: 'transform, opacity, background-color, border-color' }}
           >
-            <div className="relative flex items-center justify-center gap-4">
+            <div className="relative flex flex-col items-center justify-center gap-3 text-center">
               <span className="text-2xl md:text-3xl font-extrabold uppercase tracking-tighter select-none">
                 Send Us an Email
+              </span>
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest select-none">
+                proeditz9803@gmail.com
               </span>
             </div>
           </a>
         </div>
       </div>
+
+      <section className={cn(
+        "text-center border-t border-border pt-8 transition-all",
+        lVis ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+      )}>
+        <p className="text-sm text-muted-foreground select-none">
+          Typical response time is within one to two days. This page was last updated on May 2, 2026.
+        </p>
+      </section>
     </div>
   );
 }
