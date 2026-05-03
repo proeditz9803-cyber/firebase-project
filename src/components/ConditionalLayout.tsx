@@ -32,7 +32,11 @@ export default function ConditionalLayout({
       <Navigation />
       <main className="flex-1 flex flex-col">
         {isMainPage ? (
-          <SwipeNavigator pageNodes={[<TimerPage />, <LogPage />, <GuidePage />]} />
+          <SwipeNavigator pageNodes={[
+            <TimerPage key="timer" />,
+            <LogPage key="log" />,
+            <GuidePage key="guide" />,
+          ]} />
         ) : (
           <div className="container mx-auto px-4 py-8">
             {children}
