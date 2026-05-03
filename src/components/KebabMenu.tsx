@@ -27,7 +27,7 @@ export default function KebabMenu() {
       <button
         onClick={toggleMenu}
         className={cn(
-          "p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-md border border-transparent focus:outline-none",
+          "p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-md border border-transparent focus:outline-none select-none",
           isOpen && "bg-primary/10 text-primary border-primary/20 shadow-sm"
         )}
         aria-label="Menu"
@@ -38,15 +38,15 @@ export default function KebabMenu() {
       <div
         className={cn(
           "absolute top-full left-0 mt-2 w-52 bg-popover border border-border shadow-2xl rounded-md overflow-hidden transition-all duration-300 ease-out origin-top-left",
-          isOpen 
-            ? "opacity-100 scale-100 translate-y-0" 
+          isOpen
+            ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 -translate-y-4 pointer-events-none"
         )}
       >
         <Link
           href="/settings"
           onClick={closeMenu}
-          className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="flex items-center gap-2 px-4 py-3 text-sm font-bold text-popover-foreground hover:bg-accent hover:text-accent-foreground transition-colors select-none"
         >
           <Settings className="w-4 h-4" />
           Settings
@@ -54,28 +54,28 @@ export default function KebabMenu() {
         <Link
           href="/about"
           onClick={closeMenu}
-          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors select-none"
         >
           About Us
         </Link>
         <Link
           href="/privacy-policy"
           onClick={closeMenu}
-          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors select-none"
         >
           Privacy Policy
         </Link>
         <Link
           href="/terms-and-conditions"
           onClick={closeMenu}
-          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors select-none"
         >
           Terms and Conditions
         </Link>
         <Link
           href="/contact"
           onClick={closeMenu}
-          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="block px-4 py-3 text-sm font-bold text-popover-foreground border-t border-border hover:bg-accent hover:text-accent-foreground transition-colors select-none"
         >
           Contact Us
         </Link>
