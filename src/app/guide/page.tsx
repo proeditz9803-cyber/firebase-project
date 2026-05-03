@@ -27,43 +27,43 @@ export default function GuidePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-12">
-      <section 
+      <section
         ref={hRef}
         className={cn("space-y-4 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
-        <h1 className="text-4xl font-bold tracking-tight text-primary">Fasting Guide</h1>
-        <p className="text-muted-foreground leading-relaxed">
-          Intermittent fasting is an eating pattern that cycles between periods of fasting and eating. 
-          Unlike traditional diets, it doesn’t specify which foods you should eat, but rather when 
+        <h1 className="text-4xl font-bold tracking-tight text-primary select-none">Fasting Guide</h1>
+        <p className="text-muted-foreground leading-relaxed select-none">
+          Intermittent fasting is an eating pattern that cycles between periods of fasting and eating.
+          Unlike traditional diets, it doesn't specify which foods you should eat, but rather when
           you should eat them. It is essentially an "eating pattern" rather than a diet.
         </p>
       </section>
 
-      <section 
+      <section
         ref={pRef}
         className={cn("space-y-6 transition-all", pVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
-        <h2 className="text-2xl font-bold">Popular Protocols</h2>
+        <h2 className="text-2xl font-bold select-none">Popular Protocols</h2>
         <div className="grid gap-4">
           {protocols.map((p) => (
             <div key={p.name} className="p-6 bg-card rounded-2xl border border-border">
-              <h3 className="text-lg font-bold text-primary mb-2">{p.name}</h3>
-              <p className="text-sm text-muted-foreground">{p.desc}</p>
+              <h3 className="text-lg font-bold text-primary mb-2 select-none">{p.name}</h3>
+              <p className="text-sm text-muted-foreground select-none">{p.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section 
+      <section
         ref={mRef}
         className={cn("space-y-6 transition-all", mVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
-        <h2 className="text-2xl font-bold">What Happens to Your Body?</h2>
+        <h2 className="text-2xl font-bold select-none">What Happens to Your Body?</h2>
         <div className="space-y-4">
           {milestones.map((m) => (
             <div key={m.time} className="flex gap-4">
-              <div className="flex-shrink-0 w-24 font-bold text-primary">{m.time}</div>
-              <div className="text-sm text-muted-foreground border-l border-border pl-4 pb-4">
+              <div className="flex-shrink-0 w-24 font-bold text-primary select-none">{m.time}</div>
+              <div className="text-sm text-muted-foreground border-l border-border pl-4 pb-4 select-none">
                 {m.effect}
               </div>
             </div>
@@ -71,35 +71,35 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section 
+      <section
         ref={eRef}
         className={cn("space-y-6 transition-all", eVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
-        <h2 className="text-2xl font-bold">Common Mistakes</h2>
+        <h2 className="text-2xl font-bold select-none">Common Mistakes</h2>
         <ul className="space-y-4 list-disc pl-6 text-muted-foreground text-sm">
-          <li>
+          <li className="select-none">
             <strong className="text-foreground">Diving in too fast:</strong> Starting with 20:4 or OMAD can be stressful for the body. Start with 12:12 or 14:10.
           </li>
-          <li>
+          <li className="select-none">
             <strong className="text-foreground">Dehydration:</strong> Many people forget to drink water. Coffee and tea are okay (without sugar/milk), but water is essential.
           </li>
-          <li>
+          <li className="select-none">
             <strong className="text-foreground">Overeating during the window:</strong> Fasting isn't a license to eat junk food. Focus on nutrient-dense meals.
           </li>
-          <li>
+          <li className="select-none">
             <strong className="text-foreground">Breaking fasts too aggressively:</strong> Large, heavy meals can cause digestive distress. Start with something light.
           </li>
         </ul>
       </section>
 
-      <section 
+      <section
         ref={tipRef}
         className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", tipVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
-        <h2 className="text-xl font-bold mb-4">Pro Tip for Success</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Consistency is more important than perfection. If you have to break your fast early one day, 
-          don't worry. Just resume your schedule the following day. Listen to your body—fasting 
+        <h2 className="text-xl font-bold mb-4 select-none">Pro Tip for Success</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed select-none">
+          Consistency is more important than perfection. If you have to break your fast early one day,
+          don't worry. Just resume your schedule the following day. Listen to your body — fasting
           should feel challenging but never painful or dangerous.
         </p>
       </section>
