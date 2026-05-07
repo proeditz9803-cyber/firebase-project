@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description: 'A free, simple, intermittent fasting timer and tracker.',
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+      { url: '/favicon-32×32.png', sizes: '32×32', type: 'image/x-icon' },
       { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
