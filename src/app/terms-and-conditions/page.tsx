@@ -157,7 +157,7 @@ export default function TermsAndConditionsPage() {
         <p className="leading-relaxed text-muted-foreground select-none">
           FasTrack is a fasting tracker not a medical service. If at any point during your fast you experience a medical emergency please stop fasting immediately and contact your local emergency services right away.
         </p>
-        <p className="leading-relaxed text-muted-foreground font-bold select-none">
+        <p className="leading-relaxed text-muted-foreground select-none">
           Please do not wait or try to push through a fast if something feels seriously wrong. Your life is more important than any fasting goal.
         </p>
         <Separator className="opacity-20" />
