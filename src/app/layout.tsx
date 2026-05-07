@@ -17,7 +17,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: 'FasTrack | Intermittent Fasting Timer',
-  description: 'A free, simple, no-account intermittent fasting timer and tracker.',
+  description: 'A free, simple, intermittent fasting timer and tracker.',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
@@ -38,9 +38,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${dmSans.variable} ${outfit.variable}`}>
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="48x48" type="image/x-icon" />
+        <link rel="icon" href="/android-chrome-192x192.png" sizes="192x192" type="image/png" />
+        <link rel="icon" href="/android-chrome-512x512.png" sizes="512x512" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="manifest" href="/manifest.json" />
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6752713314867783"
-          crossOrigin="anonymous"></script>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6752713314867783"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="font-sans antialiased bg-background text-foreground min-h-screen flex flex-col overflow-x-hidden">
         <ConditionalLayout>{children}</ConditionalLayout>
