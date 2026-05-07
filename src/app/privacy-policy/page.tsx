@@ -161,7 +161,7 @@ export default function PrivacyPolicyPage() {
           If you have any questions, concerns, or requests related to this privacy policy or how FasTrack handles your data, you are welcome to reach out directly. We read every message and will do our best to respond in a timely and helpful manner.
         </p>
         <p className="font-bold text-foreground text-lg select-none">
-          proeditz9803@gmail.com
+          fastracksupport@gmail.com
         </p>
         <p className="leading-relaxed text-muted-foreground select-none">
           This Privacy Policy was last updated on May 2, 2026. We reserve the right to update this policy at any time. Any changes will be reflected on this page with an updated effective date.
