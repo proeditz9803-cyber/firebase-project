@@ -114,7 +114,7 @@ export default function ContactPage() {
                          <div className="flex items-center justify-center py-8 md:py-0">
           <a
             ref={buttonRef}
-            href="mailto:proeditz9803@gmail.com"
+            href="mailto: fastracksupport@gmail.com.com"
             className={cn(
               "group relative w-full max-w-sm flex flex-col items-center justify-center p-8 md:p-12",
               "bg-transparent text-foreground border border-border rounded-full select-none",
@@ -130,7 +130,7 @@ export default function ContactPage() {
                 Send Us an Email
               </span>
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest select-none">
-                proeditz9803@gmail.com
+                fastracksupport@gmail.com
               </span>
             </div>
           </a>
