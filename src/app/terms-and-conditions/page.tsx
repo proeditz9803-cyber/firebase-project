@@ -244,7 +244,7 @@ export default function TermsAndConditionsPage() {
           Have a question about these terms or anything else on FasTrack? We are happy to hear from you. Whether it is a concern, a suggestion, or just a general question, feel free to reach out to us anytime at:
         </p>
         <p className="font-bold text-foreground text-lg select-none">
-          proeditz9803@gmail.com
+          fastracksupport@gmail.com
         </p>
         <p className="leading-relaxed text-muted-foreground select-none">
           We do our best to respond to every message as quickly as possible.
