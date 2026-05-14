@@ -1,14 +1,44 @@
 "use client"
 
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
+import { guideArticles } from '@/lib/guide-articles';
 
 export default function GuidePage() {
+  const [ready, setReady] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
+  const [introExiting, setIntroExiting] = useState(false);
+
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
   const [pRef, pVis] = useScrollReveal({ delay: 150 });
   const [mRef, mVis] = useScrollReveal({ delay: 300 });
   const [eRef, eVis] = useScrollReveal({ delay: 450 });
   const [tipRef, tipVis] = useScrollReveal({ delay: 600 });
+  const [artRef, artVis] = useScrollReveal({ delay: 750 });
+
+  useEffect(() => {
+    const permanentlyDismissed = localStorage.getItem('fastrack-guide-intro-dismissed');
+    const sessionSeen = sessionStorage.getItem('fastrack-guide-intro-seen');
+    if (!permanentlyDismissed && !sessionSeen) {
+      setShowIntro(true);
+    }
+    setReady(true);
+  }, []);
+
+  const handleProceed = () => {
+    sessionStorage.setItem('fastrack-guide-intro-seen', 'true');
+    setIntroExiting(true);
+    setTimeout(() => { setShowIntro(false); setIntroExiting(false); }, 500);
+  };
+
+  const handleProceedPermanent = () => {
+    localStorage.setItem('fastrack-guide-intro-dismissed', 'true');
+    sessionStorage.setItem('fastrack-guide-intro-seen', 'true');
+    setIntroExiting(true);
+    setTimeout(() => { setShowIntro(false); setIntroExiting(false); }, 500);
+  };
 
   const protocols = [
     { name: '16:8 Protocol', desc: 'The most popular method. You fast for 16 hours and eat within an 8-hour window. Ideal for beginners.' },
@@ -25,7 +55,59 @@ export default function GuidePage() {
     { time: '24 Hours', effect: 'Ketosis is typically fully reached. Cellular regeneration and stem cell production increase.' },
   ];
 
-  return (
+  if (!ready) return <div className="max-w-3xl mx-auto min-h-[80vh]" />;
+
+  if (showIntro) {
+    return (
+      <div className={cn(
+        "max-w-3xl mx-auto min-h-[80vh] flex flex-col justify-center py-12 space-y-10 transition-all duration-500",
+        introExiting ? "opacity-0 translate-y-4 pointer-events-none" : "opacity-100 translate-y-0"
+      )}>
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-primary uppercase tracking-widest select-none">New feature</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground select-none">
+            Introducing the new FasTrack Guide Articles
+          </h1>
+        </div>
+        <div className="space-y-8">
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-foreground select-none">What you'd learn:</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed select-none">
+              How intermittent fasting works, the key differences between popular protocols, and how to start safely as a beginner.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-foreground select-none">What you'd not learn:</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed select-none">
+              Specific meal plans, calorie targets, or medical advice. These articles focus on fasting structure and timing only.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-foreground select-none">The help you'd get:</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed select-none">
+              Beginner-friendly guidance written in plain language, structured to help you make informed decisions about your fasting routine.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={handleProceed}
+            className="px-6 py-3 rounded-full border border-border text-sm font-medium text-foreground bg-card hover:bg-secondary active:scale-95 transition-all duration-200 select-none"
+          >
+            Proceed
+          </button>
+          <button
+            onClick={handleProceedPermanent}
+            className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-95 transition-all duration-200 select-none"
+          >
+            Proceed and don't show this again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+return (
     <div className="max-w-3xl mx-auto space-y-12">
       <section
         ref={hRef}
@@ -102,6 +184,35 @@ export default function GuidePage() {
           don't worry. Just resume your schedule the following day. Listen to your body — fasting
           should feel challenging but never painful or dangerous.
         </p>
+      </section>
+     
+      <section
+        ref={artRef}
+        className={cn("space-y-6 transition-all", artVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+      >
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold select-none">Guide Articles</h2>
+          <p className="text-sm text-muted-foreground select-none">
+            Beginner-friendly reads to deepen your understanding of intermittent fasting.
+          </p>
+        </div>
+        <div className="grid gap-4">
+          {guideArticles.map((article) => (
+            <Link href={`/guide/${article.id}`} key={article.id} className="block">
+              <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/40 transition-colors cursor-pointer">
+                <h3 className="text-base font-bold text-foreground mb-2 select-none">{article.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4 select-none">{article.description}</p>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span className="select-none">{article.date}</span>
+                  <span className="select-none">·</span>
+                  <span className="select-none">{article.readTime}</span>
+                  <span className="select-none">·</span>
+                  <span className="select-none">{article.size}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </section>
     </div>
   );
