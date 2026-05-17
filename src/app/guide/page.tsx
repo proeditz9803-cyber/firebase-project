@@ -10,19 +10,21 @@ export default function GuidePage() {
   const [ready, setReady] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [introExiting, setIntroExiting] = useState(false);
+  const [articlesVisible, setArticlesVisible] = useState(false);
 
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
   const [pRef, pVis] = useScrollReveal({ delay: 150 });
   const [mRef, mVis] = useScrollReveal({ delay: 300 });
   const [eRef, eVis] = useScrollReveal({ delay: 450 });
   const [tipRef, tipVis] = useScrollReveal({ delay: 600 });
-  const [artRef, artVis] = useScrollReveal({ delay: 750 });
 
   useEffect(() => {
     const permanentlyDismissed = localStorage.getItem('fastrack-guide-intro-dismissed');
     const sessionSeen = sessionStorage.getItem('fastrack-guide-intro-seen');
     if (!permanentlyDismissed && !sessionSeen) {
       setShowIntro(true);
+    } else {
+      setArticlesVisible(true);
     }
     setReady(true);
   }, []);
@@ -30,14 +32,22 @@ export default function GuidePage() {
   const handleProceed = () => {
     sessionStorage.setItem('fastrack-guide-intro-seen', 'true');
     setIntroExiting(true);
-    setTimeout(() => { setShowIntro(false); setIntroExiting(false); }, 500);
+    setTimeout(() => {
+      setShowIntro(false);
+      setIntroExiting(false);
+      setArticlesVisible(true);
+    }, 500);
   };
 
   const handleProceedPermanent = () => {
     localStorage.setItem('fastrack-guide-intro-dismissed', 'true');
     sessionStorage.setItem('fastrack-guide-intro-seen', 'true');
     setIntroExiting(true);
-    setTimeout(() => { setShowIntro(false); setIntroExiting(false); }, 500);
+    setTimeout(() => {
+      setShowIntro(false);
+      setIntroExiting(false);
+      setArticlesVisible(true);
+    }, 500);
   };
 
   const protocols = [
@@ -185,10 +195,14 @@ return (
           should feel challenging but never painful or dangerous.
         </p>
       </section>
-     
+
       <section
-        ref={artRef}
-        className={cn("space-y-6 transition-all", artVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn(
+          "space-y-6 transition-all duration-700",
+          articlesVisible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-6 pointer-events-none"
+        )}
       >
         <div className="space-y-1">
           <h2 className="text-2xl font-bold select-none">Guide Articles</h2>
