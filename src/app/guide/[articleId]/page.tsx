@@ -24,7 +24,6 @@ export default async function ArticlePage({
       >
         ← Guide
       </Link>
-
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight text-foreground select-none">
           {article.title}
@@ -40,11 +39,9 @@ export default async function ArticlePage({
           {article.description}
         </p>
       </div>
-
       <div className="min-h-48 rounded-2xl bg-card border border-border/50 flex items-center justify-center py-16">
         <p className="text-sm text-muted-foreground/40 select-none">Article content coming soon.</p>
       </div>
-
       {relatedArticles.length > 0 && (
         <div className="space-y-4">
           {relatedArticles.map((related) => (
