@@ -121,7 +121,7 @@ return (
     <div className="max-w-3xl mx-auto space-y-12">
       <section
         ref={hRef}
-        className={cn("space-y-4 transition-all", hVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-4 transition-all", hVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
         <h1 className="text-4xl font-bold tracking-tight text-primary select-none">Fasting Guide</h1>
         <p className="text-muted-foreground leading-relaxed select-none">
@@ -133,7 +133,7 @@ return (
 
       <section
         ref={pRef}
-        className={cn("space-y-6 transition-all", pVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", pVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
         <h2 className="text-2xl font-bold select-none">Popular Protocols</h2>
         <div className="grid gap-4">
@@ -148,7 +148,7 @@ return (
 
       <section
         ref={mRef}
-        className={cn("space-y-6 transition-all", mVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", mVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
         <h2 className="text-2xl font-bold select-none">What Happens to Your Body?</h2>
         <div className="space-y-4">
@@ -165,7 +165,7 @@ return (
 
       <section
         ref={eRef}
-        className={cn("space-y-6 transition-all", eVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", eVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
         <h2 className="text-2xl font-bold select-none">Common Mistakes</h2>
         <ul className="space-y-4 list-disc pl-6 text-muted-foreground text-sm">
@@ -186,7 +186,7 @@ return (
 
       <section
         ref={tipRef}
-        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", tipVis ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", tipVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
       >
         <h2 className="text-xl font-bold mb-4 select-none">Pro Tip for Success</h2>
         <p className="text-sm text-muted-foreground leading-relaxed select-none">
@@ -195,7 +195,7 @@ return (
           should feel challenging but never painful or dangerous.
         </p>
       </section>
-
+ 
       <section
         className={cn(
           "space-y-6 transition-all duration-700",
