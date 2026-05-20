@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import useScrollReveal from '@/hooks/useScrollReveal';
 import { cn } from '@/lib/utils';
 import { guideArticles } from '@/lib/guide-articles';
 
 export default function GuidePage() {
+  const pathname = usePathname();
   const [ready, setReady] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [introExiting, setIntroExiting] = useState(false);
+  const [introRevealed, setIntroRevealed] = useState(false);
   const [articlesVisible, setArticlesVisible] = useState(false);
+  const [pageRevealed, setPageRevealed] = useState(false);
 
   const [hRef, hVis] = useScrollReveal({ delay: 0 });
   const [pRef, pVis] = useScrollReveal({ delay: 150 });
@@ -28,6 +32,25 @@ export default function GuidePage() {
     }
     setReady(true);
   }, []);
+
+  useEffect(() => {
+    if (showIntro) {
+      const timer = setTimeout(() => setIntroRevealed(true), 80);
+      return () => clearTimeout(timer);
+    } else {
+      setIntroRevealed(false);
+    }
+  }, [showIntro]);
+
+  useEffect(() => {
+    if (pathname === '/guide' && !showIntro) {
+      const timer = setTimeout(() => setPageRevealed(true), 80);
+      return () => {
+        clearTimeout(timer);
+        setPageRevealed(false);
+      };
+    }
+  }, [pathname, showIntro]);
 
   const handleProceed = () => {
     sessionStorage.setItem('fastrack-guide-intro-seen', 'true');
@@ -70,36 +93,68 @@ export default function GuidePage() {
   if (showIntro) {
     return (
       <div className={cn(
-        "max-w-3xl mx-auto min-h-[80vh] flex flex-col justify-center py-12 space-y-10 transition-all duration-500",
-        introExiting ? "opacity-0 translate-y-4 pointer-events-none" : "opacity-100 translate-y-0"
+        "max-w-3xl mx-auto min-h-[80vh] flex flex-col justify-center py-12 space-y-10",
+        introExiting
+          ? "opacity-0 translate-y-4 pointer-events-none transition-all duration-500"
+          : "transition-none"
       )}>
-        <div className="space-y-2">
+        <div
+          className={cn(
+            "space-y-2 transition-all",
+            introRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+          )}
+          style={{ transitionDelay: introRevealed ? '0ms' : '0ms' }}
+        >
           <p className="text-xs font-medium text-primary uppercase tracking-widest select-none">New feature</p>
           <h1 className="text-3xl font-bold tracking-tight text-foreground select-none">
             Introducing the new FasTrack Guide Articles
           </h1>
         </div>
         <div className="space-y-8">
-          <div className="space-y-3">
+          <div
+            className={cn(
+              "space-y-3 transition-all",
+              introRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+            )}
+            style={{ transitionDelay: introRevealed ? '150ms' : '0ms' }}
+          >
             <h2 className="text-base font-bold text-foreground select-none">What you'd learn:</h2>
             <p className="text-sm text-muted-foreground leading-relaxed select-none">
               How intermittent fasting works, the key differences between popular protocols, and how to start safely as a beginner.
             </p>
           </div>
-          <div className="space-y-3">
+          <div
+            className={cn(
+              "space-y-3 transition-all",
+              introRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+            )}
+            style={{ transitionDelay: introRevealed ? '300ms' : '0ms' }}
+          >
             <h2 className="text-base font-bold text-foreground select-none">What you'd not learn:</h2>
             <p className="text-sm text-muted-foreground leading-relaxed select-none">
               Specific meal plans, calorie targets, or medical advice. These articles focus on fasting structure and timing only.
             </p>
           </div>
-          <div className="space-y-3">
+          <div
+            className={cn(
+              "space-y-3 transition-all",
+              introRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+            )}
+            style={{ transitionDelay: introRevealed ? '450ms' : '0ms' }}
+          >
             <h2 className="text-base font-bold text-foreground select-none">The help you'd get:</h2>
             <p className="text-sm text-muted-foreground leading-relaxed select-none">
               Beginner-friendly guidance written in plain language, structured to help you make informed decisions about your fasting routine.
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div
+          className={cn(
+            "flex flex-wrap gap-3 transition-all",
+            introRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden"
+          )}
+          style={{ transitionDelay: introRevealed ? '600ms' : '0ms' }}
+        >
           <button
             onClick={handleProceed}
             className="px-6 py-3 rounded-full border border-border text-sm font-medium text-foreground bg-card hover:bg-secondary active:scale-95 transition-all duration-200 select-none"
@@ -121,7 +176,8 @@ return (
     <div className="max-w-3xl mx-auto space-y-12">
       <section
         ref={hRef}
-        className={cn("space-y-4 transition-all", hVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-4 transition-all", hVis || pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        style={{ transitionDelay: pageRevealed && !hVis ? '0ms' : '0ms' }}
       >
         <h1 className="text-4xl font-bold tracking-tight text-primary select-none">Fasting Guide</h1>
         <p className="text-muted-foreground leading-relaxed select-none">
@@ -133,7 +189,8 @@ return (
 
       <section
         ref={pRef}
-        className={cn("space-y-6 transition-all", pVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", pVis || pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        style={{ transitionDelay: pageRevealed && !pVis ? '150ms' : '0ms' }}
       >
         <h2 className="text-2xl font-bold select-none">Popular Protocols</h2>
         <div className="grid gap-4">
@@ -148,7 +205,8 @@ return (
 
       <section
         ref={mRef}
-        className={cn("space-y-6 transition-all", mVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", mVis || pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        style={{ transitionDelay: pageRevealed && !mVis ? '300ms' : '0ms' }}
       >
         <h2 className="text-2xl font-bold select-none">What Happens to Your Body?</h2>
         <div className="space-y-4">
@@ -165,7 +223,8 @@ return (
 
       <section
         ref={eRef}
-        className={cn("space-y-6 transition-all", eVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", eVis || pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        style={{ transitionDelay: pageRevealed && !eVis ? '450ms' : '0ms' }}
       >
         <h2 className="text-2xl font-bold select-none">Common Mistakes</h2>
         <ul className="space-y-4 list-disc pl-6 text-muted-foreground text-sm">
@@ -186,7 +245,8 @@ return (
 
       <section
         ref={tipRef}
-        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", tipVis || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", tipVis || pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        style={{ transitionDelay: pageRevealed && !tipVis ? '600ms' : '0ms' }}
       >
         <h2 className="text-xl font-bold mb-4 select-none">Pro Tip for Success</h2>
         <p className="text-sm text-muted-foreground leading-relaxed select-none">
@@ -195,7 +255,7 @@ return (
           should feel challenging but never painful or dangerous.
         </p>
       </section>
- 
+
       <section
         className={cn(
           "space-y-6 transition-all duration-700",
