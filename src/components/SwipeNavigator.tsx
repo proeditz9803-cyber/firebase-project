@@ -202,12 +202,14 @@ export function SwipeNavigator({ pageNodes }: SwipeNavigatorProps) {
           <div key={page.path} className="absolute top-0 left-0 w-full h-full overflow-y-auto bg-background"
             style={{ transform, zIndex, boxShadow: shadow, pointerEvents, transition: transitionStyle, willChange: 'transform' }}
             onTransitionEnd={isOutgoing ? handleTransitionEnd : undefined}>
-            <div className="container mx-auto px-4 py-8">{pageNodes[i]}</div>
+            <div className="container mx-auto px-4 py-8">
+              {React.cloneElement(pageNodes[i] as React.ReactElement, { isActive: i === currentPage })}
+            </div>
           </div>
         );
       })}
 
-  <div className="pointer-events-none fixed inset-0 z-[50]">
+      <div className="pointer-events-none fixed inset-0 z-[50]">
         <button
           onPointerDown={() => setLeftPressed(true)}
           onPointerUp={() => { setLeftPressed(false); commitPageTransition(currentPage - 1); }}
