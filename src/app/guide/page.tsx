@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { guideArticles } from '@/lib/guide-articles';
 
-export default function GuidePage() {
-  const pathname = usePathname();
+interface GuidePageProps {
+  isActive?: boolean;
+}
+
+export default function GuidePage({ isActive = false }: GuidePageProps) {
   const [ready, setReady] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
   const [introExiting, setIntroExiting] = useState(false);
@@ -36,14 +38,17 @@ export default function GuidePage() {
   }, [showIntro]);
 
   useEffect(() => {
-    if (pathname === '/guide' && !showIntro) {
+    if (isActive && !showIntro) {
       const timer = setTimeout(() => setPageRevealed(true), 80);
       return () => {
         clearTimeout(timer);
         setPageRevealed(false);
       };
     }
-  }, [pathname, showIntro]);
+    if (!isActive) {
+      setPageRevealed(false);
+    }
+  }, [isActive, showIntro]);
 
   const handleProceed = () => {
     sessionStorage.setItem('fastrack-guide-intro-seen', 'true');
