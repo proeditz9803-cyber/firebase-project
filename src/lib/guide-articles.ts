@@ -6,6 +6,7 @@ export interface GuideArticle {
   readTime: string;
   size: string;
   relatedIds: string[];
+  content?: string;
 }
 
 export const guideArticles: GuideArticle[] = [
@@ -21,6 +22,7 @@ export const guideArticles: GuideArticle[] = [
       'what-is-best-for-beginners',
       'what-is-16-8-18-6-and-omad-fasting-method',
     ],
+    content: '',
   },
   {
     id: 'common-mistakes-beginners-make-frequently',
@@ -33,6 +35,7 @@ export const guideArticles: GuideArticle[] = [
       'a-simple-guide-about-intermittent-fasting',
       'risks-of-fasting-too-aggressively',
     ],
+    content: '',
   },
   {
     id: 'what-is-best-for-beginners',
@@ -46,8 +49,10 @@ export const guideArticles: GuideArticle[] = [
       'what-is-16-8-18-6-and-omad-fasting-method',
       'what-is-different-between-16-8-18-6-and-omad',
     ],
+    content: '',
   },
-  {
+
+{
     id: 'what-is-16-8-18-6-and-omad-fasting-method',
     title: 'What is 16:8, 18:6 and OMAD fasting method',
     description: 'A clear explanation of each of the three major fasting protocols, how they work, and who they are designed for.',
@@ -58,6 +63,7 @@ export const guideArticles: GuideArticle[] = [
       'what-is-best-for-beginners',
       'what-is-different-between-16-8-18-6-and-omad',
     ],
+    content: '',
   },
   {
     id: 'what-is-different-between-16-8-18-6-and-omad',
@@ -70,6 +76,7 @@ export const guideArticles: GuideArticle[] = [
       'what-is-best-for-beginners',
       'what-is-16-8-18-6-and-omad-fasting-method',
     ],
+    content: '',
   },
   {
     id: 'risks-of-fasting-too-aggressively',
@@ -82,6 +89,7 @@ export const guideArticles: GuideArticle[] = [
       'a-simple-guide-about-intermittent-fasting',
       'common-mistakes-beginners-make-frequently',
     ],
+    content: '',
   },
 ];
 
