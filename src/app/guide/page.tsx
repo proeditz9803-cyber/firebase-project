@@ -14,7 +14,6 @@ export default function GuidePage({ isActive = false }: GuidePageProps) {
   const [showIntro, setShowIntro] = useState(false);
   const [introExiting, setIntroExiting] = useState(false);
   const [introRevealed, setIntroRevealed] = useState(false);
-  const [articlesVisible, setArticlesVisible] = useState(false);
   const [pageRevealed, setPageRevealed] = useState(false);
 
   useEffect(() => {
@@ -22,8 +21,6 @@ export default function GuidePage({ isActive = false }: GuidePageProps) {
     const sessionSeen = sessionStorage.getItem('fastrack-guide-intro-seen');
     if (!permanentlyDismissed && !sessionSeen) {
       setShowIntro(true);
-    } else {
-      setArticlesVisible(true);
     }
     setReady(true);
   }, []);
@@ -56,7 +53,6 @@ export default function GuidePage({ isActive = false }: GuidePageProps) {
     setTimeout(() => {
       setShowIntro(false);
       setIntroExiting(false);
-      setArticlesVisible(true);
     }, 500);
   };
 
@@ -67,7 +63,6 @@ export default function GuidePage({ isActive = false }: GuidePageProps) {
     setTimeout(() => {
       setShowIntro(false);
       setIntroExiting(false);
-      setArticlesVisible(true);
     }, 500);
   };
 
@@ -173,7 +168,7 @@ export default function GuidePage({ isActive = false }: GuidePageProps) {
 return (
     <div className="max-w-3xl mx-auto space-y-12">
       <section
-        className={cn("space-y-4 transition-all", pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-4 transition-all", pageRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
         style={{ transitionDelay: '0ms' }}
       >
         <h1 className="text-4xl font-bold tracking-tight text-primary select-none">Fasting Guide</h1>
@@ -185,7 +180,7 @@ return (
       </section>
 
       <section
-        className={cn("space-y-6 transition-all", pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", pageRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
         style={{ transitionDelay: pageRevealed ? '150ms' : '0ms' }}
       >
         <h2 className="text-2xl font-bold select-none">Popular Protocols</h2>
@@ -200,7 +195,7 @@ return (
       </section>
 
       <section
-        className={cn("space-y-6 transition-all", pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", pageRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
         style={{ transitionDelay: pageRevealed ? '300ms' : '0ms' }}
       >
         <h2 className="text-2xl font-bold select-none">What Happens to Your Body?</h2>
@@ -217,7 +212,7 @@ return (
       </section>
 
       <section
-        className={cn("space-y-6 transition-all", pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("space-y-6 transition-all", pageRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
         style={{ transitionDelay: pageRevealed ? '450ms' : '0ms' }}
       >
         <h2 className="text-2xl font-bold select-none">Common Mistakes</h2>
@@ -238,7 +233,7 @@ return (
       </section>
 
       <section
-        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", pageRevealed || articlesVisible ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        className={cn("p-8 bg-primary/10 rounded-2xl border border-primary/20 transition-all", pageRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
         style={{ transitionDelay: pageRevealed ? '600ms' : '0ms' }}
       >
         <h2 className="text-xl font-bold mb-4 select-none">Pro Tip for Success</h2>
@@ -250,12 +245,8 @@ return (
       </section>
 
       <section
-        className={cn(
-          "space-y-6 transition-all duration-700",
-          articlesVisible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-6 pointer-events-none"
-        )}
+        className={cn("space-y-6 transition-all", pageRevealed ? "scroll-reveal-visible" : "scroll-reveal-hidden")}
+        style={{ transitionDelay: pageRevealed ? '750ms' : '0ms' }}
       >
         <div className="space-y-1">
           <h2 className="text-2xl font-bold select-none">Guide Articles</h2>
