@@ -2,6 +2,49 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getArticleById, getRelatedArticles } from '@/lib/guide-articles';
 
+function renderContent(content: string | undefined): React.ReactNode {
+  if (!content || content.trim() === '') {
+    return (
+      <div className="min-h-48 rounded-2xl bg-card border border-border/50 flex items-center justify-center py-16">
+        <p className="text-sm text-muted-foreground/40 select-none">Article content coming soon.</p>
+      </div>
+    );
+  }
+
+  const blocks = content.split('\n\n');
+
+  return (
+    <div className="space-y-6">
+      {blocks.map((block, index) => {
+        if (block.startsWith('# ')) {
+          return (
+            <h2
+              key={index}
+              className="text-2xl font-bold text-foreground select-none mt-8 first:mt-0"
+            >
+              {block.slice(2)}
+            </h2>
+          );
+        }
+        const lines = block.split('\n');
+        return (
+          <p
+            key={index}
+            className="text-base text-muted-foreground leading-relaxed select-none"
+          >
+            {lines.map((line, lineIndex) => (
+              <span key={lineIndex}>
+                {line}
+                {lineIndex < lines.length - 1 && <br />}
+              </span>
+            ))}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export default async function ArticlePage({
   params,
 }: {
@@ -39,9 +82,7 @@ export default async function ArticlePage({
           {article.description}
         </p>
       </div>
-      <div className="min-h-48 rounded-2xl bg-card border border-border/50 flex items-center justify-center py-16">
-        <p className="text-sm text-muted-foreground/40 select-none">Article content coming soon.</p>
-      </div>
+      {renderContent(article.content)}
       {relatedArticles.length > 0 && (
         <div className="space-y-4">
           {relatedArticles.map((related) => (
